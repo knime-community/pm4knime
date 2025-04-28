@@ -198,8 +198,9 @@
         
         
         
-        <!-- 
+         
         <node category-path="/community/processmining/io/ioRead" factory-class="org.pm4knime.node.io.bpmn.reader.BpmnReaderNodeFactory"/>
+        <!--
         <node category-path="/community/processmining/io/ioWrite" factory-class="org.pm4knime.node.io.bpmn.writer.BpmnWriterNodeFactory"/>
         -->                               		
         

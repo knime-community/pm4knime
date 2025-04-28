@@ -37,7 +37,7 @@ public class PN2BPMNConverterNodeFactory extends WebUINodeFactory<PN2BPMNConvert
 					+ "			Flows, crucial for sequencing activities, delineate the order and connections between activities. These elements collectively provide a comprehensive visualization of business processes in BPMN, ensuring clarity in understanding and managing workflows")//
 			.modelSettingsClass(EmptyNodeSettings.class)//
 			.addInputPort("Petri net", PetriNetPortObject.TYPE, "a Petri net")//
-			.addOutputPort("Table", BpmnPortObject.TYPE ,"a Business Process Modeling Notation (BPMN)")//
+			.addOutputPort("BPMN", BpmnPortObject.TYPE ,"a Business Process Modeling Notation (BPMN)")//
 			.nodeType(NodeType.Manipulator)
 			.build();
 
