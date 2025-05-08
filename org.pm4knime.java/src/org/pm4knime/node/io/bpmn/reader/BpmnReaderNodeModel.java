@@ -1,6 +1,9 @@
 package org.pm4knime.node.io.bpmn.reader;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.knime.core.node.port.PortObjectSpec;
@@ -25,18 +28,26 @@ public class BpmnReaderNodeModel extends ReaderNodeModel {
 
 		bpmn_po = new BpmnPortObject();
 		
+		int nRead;
+        byte[] data = new byte[1024];
+        try {
+        	ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            
+			while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+			    buffer.write(data, 0, nRead);
+			}
+			
+			String xmlContent = buffer.toString(StandardCharsets.UTF_8);
+			buffer.flush();
+	        bpmn_po = new BpmnPortObject(xmlContent);
 
-		try {
-			List<Object> imported_data = BpmnPortObject.importBPMNDiagram(inputStream);
-			String model_xml = (String) imported_data.get(1);
-			bpmn_po = new BpmnPortObject(model_xml);
-//			boolean enable_auto_layout = (boolean) imported_data.get(0);
-			bpmn_po.disable_auto_layout();
-			
-			
-		} catch (Exception e) {
+		} catch (IOException e) {
+			System.out.println(e);
 			e.printStackTrace();
 		}
+        
+                bpmn_po.disable_auto_layout();
+
 		return bpmn_po;
 	}
 

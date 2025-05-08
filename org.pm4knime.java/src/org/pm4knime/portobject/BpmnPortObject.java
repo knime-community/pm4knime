@@ -1,14 +1,9 @@
 package org.pm4knime.portobject;
 
-import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
@@ -90,118 +85,67 @@ public class BpmnPortObject extends AbstractJSONPortObject {
 		return new JComponent[] {};
 	}
 
-
 	@Override
-	protected void save(PortObjectZipOutputStream out, ExecutionMonitor exec)
-			throws IOException, CanceledExecutionException {
+    protected void save(PortObjectZipOutputStream out, ExecutionMonitor exec)
+            throws IOException, CanceledExecutionException {
+        // Saves the *current static* values
 
-		
-		byte[] xmlBytes = model_xml.getBytes(StandardCharsets.UTF_8);
+        ZipEntry entry = new ZipEntry(ZIP_ENTRY_NAME);
+        out.putNextEntry(entry);
 
-	    // 2) start the ZIP entry
-	    ZipEntry entry = new ZipEntry(ZIP_ENTRY_NAME);
-	    // (optional) help ZIP know the uncompressed size
-	    entry.setSize(1 + 4 + xmlBytes.length);  
-	    out.putNextEntry(entry);
-
-	    // 3) write boolean, length, then raw bytes
-	    DataOutputStream dataOut = new DataOutputStream(out);
-	    dataOut.writeBoolean(enable_auto_layout);
-	    dataOut.writeInt(xmlBytes.length);
-	    dataOut.write(xmlBytes);
-	    dataOut.flush();          // push into the ZIP entry
-
-	    // 4) close *only* the entry
-	    out.closeEntry();
-		
-		
-//		out.putNextEntry(new ZipEntry(ZIP_ENTRY_NAME));
-//		
-//		// Wrap only the entry in an ObjectOutputStream
-//	    
-//		 try (DataOutputStream dataOut = new DataOutputStream(out)) {
-//		        dataOut.writeBoolean(enable_auto_layout);
-//		        dataOut.writeUTF(model_xml);
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//
-//		out.close();
-	}
-
-//	public static String exportBPMNDiagram(final BPMNDiagram diagram) throws Exception {
-//		   
-//		final UIContext context = new UIContext();
-//		final UIPluginContext uiPluginContext = context.getMainPluginContext();
-//		SwingUtilities.invokeLater(new Runnable() {
-//			@Override
-//			public void run() {
-//				try {
-//					UIManager.setLookAndFeel(new MetalLookAndFeel());
-//				} catch (UnsupportedLookAndFeelException e) {
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		});
-//		final BpmnDefinitions.BpmnDefinitionsBuilder definitionsBuilder = new BpmnDefinitions.BpmnDefinitionsBuilder(
-//				(PluginContext) uiPluginContext, diagram);
-//		final BpmnDefinitions definitions = new BpmnDefinitions("definitions", definitionsBuilder);
-//		final StringBuilder sb = new StringBuilder();
-//		sb.append(
-//				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<definitions xmlns=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"\n xmlns:dc=\"http://www.omg.org/spec/DD/20100524/DC\"\n xmlns:bpmndi=\"http://www.omg.org/spec/BPMN/20100524/DI\"\n xmlns:di=\"http://www.omg.org/spec/DD/20100524/DI\"\n xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n targetNamespace=\"http://www.omg.org/bpmn20\"\n xsi:schemaLocation=\"http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd\">");
-//		sb.append(definitions.exportElements());
-//		sb.append("</definitions>");
-//		String result = sb.toString();
-//		result = result.replaceAll("\n", "&#10;");
-//		result = result.replaceAll(">&#10;", ">\n");
-//		result = result.replaceAll("\"&#10;", "\"\n");
-//		result = result.replaceFirst("<bpmndi:BPMNDiagram>.*</bpmndi:BPMNDiagram>", "");
-//		result = result.replaceAll("<[a-zA-Z]+:[a-zA-Z]+/>", "");
-//		
-//		
-//		List<String> tags = Arrays.asList("task", "endEvent", "startEvent"); 
-//		
-//		return result;
-//	}
+        DataOutputStream dataOut = new DataOutputStream(out);
+        dataOut.writeBoolean(BpmnPortObject.enable_auto_layout); // Save static field
+        if (BpmnPortObject.model_xml != null) {
+            byte[] xmlBytes = BpmnPortObject.model_xml.getBytes(StandardCharsets.UTF_8);
+            dataOut.writeInt(xmlBytes.length);
+            dataOut.write(xmlBytes);
+        } else {
+            dataOut.writeInt(-1); // Convention for null string
+        }
+        dataOut.flush();
+        out.closeEntry();
+    }
 	
 	public static String exportBPMNDiagram() throws Exception {		   
 		return model_xml;
 	}
-
 	
 
 	@Override
-	protected void load(PortObjectZipInputStream in, PortObjectSpec spec, ExecutionMonitor exec)
-			throws IOException, CanceledExecutionException {
-		
-		System.out.println("Entered load");		
-		final ZipEntry entry = in.getNextEntry();
+    protected void load(PortObjectZipInputStream in, PortObjectSpec spec, ExecutionMonitor exec)
+            throws IOException, CanceledExecutionException {
+     
+        System.out.println("BpmnPortObject: Entered load (will update static fields)");
+        final ZipEntry entry = in.getNextEntry();
+        if (entry == null) {
+            throw new IOException("Failed to load BPMN port object. No zip entry found.");
+        }
+        if (!ZIP_ENTRY_NAME.equals(entry.getName())) {
+            throw new IOException("Failed to load BPMN port object. Invalid zip entry name '" + entry.getName()
+                                  + "', expected '" + ZIP_ENTRY_NAME + "'.");
+        }
 
-		if (!ZIP_ENTRY_NAME.equals(entry.getName())) {
-			throw new IOException("Failed to load BPMN port object. " + "Invalid zip entry name '" + entry.getName()
-					+ "', expected '" + ZIP_ENTRY_NAME + "'.");
-		}
-		
-		
-		
-		
-		try {
-			setSpec((BpmnPortObjectSpec) spec);
-			List<Object> imported_data;
-			imported_data = importBPMNDiagram(in);
-			enable_auto_layout = (boolean) imported_data.get(0);
-			model_xml = (String) imported_data.get(1);
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		in.closeEntry(); 
-		
-		
-	}
+        this.setSpec(spec); 
+
+        DataInputStream dataIn = new DataInputStream(in);
+
+        BpmnPortObject.enable_auto_layout = dataIn.readBoolean();
+        int len = dataIn.readInt();
+        if (len == -1) {
+            BpmnPortObject.model_xml = null;
+        } else if (len < 0) {
+            throw new IOException("Invalid length for BPMN XML: " + len);
+        } else if (len == 0) {
+            BpmnPortObject.model_xml = "";
+        }
+        else {
+            byte[] xmlBytes = new byte[len];
+            dataIn.readFully(xmlBytes); 
+            BpmnPortObject.model_xml = new String(xmlBytes, StandardCharsets.UTF_8);
+        }
+        in.closeEntry();
+        System.out.println("BpmnPortObject: Load successful (static fields updated).");
+    }
 	
 	
 	public static List<Object> importBPMNDiagram(InputStream inputStream) throws Exception {
@@ -215,17 +159,6 @@ public class BpmnPortObject extends AbstractJSONPortObject {
 	    dataIn.readFully(xmlBytes);
 	    model_xml = new String(xmlBytes, StandardCharsets.UTF_8);
 		
-//		try (DataInputStream dataIn = new DataInputStream(inputStream)) {
-//	        enable_auto_layout = dataIn.readBoolean();
-//	        model_xml = dataIn.readUTF();
-//	        System.out.print("READ");
-//	        System.out.print(model_xml);
-//	        
-//	    } catch (Exception e) {
-//	    	System.out.print("FAILED");
-//	    	System.out.print(e);
-//	        e.printStackTrace();
-//	    }
 		
 		res = List.of(enable_auto_layout, model_xml);
 		return res;
