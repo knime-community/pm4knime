@@ -1,4 +1,4 @@
-async function createBpmn(xmlString) {
+async function createBpmn(xmlString, layouter) {
 	const mainContainer = document.createElement("div");
 	mainContainer.id = "main";
 	mainContainer.style.display = "flex";
@@ -77,12 +77,19 @@ async function createBpmn(xmlString) {
 	mainContainer.appendChild(bpmnDiv);
 
 	document.body.appendChild(mainContainer);
-
-	try {
-		xmlString = await bpmnLayoutWithDagre(xmlString);
-	} catch (err) {
-		console.error('err: ', err.stack);
+	
+	if (layouter) {
+		console.error('layouter applied: ', layouter);
+		try {
+			xmlString = await bpmnLayoutWithDagre(xmlString);
+		} catch (err) {
+			console.error('err: ', err.stack);
+		}
+	} else {
+		console.error('layouter skipped: ', layouter);		
 	}
+
+	
 
 	modelXmlString = xmlString;
 	const viewer = new BpmnJS({

@@ -83,7 +83,7 @@ public class BpmnWriterNodeModel extends DefaultNodeModel {
                     "Output file '" + e.getFile() + "' exists and must not be overwritten due to user settings.", e);
             }
 
-            BpmnPortObject.exportBPMNDiagramToFile(outStream, bpmnObj.getBPMN());
+//            BpmnPortObject.exportBPMNDiagramToFile(outStream, bpmnObj.getBPMN());
         	
         	outStream.close();
         }

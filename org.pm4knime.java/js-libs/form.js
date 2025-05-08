@@ -33,10 +33,11 @@ let process_tree_flag = 0;
 			let nodes = jsonDataFromJava.nodes;
 			let edges = jsonDataFromJava.links;
 			let xml = jsonDataFromJava.xml;
+			let layouter = jsonDataFromJava.layouter;
 
 			if (xml) {
 				let xmlString = xml[0];
-				createBpmn(xmlString);
+				createBpmn(xmlString, layouter[0]);
 			} else {
 				createGraphElements();
 				_paper = createPaper(nodes, edges);

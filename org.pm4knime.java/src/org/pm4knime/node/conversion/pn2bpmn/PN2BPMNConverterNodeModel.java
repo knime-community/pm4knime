@@ -62,9 +62,8 @@ import org.pm4knime.node.io.bpmn.writer.BPMNExporter;
 @SuppressWarnings("restriction")
 public class PN2BPMNConverterNodeModel extends
 		AbstractSVGWizardNodeModel<JSGraphVizViewRepresentation, JSGraphVizViewValue> implements PortObjectHolder {
-	// Define class-level variables
-	protected AbstractJSONPortObject bpmnPO; // Store the BPMN PortObject
-	protected PetriNetPortObject pnPO; // Store the Petri net PortObject
+	protected AbstractJSONPortObject bpmnPO; 
+	protected PetriNetPortObject pnPO;
 	private Place initialPlace;
 	private Transition initialTransition;
 
@@ -72,15 +71,6 @@ public class PN2BPMNConverterNodeModel extends
 
 	private final Class<EmptyNodeSettings> m_settingsClass;
 
-	/**
-	 * Constructor for the node model.
-	 */
-//    public PN2BPMNConverterNodeModel() {
-//        // Call the constructor of the parent class with input and output PortTypes and a node name
-//        super(new PortType[] { PetriNetPortObject.TYPE },
-//                new PortType[] { BpmnPortObject.TYPE }, "BPMN JS View");
-//                 
-//    }
 
 	public PN2BPMNConverterNodeModel(Class<EmptyNodeSettings> modelSettingsClass) {
 		// TODO Auto-generated constructor stub
@@ -88,25 +78,18 @@ public class PN2BPMNConverterNodeModel extends
 		m_settingsClass = modelSettingsClass;
 	}
 
-	// Override the method to create PortObjects during execution
 	@Override
 	protected PortObject[] performExecuteCreatePortObjects(final PortObject svgImageFromView,
 			final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
 		return new PortObject[] { bpmnPO };
 	}
 
-	// Override the method to create the node view during execution
 	@Override
 	protected void performExecuteCreateView(PortObject[] inObjects, ExecutionContext exec) throws Exception {
 		pnPO = (PetriNetPortObject) inObjects[0]; // Get the Petrinet PortObject from input
 		AcceptingPetriNet petrinet = pnPO.getANet();// Get the Petrinet from the PortObject
 
-		// You can then access the BPMN diagram, transition conversion map, and place
-		// conversion map from the result
 		BPMNDiagram bpmnDiagram = convert(petrinet);
-
-		// Create a BpmnPortObject from the AcceptingBPMN
-		// bpmnPO = new BpmnPortObject(bpmnDiagram);
 
 		String model_xml = BPMNExporter.convertToXML(bpmnDiagram);
 		bpmnPO = new BpmnPortObject(model_xml);
@@ -263,31 +246,6 @@ public class PN2BPMNConverterNodeModel extends
 		} while (hasDeadPlaces);
 	}
 
-///**
-// * Retrieve initial marking for a Petri net graph
-// * 
-// * @param context
-// * @param petrinetGraph
-// * @return
-// */
-//private Marking retrieveInitialMarking(PluginContext context, PetrinetGraph petrinetGraph) {
-//	Marking marking = new Marking();
-//	try {
-//		InitialMarkingConnection initialMarkingConnection = context.getConnectionManager().getFirstConnection(
-//				InitialMarkingConnection.class, context, petrinetGraph);
-//		marking = initialMarkingConnection.getObjectWithRole(InitialMarkingConnection.MARKING);
-//		if ((marking != null) && (marking.size() == 0)) {
-//			Place sourcePlace = retrieveSourcePlace(petrinetGraph);
-//			if (sourcePlace != null) {
-//				marking.add(sourcePlace);
-//			}
-//		}
-//	} catch (ConnectionCannotBeObtained e) {
-//		Place sourcePlace = retrieveSourcePlace(petrinetGraph);
-//		marking.add(sourcePlace);
-//	}
-//	return marking;
-//}
 
 	private Place retrieveSourcePlace(PetrinetGraph petrinetGraph) {
 		for (Place place : petrinetGraph.getPlaces()) {
@@ -353,26 +311,7 @@ public class PN2BPMNConverterNodeModel extends
 		}
 	}
 
-///**
-// * Check whether Petri net is a Free-Choice
-// * 
-// * @param context
-// * @param petrinetGraph
-// * @return
-// */
-//private boolean petriNetIsFreeChoice(PluginContext context, PetrinetGraph petrinetGraph) {
-//	NetAnalysisInformation.FREECHOICE fCRes = null;
-//	try {
-//		fCRes = context.tryToFindOrConstructFirstObject(NetAnalysisInformation.FREECHOICE.class,
-//				FreeChoiceInfoConnection.class, "Free Choice information of " + petrinetGraph.getLabel(),
-//				petrinetGraph);
-//	} catch (ConnectionCannotBeObtained e) {
-//		context.log("Can't obtain connection for " + petrinetGraph.getLabel());
-//		e.printStackTrace();
-//	}
-//	return fCRes.getValue().equals(UnDetBool.TRUE);
-//}
-
+	
 	/**
 	 * Delete reset arcs
 	 * 
@@ -588,19 +527,6 @@ public class PN2BPMNConverterNodeModel extends
 	/**
 	 * {@inheritDoc}
 	 */
-//    @Override
-//    protected void saveSettingsTo(final NodeSettingsWO settings) {
-//         // TODO: generated method stub
-//    }
-//
-//    /**
-//     * {@inheritDoc}
-//     */
-//    @Override
-//    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-//            throws InvalidSettingsException {
-//        // TODO: generated method stub
-//    }
 
 	@Override
 	protected void saveSettingsTo(final NodeSettingsWO settings) {

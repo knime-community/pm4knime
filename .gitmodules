@@ -1,0 +1,3 @@
+[submodule "org.pm4knime.python/libs/promoai"]
+	path = org.pm4knime.python/libs/promoai
+	url = https://github.com/humam-kourani/ProMoAI.git
