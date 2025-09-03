@@ -8,9 +8,11 @@ import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
 import org.pm4knime.portobject.BpmnPortObject;
 import org.pm4knime.util.defaultnode.ReaderNodeSettings;
 
-@SuppressWarnings("restriction")
+
 public class BpmnReaderNodeFactory extends WebUINodeFactory<BpmnReaderNodeModel> implements
 		WizardNodeFactoryExtension<BpmnReaderNodeModel, JSGraphVizViewRepresentation, JSGraphVizViewValue> {
+
+	BpmnReaderNodeModel node;
 
 	private static final WebUINodeConfiguration CONFIG = WebUINodeConfiguration.builder()
 			.name("BPMN Reader").icon("../../read.png")
