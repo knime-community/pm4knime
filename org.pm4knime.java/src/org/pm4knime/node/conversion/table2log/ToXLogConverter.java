@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.deckfour.xes.extension.XExtension;
 import org.deckfour.xes.extension.std.XConceptExtension;
@@ -25,6 +27,7 @@ import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.def.BooleanCell;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.IntCell;
@@ -66,44 +69,30 @@ public class ToXLogConverter {
 	
 	NodeLogger logger;
 	
-	// need to check if we have the available values for it. But else, we don't need here
-//	private int instanceCounter = 0;
-	
-	// save trace attributes set
 	private Map<String, DataCell> traceAttrMap = new HashMap<String, DataCell>();
 	
-//	DateTimeFormatter df ; //;
 	
-	//SMTable2XLogConfig config;
-		
-//	public void setConfig() {
-//		//this.config = m_config;
-//		factory = config.getFactory();
-//	}
-		
-	
-	/**
-	 * convert CSV data table into xlog, but we need to know the column index,
-	 * so we know which one is which event?
-	 * @param m_settings2 
-	 * @param exec 
-	 * @param logName
-	 * @throws CanceledExecutionException 
-	 */
 	public void convertDataTable2Log(BufferedDataTable csvData, Table2XLogConverterNodeSettings m_settings2, ExecutionContext exec) throws CanceledExecutionException {
 		
-		// get trace and event attribute available sets here 
-		//List<String> traceColumns= config.getMTraceAttrSet().getIncludeList();
 		this.m_settings = m_settings2;
 		this.factory = XFactoryRegistry.instance().currentDefault();
-		List<String> traceColumns = Arrays.asList(m_settings.m_columnFilterTrace);
-		// find the idx for it, for once 
-		//List<String> eventColumns= config.getMEventAttrSet().getIncludeList();
-		List<String> eventColumns = Arrays.asList(m_settings.m_columnFilterEvent);
-	
+		DataTableSpec spec = csvData.getDataTableSpec();
+		String[] all_columns = spec.getColumnNames();
 		
-		int[] traceColIndices = csvData.getDataTableSpec().columnsToIndices(traceColumns.toArray(new String[0]));
-		int[] eventColIndices = csvData.getDataTableSpec().columnsToIndices(eventColumns.toArray(new String[0]));
+		String[] traceColumns = m_settings.m_columnFilterTrace.filterFromFullSpec(spec);
+		List<String> traceList = Arrays.asList(traceColumns);
+		Set<String> traceSet = new HashSet<>(traceList);
+		
+		List<String> eventList = new ArrayList<>();
+		for (String col : all_columns) {
+		    if (!traceSet.contains(col)) {
+		        eventList.add(col);
+		    }
+		}
+		String[] eventColumns = eventList.toArray(new String[0]);
+		
+		int[] traceColIndices = csvData.getDataTableSpec().columnsToIndices(traceColumns);
+		int[] eventColIndices = csvData.getDataTableSpec().columnsToIndices(eventColumns);
 		boolean[] traceColVisited = new boolean[traceColIndices.length];
 		boolean[] eventColVisited = new boolean[eventColIndices.length];
 		
@@ -112,8 +101,8 @@ public class ToXLogConverter {
 //		caseIDIdx = traceColumns.indexOf(config.getMCaseID().getStringValue());
 //		eventClassIdx = eventColumns.indexOf(config.getMEventClass().getStringValue());
 //		
-		caseIDIdx = traceColumns.indexOf(m_settings.case_id);
-		eventClassIdx = eventColumns.indexOf(m_settings.event_class);
+		caseIDIdx = traceList.indexOf(m_settings.case_id);
+		eventClassIdx = eventList.indexOf(m_settings.event_class);
 
 //		String tsFormat = config.getMTSFormat().getStringValue();
 //		df = DateTimeFormatter.ofPattern(tsFormat);
@@ -128,7 +117,7 @@ public class ToXLogConverter {
 			// only when it is no-available, it can be excluded. But we test it in configuration part.
 			withLifecycle = true;
 			//lifecycleIdx = eventColumns.indexOf(config.getMLifecycle().getStringValue());
-			lifecycleIdx = eventColumns.indexOf(m_settings.life_cycle);
+			lifecycleIdx = eventList.indexOf(m_settings.life_cycle);
 			eventColVisited[lifecycleIdx] =  true;
 		}
 		
@@ -139,7 +128,7 @@ public class ToXLogConverter {
 			withTimeStamp = true;
 			// complete time the time stamp here in default
 			//tsIdx = eventColumns.indexOf(config.getMTimeStamp().getStringValue());
-			tsIdx = eventColumns.indexOf(m_settings.time_stamp);
+			tsIdx = eventList.indexOf(m_settings.time_stamp);
 			eventColVisited[tsIdx] =  true;
 		}
 		
@@ -172,16 +161,16 @@ public class ToXLogConverter {
 			for(int tIdx = 0; tIdx< traceColIndices.length ; tIdx++) {
 				if(traceColVisited[tIdx])
 					continue; 
-				if(traceAttrMap.containsKey(traceColumns.get(tIdx))) {
+				if(traceAttrMap.containsKey(traceList.get(tIdx))) {
 					// if contains value, compare if they are same 
-					if(!traceAttrMap.get(traceColumns.get(tIdx)).equals(row.getCell(traceColIndices[tIdx]))) {
+					if(!traceAttrMap.get(traceList.get(tIdx)).equals(row.getCell(traceColIndices[tIdx]))) {
 //						System.out.println("Error happens with the trace Attributes here");
 						errorDetected = true;
 						break;
 					}
 				}else {
 					// for the values there, we deal with it later 
-					traceAttrMap.put(traceColumns.get(tIdx), row.getCell(traceColIndices[tIdx]));
+					traceAttrMap.put(traceList.get(tIdx), row.getCell(traceColIndices[tIdx]));
 				}
 			}
 
@@ -224,7 +213,7 @@ public class ToXLogConverter {
 					continue;
 
 				DataCell otherData = row.getCell(eventColIndices[eIdx]);
-				String attrName = eventColumns.get(eIdx);
+				String attrName = eventList.get(eIdx);
 				assignAttributeWithDataCell(currentEvent, otherData, attrName);
 			}
 			

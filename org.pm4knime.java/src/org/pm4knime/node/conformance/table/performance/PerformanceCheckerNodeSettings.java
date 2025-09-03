@@ -1,12 +1,12 @@
 package org.pm4knime.node.conformance.table.performance;
 
-import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeSettings;
-import org.knime.core.webui.node.dialog.defaultdialog.layout.After;
-import org.knime.core.webui.node.dialog.defaultdialog.layout.Layout;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.Widget;
+import org.knime.node.parameters.NodeParameters;
+import org.knime.node.parameters.layout.After;
+import org.knime.node.parameters.layout.Layout;
+import org.knime.node.parameters.Widget;
 
-@SuppressWarnings("restriction")
-public final class PerformanceCheckerNodeSettings implements DefaultNodeSettings {
+
+public final class PerformanceCheckerNodeSettings implements NodeParameters {
 	
 	public static interface PerformanceDialogLayout {
 	    

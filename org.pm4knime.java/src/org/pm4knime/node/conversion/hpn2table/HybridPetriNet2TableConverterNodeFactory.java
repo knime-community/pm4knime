@@ -6,7 +6,7 @@ import org.knime.core.webui.node.impl.WebUINodeFactory;
 import org.pm4knime.portobject.HybridPetriNetPortObject;
 
 
-@SuppressWarnings("restriction")
+
 public class HybridPetriNet2TableConverterNodeFactory extends WebUINodeFactory<HybridPetriNet2TableConverterNodeModel> {
 
 	HybridPetriNet2TableConverterNodeModel node;

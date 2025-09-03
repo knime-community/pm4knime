@@ -16,7 +16,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
-import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeSettings;
+import org.knime.core.webui.node.dialog.defaultdialog.NodeParametersUtil;
 
 
 
@@ -25,27 +25,23 @@ public class MergeTableNodeModel extends NodeModel {
 	
 	private static final NodeLogger logger = NodeLogger.getLogger(MergeTableNodeModel.class);
 	
-	protected MergeTableNodeSettings m_settings;
+	protected MergeTableNodeSettings m_settings = new MergeTableNodeSettings();
     
 	
 	protected MergeTableNodeModel() {
-        super(new PortType[] { BufferedDataTable.TYPE, BufferedDataTable.TYPE }, new PortType[] { BufferedDataTable.TYPE });         
+        super(new PortType[] { BufferedDataTable.TYPE, BufferedDataTable.TYPE }, new PortType[] { BufferedDataTable.TYPE });    
+        
     }
 
     
     @Override
     protected final PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
-        if (m_settings == null) {
-            m_settings = DefaultNodeSettings.createSettings(MergeTableNodeSettings.class, inSpecs);
-        }
         return configure(inSpecs, m_settings);
     }
 
     @Override
     protected final DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
-        if (m_settings == null) {
-            m_settings = DefaultNodeSettings.createSettings(MergeTableNodeSettings.class, inSpecs);
-        }
+ 
         return (DataTableSpec[]) configure(inSpecs, m_settings);
     }
     
@@ -76,12 +72,12 @@ public class MergeTableNodeModel extends NodeModel {
 		BufferedDataTable log1 = ((BufferedDataTable) inData[1]);
 		
 		BufferedDataTable mlog = null;
-    	if(m_settings.m_strategy.equals(MergeTableNodeSettings.CFG_TRACE_STRATEGY[0])) {
+    	if(m_settings.m_strategy.equals(MergeTableNodeSettings.CFG_TRACE_STRATEGY.get(0))) {
 			mlog = MergeTableUtil.mergeTablesSeparate(log0, log1, m_settings.t_classifier_0, m_settings.t_classifier_1, exec);
-		} else if(m_settings.m_strategy.equals(MergeTableNodeSettings.CFG_TRACE_STRATEGY[1])) {
+		} else if(m_settings.m_strategy.equals(MergeTableNodeSettings.CFG_TRACE_STRATEGY.get(1))) {
 			mlog = MergeTableUtil.mergeLogsIgnoreTrace(log0, log1, m_settings.t_classifier_0, m_settings.t_classifier_1, exec);
 			
-		} else if(m_settings.m_strategy.equals(MergeTableNodeSettings.CFG_TRACE_STRATEGY[2])) {
+		} else if(m_settings.m_strategy.equals(MergeTableNodeSettings.CFG_TRACE_STRATEGY.get(2))) {
 			mlog = MergeTableUtil.mergeLogsMergeTraces(log0, log1, m_settings.t_classifier_0, m_settings.t_classifier_1, exec);
 		}else {
 			System.out.println("Invalid strategy!");
@@ -111,14 +107,14 @@ public class MergeTableNodeModel extends NodeModel {
 	@Override
     protected final void saveSettingsTo(final NodeSettingsWO settings) {
         if (m_settings != null) {
-            DefaultNodeSettings.saveSettings(MergeTableNodeSettings.class, m_settings, settings);
+        	NodeParametersUtil.saveSettings(MergeTableNodeSettings.class, m_settings, settings);
         }
     }
 
 
     @Override
     protected final void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_settings = DefaultNodeSettings.loadSettings(settings, MergeTableNodeSettings.class);
+        m_settings = NodeParametersUtil.loadSettings(settings, MergeTableNodeSettings.class);
     }
 
 

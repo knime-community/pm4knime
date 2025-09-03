@@ -1,14 +1,14 @@
 package org.pm4knime.node.conformance.table.fitness;
 
 import org.knime.core.node.BufferedDataTable;
-import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeSettings;
+import org.knime.node.parameters.NodeParameters;
 import org.knime.core.webui.node.impl.WebUINodeConfiguration;
 import org.knime.core.webui.node.impl.WebUINodeFactory;
 import org.pm4knime.portobject.RepResultPortObjectTable;
 import org.pm4knime.util.defaultnode.EmptyNodeSettings;
 
 
-@SuppressWarnings("restriction")
+
 public class FitnessCheckerNodeFactory extends WebUINodeFactory<FitnessCheckerNodeModel> {
 
 	FitnessCheckerNodeModel node;

@@ -8,7 +8,7 @@ import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
 import org.pm4knime.portobject.CausalGraphPortObject;
 import org.pm4knime.portobject.HybridPetriNetPortObject;
 
-@SuppressWarnings("restriction")
+
 public final class HybridMinerNodeFactory extends WebUINodeFactory<HybridMinerNodeModel> implements WizardNodeFactoryExtension<HybridMinerNodeModel, JSGraphVizViewRepresentation, JSGraphVizViewValue> {
 
 	HybridMinerNodeModel node;

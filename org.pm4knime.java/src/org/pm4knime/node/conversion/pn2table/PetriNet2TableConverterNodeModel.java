@@ -10,8 +10,6 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.defaultnodesettings.SettingsModelString;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,13 +23,14 @@ import org.knime.core.data.def.DefaultRow;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
-import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeSettings;
+import org.knime.core.webui.node.dialog.defaultdialog.NodeParametersUtil;
 import org.pm4knime.portobject.PetriNetPortObject;
 import org.pm4knime.portobject.PetriNetPortObjectSpec;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 
-@SuppressWarnings("restriction")
 
+
+@SuppressWarnings("restriction")
 public class PetriNet2TableConverterNodeModel extends NodeModel {
 
 	private static final NodeLogger logger = NodeLogger.getLogger(PetriNet2TableConverterNodeModel.class);
@@ -151,7 +150,7 @@ public class PetriNet2TableConverterNodeModel extends NodeModel {
 	@Override
 	protected void saveSettingsTo(final NodeSettingsWO settings) {
 		if (m_settings != null) {
-			DefaultNodeSettings.saveSettings(m_settingsClass, m_settings, settings);
+			NodeParametersUtil.saveSettings(m_settingsClass, m_settings, settings);
 		}
 	}
 
@@ -161,7 +160,7 @@ public class PetriNet2TableConverterNodeModel extends NodeModel {
 	
 	@Override
 	protected final void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-		validateSettings(DefaultNodeSettings.loadSettings(settings, m_settingsClass));
+		validateSettings(NodeParametersUtil.loadSettings(settings, m_settingsClass));
 	}
 
 	private void validateSettings(PetriNet2TableConverterNodeSettings settings) {
@@ -175,7 +174,7 @@ public class PetriNet2TableConverterNodeModel extends NodeModel {
 	@Override
 	protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
 			throws InvalidSettingsException {        
-		m_settings = DefaultNodeSettings.loadSettings(settings, m_settingsClass);
+		m_settings = NodeParametersUtil.loadSettings(settings, m_settingsClass);
 	}
 
 	@Override

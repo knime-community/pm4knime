@@ -61,8 +61,9 @@ def is_binary(column: knext.Column) -> bool:
     return column.ktype == knext.blob
 
 
-def is_local_date(column: knext.Column) -> bool:
-    return __is_type_x(column, "org.knime.core.data.v2.time.LocalDateTimeValueFactory")
+def is_date(column: knext.Column) -> bool:
+    return column.ktype == knext.datetime()
+
 
 
 def is_petri_net(column: knext.Column) -> bool:

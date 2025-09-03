@@ -4,7 +4,7 @@ import org.knime.core.webui.node.impl.WebUINodeConfiguration;
 import org.knime.core.webui.node.impl.WebUINodeFactory;
 import org.pm4knime.portobject.XLogPortObject;
 
-@SuppressWarnings("restriction")
+
 public class MXMLImporterNodeFactory extends WebUINodeFactory<MXMLImporterNodeModel>  {
 
 	MXMLImporterNodeModel node;

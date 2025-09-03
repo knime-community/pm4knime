@@ -15,7 +15,7 @@ import org.pm4knime.portobject.DfgMsdPortObject;
 import org.pm4knime.portobject.PetriNetPortObject;
 
 
-@SuppressWarnings("restriction")
+
 public class DfgMinerTableNodeFactory extends WebUINodeFactory<DfgMinerTableNodeModel> implements WizardNodeFactoryExtension<DfgMinerTableNodeModel, JSGraphVizViewRepresentation, JSGraphVizViewValue> {
 	
 	DfgMinerTableNodeModel node;

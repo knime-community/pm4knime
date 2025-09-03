@@ -6,7 +6,7 @@ import org.knime.core.webui.node.impl.WebUINodeFactory;
 import org.pm4knime.portobject.XLogPortObject;
 import org.pm4knime.util.defaultnode.EmptyNodeSettings;
 
-@SuppressWarnings("restriction")
+
 public class XLog2TableConverterNodeFactory extends WebUINodeFactory<XLog2TableConverterNodeModel> {
 
 	XLog2TableConverterNodeModel node;

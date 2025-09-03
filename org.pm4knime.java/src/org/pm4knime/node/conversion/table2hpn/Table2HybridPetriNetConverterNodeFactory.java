@@ -9,7 +9,7 @@ import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewRepresentation;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
 import org.pm4knime.portobject.HybridPetriNetPortObject;
 
-@SuppressWarnings("restriction")
+
 public class Table2HybridPetriNetConverterNodeFactory extends WebUINodeFactory<Table2HybridPetriNetConverterNodeModel> implements WizardNodeFactoryExtension<Table2HybridPetriNetConverterNodeModel, JSGraphVizViewRepresentation, JSGraphVizViewValue> {
 
 	Table2HybridPetriNetConverterNodeModel node;

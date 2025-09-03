@@ -5,7 +5,7 @@ import org.knime.core.webui.node.impl.WebUINodeConfiguration;
 import org.knime.core.webui.node.impl.WebUINodeFactory;
 
 
-@SuppressWarnings("restriction")
+
 public final class FilterByLengthTableNodeFactory extends WebUINodeFactory<FilterByLengthTableNodeModel> {
 
 	FilterByLengthTableNodeModel node;

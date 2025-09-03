@@ -1,20 +1,16 @@
 package org.pm4knime.util.defaultnode;
 
-import org.knime.core.data.DataColumnSpec;
-import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.StringValue;
-import org.knime.core.data.time.localdatetime.LocalDateTimeCellFactory;
-import org.knime.core.data.time.zoneddatetime.ZonedDateTimeCellFactory;
-import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeSettings;
-import org.knime.core.webui.node.dialog.defaultdialog.layout.Layout;
-import org.knime.core.webui.node.dialog.defaultdialog.layout.Section;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.ChoicesProvider;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.ChoicesWidget;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.Widget;
+import org.knime.node.parameters.NodeParameters;
+import org.knime.node.parameters.layout.Layout;
+import org.knime.node.parameters.layout.Section;
+import org.knime.node.parameters.widget.choices.ChoicesProvider;
+import org.knime.node.parameters.Widget;
+import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerSettings.StringCellColumnsProvider;
+import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerSettings.TimeColumnsProvider;
 
 
-@SuppressWarnings({"restriction"}) 
-public class DefaultTableNodeSettings implements DefaultNodeSettings {
+
+public class DefaultTableNodeSettings implements NodeParameters {
 
 	
 	public interface DialogLayoutWithTime {
@@ -23,72 +19,21 @@ public class DefaultTableNodeSettings implements DefaultNodeSettings {
         interface EventLogClassifiers {
         }
       }
-	
-	public static final class StringColumnChoices implements ChoicesProvider {
 
-	    @Override
-	    public String[] choices(final DefaultNodeSettingsContext context) {
-	        // Assuming context.getDataTableSpecs() returns an array of Object or a more generic type
-	        Object specObj = context.getPortObjectSpecs()[0];
-
-	        if (specObj instanceof DataTableSpec) { // Check if the object is an instance of DataTableSpec
-	            DataTableSpec specs = (DataTableSpec) specObj;
-
-	            return specs.stream()
-	                    .filter(s -> s.getType().isCompatible(StringValue.class))
-	                    .map(DataColumnSpec::getName)
-	                    .toArray(String[]::new);
-	        } else {
-	            // Handle the case where specObj is not an instance of DataTableSpec
-	            // For example, log an error or throw a more descriptive exception
-	            System.err.println("Expected a DataTableSpec but received a different type: " + specObj.getClass().getSimpleName());
-	            return new String[0];
-	        }
-	    }
-	}
-	
-	public static final class TimeColumnChoices implements ChoicesProvider {
-
-        @Override
-        public String[] choices(final DefaultNodeSettingsContext context) {
-
-        	Object specObj = context.getPortObjectSpecs()[0];
-
-        	if (specObj instanceof DataTableSpec) { // Check if the object is an instance of DataTableSpec
-	            DataTableSpec specs = (DataTableSpec) specObj;
-	            return specs.stream() //
-
-	                    .filter(s -> s.getType().equals(ZonedDateTimeCellFactory.TYPE) || s.getType().equals(LocalDateTimeCellFactory.TYPE)) //
-
-	                    .map(DataColumnSpec::getName) //
-
-	                    .toArray(String[]::new);
-	            
-            } else {
-
-            	System.err.println("Expected a DataTableSpec but received a different type: " + specObj.getClass().getSimpleName());
-	            return new String[0];
-
-            }
-
-        }
-	 }
-	
-	
 	
 	@Layout(DialogLayoutWithTime.EventLogClassifiers.class)
 	@Widget(title = "Case ID", description = "The column that contains the case/trace identifiers.")
-    @ChoicesWidget(choices = StringColumnChoices.class)
+    @ChoicesProvider(value = StringCellColumnsProvider.class)
 	public String t_classifier;
 	
 	@Layout(DialogLayoutWithTime.EventLogClassifiers.class)
     @Widget(title = "Activity", description = "The column that contains the activity/event identifiers.")
-	@ChoicesWidget(choices = StringColumnChoices.class)
+	@ChoicesProvider(value = StringCellColumnsProvider.class)
 	public String e_classifier;
 	
 	@Layout(DialogLayoutWithTime.EventLogClassifiers.class)
 	@Widget(title = "Timestamp", description = "The column that contains the timestamps.")
-    @ChoicesWidget(choices = TimeColumnChoices.class)
+	@ChoicesProvider(value = TimeColumnsProvider.class)
 	public String time_classifier;
 
 	

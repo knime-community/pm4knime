@@ -1,17 +1,13 @@
 package org.pm4knime.node.conversion.hpn2table;
 
-import java.util.ArrayList;
+import org.knime.node.parameters.NodeParameters;
+import org.knime.node.parameters.layout.After;
+import org.knime.node.parameters.layout.Layout;
+import org.knime.node.parameters.widget.text.TextInputWidget;
+import org.knime.node.parameters.Widget;
 
-import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeSettings;
-import org.knime.core.webui.node.dialog.defaultdialog.layout.After;
-import org.knime.core.webui.node.dialog.defaultdialog.layout.Layout;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.ChoicesProvider;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.ChoicesWidget;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.Widget;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.TextInputWidget;
 
-@SuppressWarnings("restriction")
-public final class HybridPetriNet2TableConverterNodeSettings implements DefaultNodeSettings {
+public final class HybridPetriNet2TableConverterNodeSettings implements NodeParameters {
 	 
 	public static interface HybridPetriNet2TableDialogLayout {
 	    		

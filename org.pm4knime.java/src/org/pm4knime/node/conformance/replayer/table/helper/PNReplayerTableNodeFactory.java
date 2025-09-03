@@ -7,7 +7,7 @@ import org.pm4knime.portobject.PetriNetPortObject;
 import org.pm4knime.portobject.RepResultPortObjectTable;
 
 
-@SuppressWarnings("restriction")
+
 public class PNReplayerTableNodeFactory extends WebUINodeFactory<DefaultPNReplayerTableModel> {
 
 	DefaultPNReplayerTableModel node;

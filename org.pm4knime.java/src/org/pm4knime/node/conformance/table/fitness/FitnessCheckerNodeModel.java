@@ -22,16 +22,14 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.port.PortObject;
-import org.knime.core.node.port.PortObjectHolder;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
-import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeSettings;
-import org.pm4knime.node.conformance.table.precision.PrecisionCheckerNodeSettings;
+import org.knime.core.webui.node.dialog.defaultdialog.NodeParametersUtil;
 import org.pm4knime.portobject.RepResultPortObjectSpecTable;
 import org.pm4knime.portobject.RepResultPortObjectTable;
 import org.pm4knime.util.ReplayerUtil;
-import org.pm4knime.util.defaultnode.DefaultNodeModel;
 import org.pm4knime.util.defaultnode.EmptyNodeSettings;
+
 
 
 @SuppressWarnings("restriction")
@@ -96,9 +94,6 @@ public class FitnessCheckerNodeModel extends NodeModel {
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
             throws InvalidSettingsException {
     	
-    	if (m_settings == null) {
-    		m_settings = DefaultNodeSettings.createSettings(m_settingsClass, inSpecs);
-        }
     	
     	if (!inSpecs[0].getClass().equals(RepResultPortObjectSpecTable.class))
 			throw new InvalidSettingsException("Input is not a valid replay result!");
@@ -132,15 +127,8 @@ public class FitnessCheckerNodeModel extends NodeModel {
     protected void saveSettingsTo(final NodeSettingsWO settings) {
          // TODO: generated method stub
     	if (m_settings != null) {
-            DefaultNodeSettings.saveSettings(m_settingsClass, m_settings, settings);
+    		NodeParametersUtil.saveSettings(m_settingsClass, m_settings, settings);
         }
-    }
-
-    
-	@Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-    	m_settings = DefaultNodeSettings.loadSettings(settings, m_settingsClass);
     }
 
 	@Override
@@ -149,12 +137,19 @@ public class FitnessCheckerNodeModel extends NodeModel {
 		
 	}
 
+	@Override
+	protected void loadValidatedSettingsFrom(NodeSettingsRO settings) throws InvalidSettingsException {
+		m_settings = NodeParametersUtil.loadSettings(settings, m_settingsClass);
+	}
 
 	@Override
 	protected void reset() {
 		// TODO Auto-generated method stub
 		
 	}
+
+    
+	
 
 
 }

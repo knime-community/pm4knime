@@ -8,7 +8,7 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.image.ImagePortObject;
 import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
-@SuppressWarnings("restriction")
+
 public class JSVisHybridPNNodeFactory extends WebUINodeFactory<JSGraphVizAbstractModel> implements WizardNodeFactoryExtension<JSGraphVizAbstractModel, JSGraphVizViewRepresentation, JSGraphVizViewValue> {
 	
 	JSGraphVizAbstractModel node;

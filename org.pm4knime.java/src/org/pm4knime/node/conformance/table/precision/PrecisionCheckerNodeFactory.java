@@ -10,7 +10,7 @@ import org.knime.core.node.NodeFactory.NodeType;
 import org.pm4knime.portobject.RepResultPortObjectTable;
 
 
-@SuppressWarnings("restriction")
+
 public class PrecisionCheckerNodeFactory extends WebUINodeFactory<PrecisionCheckerNodeModel> {
 
 	PrecisionCheckerNodeModel node;

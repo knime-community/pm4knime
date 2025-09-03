@@ -9,7 +9,7 @@ import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
 import org.pm4knime.portobject.PetriNetPortObject;
 
 
-@SuppressWarnings("restriction")
+
 public class ILPMinerTableNodeFactory extends WebUINodeFactory<ILPMinerTableNodeModel> implements WizardNodeFactoryExtension<ILPMinerTableNodeModel, JSGraphVizViewRepresentation, JSGraphVizViewValue> {
 
 	ILPMinerTableNodeModel node;

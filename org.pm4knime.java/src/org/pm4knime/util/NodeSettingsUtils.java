@@ -2,11 +2,10 @@ package org.pm4knime.util;
 
 import java.nio.file.Path;
 
-import org.knime.core.webui.node.dialog.defaultdialog.widget.Label;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.ValueSwitchWidget;
+import org.knime.node.parameters.widget.choices.Label;
 
 
-@SuppressWarnings("restriction") // webui classes
+ // webui classes
 public final class NodeSettingsUtils {
     private NodeSettingsUtils() {
     }

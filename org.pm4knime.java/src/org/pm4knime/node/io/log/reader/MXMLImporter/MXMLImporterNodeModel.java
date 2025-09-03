@@ -19,7 +19,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
-import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeSettings;
+import org.knime.core.webui.node.dialog.defaultdialog.NodeParametersUtil;
 import org.knime.filehandling.core.connections.FSConnection;
 import org.knime.filehandling.core.connections.FSFileSystem;
 import org.knime.filehandling.core.connections.FSFiles;
@@ -29,6 +29,7 @@ import org.pm4knime.portobject.XLogPortObject;
 import org.pm4knime.portobject.XLogPortObjectSpec;
 import org.pm4knime.util.connectors.prom.PM4KNIMEGlobalContext;
 import org.processmining.plugins.log.OpenNaiveLogFilePlugin;
+
 
 
 @SuppressWarnings("restriction")
@@ -134,7 +135,7 @@ public class MXMLImporterNodeModel extends NodeModel {
 	@Override
 	protected void saveSettingsTo(NodeSettingsWO settings) {
 		if (m_settings != null) {
-            DefaultNodeSettings.saveSettings(m_settingsClass, m_settings, settings);
+			NodeParametersUtil.saveSettings(m_settingsClass, m_settings, settings);
         }
 	}
 
@@ -145,7 +146,7 @@ public class MXMLImporterNodeModel extends NodeModel {
 
 	@Override
 	protected void loadValidatedSettingsFrom(NodeSettingsRO settings) throws InvalidSettingsException {
-		m_settings = DefaultNodeSettings.loadSettings(settings, m_settingsClass);
+		m_settings = NodeParametersUtil.loadSettings(settings, m_settingsClass);
 
 	}
 

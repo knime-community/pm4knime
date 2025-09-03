@@ -12,7 +12,7 @@ import org.knime.core.webui.node.impl.WebUINodeFactory;
 import org.knime.filehandling.core.port.FileSystemPortObject;
 import org.pm4knime.portobject.PetriNetPortObject;
 
-@SuppressWarnings("restriction")
+
 public class PetrinetWriterNodeFactory extends WebUINodeFactory<PetrinetWriterNodeModel> {
 
     private static final WebUINodeConfiguration CONFIG = WebUINodeConfiguration.builder() //

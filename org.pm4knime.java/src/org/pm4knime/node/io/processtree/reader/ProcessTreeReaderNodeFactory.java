@@ -8,7 +8,7 @@ import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
 import org.pm4knime.portobject.ProcessTreePortObject;
 import org.pm4knime.util.defaultnode.ReaderNodeSettings;
 
-@SuppressWarnings("restriction")
+
 public class ProcessTreeReaderNodeFactory extends WebUINodeFactory<ProcessTreeReaderNodeModel> implements
 		WizardNodeFactoryExtension<ProcessTreeReaderNodeModel, JSGraphVizViewRepresentation, JSGraphVizViewValue> {
 

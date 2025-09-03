@@ -1,77 +1,78 @@
 package org.pm4knime.node.conformance.replayer.table.helper;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.knime.core.data.DataColumnSpec;
-import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.StringValue;
-import org.knime.core.data.time.localdatetime.LocalDateTimeCellFactory;
-import org.knime.core.data.time.zoneddatetime.ZonedDateTimeCellFactory;
-import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeSettings;
-import org.knime.core.webui.node.dialog.defaultdialog.layout.After;
-import org.knime.core.webui.node.dialog.defaultdialog.layout.HorizontalLayout;
-import org.knime.core.webui.node.dialog.defaultdialog.layout.Layout;
-import org.knime.core.webui.node.dialog.defaultdialog.layout.Section;
-import org.knime.core.webui.node.dialog.defaultdialog.rule.Effect;
-import org.knime.core.webui.node.dialog.defaultdialog.rule.Effect.EffectType;
-import org.knime.core.webui.node.dialog.defaultdialog.rule.Signal;
-import org.knime.core.webui.node.dialog.defaultdialog.rule.TrueCondition;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.ArrayWidget;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.ChoicesProvider;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.ChoicesWidget;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.DomainValuesProvider;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.NumberInputWidget;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.StringChoicesStateProvider;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.Widget;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.updates.Reference;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.updates.ValueReference;
-import org.pm4knime.node.conformance.replayer.table.helper.tableLibs.CostBasedCompleteParamTable;
-import org.pm4knime.node.conformance.replayer.table.helper.tableLibs.EvClassPatternTable;
-import org.pm4knime.node.conformance.replayer.table.helper.tableLibs.PNManifestReplayerParameterTable;
-import org.pm4knime.node.conformance.replayer.table.helper.tableLibs.ReplayerUtilTable;
-import org.pm4knime.node.conformance.replayer.table.helper.tableLibs.TableEventLog;
-import org.pm4knime.node.conformance.replayer.table.helper.tableLibs.TransClass2PatternMapTable;
+import org.knime.node.parameters.NodeParameters;
+import org.knime.node.parameters.NodeParametersInput;
+import org.knime.node.parameters.layout.After;
+import org.knime.node.parameters.layout.HorizontalLayout;
+import org.knime.node.parameters.layout.Layout;
+import org.knime.node.parameters.layout.Section;
+import org.knime.node.parameters.Widget;
+import org.knime.node.parameters.array.ArrayWidget;
+import org.knime.node.parameters.widget.choices.ChoicesProvider;
+import org.knime.node.parameters.widget.choices.StringChoicesProvider;
+import org.knime.node.parameters.widget.number.NumberInputWidget;
+import org.knime.node.parameters.widget.number.NumberInputWidgetValidation.MinValidation.IsNonNegativeValidation;
+import org.knime.node.parameters.updates.Effect;
+import org.knime.node.parameters.updates.Effect.EffectType;
+import org.knime.node.parameters.updates.EffectPredicate;
+import org.knime.node.parameters.updates.EffectPredicateProvider;
+import org.knime.node.parameters.updates.EffectPredicateProvider.PredicateInitializer;
+import org.knime.node.parameters.updates.ParameterReference;
+import org.knime.node.parameters.updates.ValueReference;
+import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerSettings.TimeColumnsProvider;
 import org.pm4knime.portobject.PetriNetPortObjectSpec;
 import org.pm4knime.util.ReplayerUtil;
-import org.pm4knime.util.defaultnode.DefaultTableNodeSettings.DialogLayoutWithTime;
-import org.pm4knime.util.defaultnode.DefaultTableNodeSettings.StringColumnChoices;
-import org.pm4knime.util.defaultnode.DefaultTableNodeSettings.TimeColumnChoices;
-import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
-import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
-import org.processmining.models.semantics.petrinet.Marking;
-import org.processmining.plugins.petrinet.manifestreplayer.transclassifier.TransClass;
-import org.processmining.plugins.petrinet.manifestreplayer.transclassifier.TransClasses;
-import org.processmining.plugins.petrinet.replayer.algorithms.IPNReplayParameter;
+import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerSettings.StringCellColumnsProvider;
 
 
-@SuppressWarnings({"restriction"}) 
-public final class PNReplayerTableNodeSettings implements DefaultNodeSettings {
+
+@SuppressWarnings("restriction")
+public final class PNReplayerTableNodeSettings implements NodeParameters {
 	
 
-	/** For enabling custom activity costs **/
-    interface customLogMoveCosts {}
-    interface customModelMoveCosts {}
-    interface customSynchronousMoveCosts {}
+	//  For enabling custom activity costs
+	static final class CustomLogMoveCostsRef implements ParameterReference<Boolean> {}
+    static final class CustomModelMoveCostsRef implements ParameterReference<Boolean> {}
+    static final class CustomSynchronousMoveCostsRef implements ParameterReference<Boolean> {}
     
-//    interface ClassifiersSet {}
+    
+    // Predicate providers to control visibility based on the new References
+    static final class IsCustomLogCostsEnabled implements EffectPredicateProvider {
+        @Override
+        public EffectPredicate init(final PredicateInitializer i) {
+            return i.getBoolean(CustomLogMoveCostsRef.class).isTrue();
+        }
+    }
+
+    static final class IsCustomModelCostsEnabled implements EffectPredicateProvider {
+        @Override
+        public EffectPredicate init(final PredicateInitializer i) {
+            return i.getBoolean(CustomModelMoveCostsRef.class).isTrue();
+        }
+    }
+
+    static final class IsCustomSyncCostsEnabled implements EffectPredicateProvider {
+        @Override
+        public EffectPredicate init(final PredicateInitializer i) {
+            return i.getBoolean(CustomSynchronousMoveCostsRef.class).isTrue();
+        }
+    }
+
+    
 	
 	public static interface DialogLayout{
-	    
-		
-//		@Section(title = "Event Log Classifiers")
-//        interface EventLogClassifiers {
-//        }
+	    	
 		
 		@Section(title = "Replayer Settings")
-//        @After(EventLogClassifiers.class)
         interface ReplayerSettings {
         }  
 		
@@ -91,82 +92,35 @@ public final class PNReplayerTableNodeSettings implements DefaultNodeSettings {
         } 
 	    
 	}
-	
-	
-	public static final class StringColumnChoices implements ChoicesProvider {
 
-	    @Override
-	    public String[] choices(final DefaultNodeSettingsContext context) {
-	        Object specObj = context.getPortObjectSpecs()[0];
-
-	        if (specObj instanceof DataTableSpec) { // Check if the object is an instance of DataTableSpec
-	            DataTableSpec specs = (DataTableSpec) specObj;
-
-	            return specs.stream()
-	                    .filter(s -> s.getType().isCompatible(StringValue.class))
-	                    .map(DataColumnSpec::getName)
-	                    .toArray(String[]::new);
-	        } else {
-	             System.err.println("Expected a DataTableSpec but received a different type: " + specObj.getClass().getSimpleName());
-	            return new String[0];
-	        }
-	    }
-	}
-	
-	public static final class TimeColumnChoices implements ChoicesProvider {
-
-        @Override
-        public String[] choices(final DefaultNodeSettingsContext context) {
-
-        	Object specObj = context.getPortObjectSpecs()[0];
-
-        	if (specObj instanceof DataTableSpec) { // Check if the object is an instance of DataTableSpec
-	            DataTableSpec specs = (DataTableSpec) specObj;
-	            return specs.stream() //
-
-	                    .filter(s -> s.getType().equals(ZonedDateTimeCellFactory.TYPE) || s.getType().equals(LocalDateTimeCellFactory.TYPE)) //
-
-	                    .map(DataColumnSpec::getName) //
-
-	                    .toArray(String[]::new);
-	            
-            } else {
-
-            	System.err.println("Expected a DataTableSpec but received a different type: " + specObj.getClass().getSimpleName());
-	            return new String[0];
-
-            }
-
-        }
-	 }
 	
 	
 	@Layout(DialogLayout.ReplayerSettings.class)
 	@Widget(title = "Case ID", description = "The column that contains the case/trace identifiers.")
-    @ChoicesWidget(choices = StringColumnChoices.class)
+    @ChoicesProvider(value = StringCellColumnsProvider.class)
 	String t_classifier;
 	
-	static final class SelectedColumnDependency implements Reference<String> {
+	static final class SelectedColumnDependency implements ParameterReference<String> {
     }
 	
 	@Layout(DialogLayout.ReplayerSettings.class)
 	@Widget(title = "Activity", description = "The column that contains the activity/event identifiers.")
 	@ValueReference(SelectedColumnDependency.class)
-	@ChoicesWidget(choices = StringColumnChoices.class)
+	@ChoicesProvider(value = StringCellColumnsProvider.class)
 	String e_classifier;
 	
 	@Layout(DialogLayout.ReplayerSettings.class)
 	@Widget(title = "Timestamp", description = "The column that contains the timestamps.")
-    @ChoicesWidget(choices = TimeColumnChoices.class)
+    @ChoicesProvider(value = TimeColumnsProvider.class)
 	String time_classifier;
 	
 	
-	public static final String[] strategyList = ReplayerUtil.strategyList;
+	public static final List<String> strategyList = Arrays.asList(ReplayerUtil.strategyList);
 		
 		
-	public static class StrategyListChoicesProvider implements ChoicesProvider {
+	public static class StrategyListChoicesProvider implements StringChoicesProvider {
 		@Override
-		public String[] choices(final DefaultNodeSettingsContext context) {
+		public List<String> choices(final NodeParametersInput context) {
 		    return strategyList;
 		}
 	}	
@@ -185,7 +139,7 @@ public final class PNReplayerTableNodeSettings implements DefaultNodeSettings {
 			+ "				</li>\r\n"
 			+ "				</ul>")
 	@Layout(DialogLayout.ReplayerSettings.class)
-	@ChoicesWidget(choices = StrategyListChoicesProvider.class)
+	@ChoicesProvider(value = StrategyListChoicesProvider.class)
 	String strategy;	
 	
 	static final class SelectedColumnDomainValuesProvider implements DomainValuesProvider {
@@ -205,13 +159,13 @@ public final class PNReplayerTableNodeSettings implements DefaultNodeSettings {
 
 
 	static final class SelectedColumnDomainChoicesStateProviderOnInitAndDepChange
-	    implements StringChoicesStateProvider {
+	    implements StringChoicesProvider {
 	
 	    private Supplier<List<String>> m_domainValues;
 	
 	    @Override
-	    public String[] choices(final DefaultNodeSettingsContext context) {
-	        return m_domainValues.get().toArray(String[]::new);
+	    public List<String> choices(final NodeParametersInput context) {
+	        return m_domainValues.get();
 	    }
 	
 	    @Override
@@ -228,35 +182,35 @@ public final class PNReplayerTableNodeSettings implements DefaultNodeSettings {
     @Layout(DialogLayout.LogMoves.class)
 	@Widget(title = "Log Move Cost", description = "The default cost for a log move in a non-negative\r\n"
 			+ "	integer. By default, it is 1.")
-	@NumberInputWidget(min = 0)
+    @NumberInputWidget(minValidation=IsNonNegativeValidation.class)
 	int log_move_cost = 1;	 
     
     @Layout(DialogLayout.LogMoves.class)
 	@Widget(title = "Enable Custom Log Move Costs", description = """
 	          Enable to assign custom costs for single log moves, overriding the default log move cost.
 	          """)
-	@Signal(id = customLogMoveCosts.class, condition = TrueCondition.class)
+    @ValueReference(CustomLogMoveCostsRef.class) 
 	boolean custom_log_costs = false;
     
     @Layout(DialogLayout.LogMoves.class)
     @Widget(title = "Custom Log Move Costs", description = "Assign custom costs for single log moves, overriding the default log move cost.")
     @ArrayWidget(addButtonText = "Custom Log Move Costs")
-    @Effect(signals = customLogMoveCosts.class, type = EffectType.SHOW)
+    @Effect(predicate = IsCustomLogCostsEnabled.class, type = EffectType.SHOW)
     public LogMoveCosts[] log_move_costs = new LogMoveCosts[0];
     
-    static final class LogMoveCosts implements DefaultNodeSettings {
+    static final class LogMoveCosts implements NodeParameters {
 
         @HorizontalLayout
         interface LogMoveCostsLayout {
         }
 
         @Widget(title = "Log Move", description = "")
-        @ChoicesWidget(choicesProvider = SelectedColumnDomainChoicesStateProviderOnInitAndDepChange.class)
+        @ChoicesProvider(value = SelectedColumnDomainChoicesStateProviderOnInitAndDepChange.class)
         @Layout(LogMoveCostsLayout.class)
         public String log_move;
 
         @Widget(title = "Cost", description = "")
-        @NumberInputWidget(min = 0)
+        @NumberInputWidget(minValidation=IsNonNegativeValidation.class)
         @Layout(LogMoveCostsLayout.class)
         public int cost = 1;
     }
@@ -264,12 +218,16 @@ public final class PNReplayerTableNodeSettings implements DefaultNodeSettings {
     
     //	Model Move Costs
     
-    public static final class ModelMoveChoices implements ChoicesProvider {
+    public static final class ModelMoveChoices implements StringChoicesProvider {
 
 	    @Override
-	    public String[] choices(final DefaultNodeSettingsContext context) {
+	    public List<String> choices(final NodeParametersInput context) {
 	
-	        Object specObj = context.getPortObjectSpecs()[1];
+	        Object specObj = context.getInPortSpecs()[1];
+	        
+	        if (specObj == null) {
+	            return Collections.emptyList(); 
+	        }
 
 	        if (specObj instanceof PetriNetPortObjectSpec) { // Check if the object is an instance of DataTableSpec
 	        	PetriNetPortObjectSpec specs = (PetriNetPortObjectSpec) specObj;
@@ -277,10 +235,10 @@ public final class PNReplayerTableNodeSettings implements DefaultNodeSettings {
 	        	return specs.getTransitions().stream()
 	                    .filter(s -> !s.isInvisible())
 	                    .map(s -> s.getLabel())
-	                    .toArray(String[]::new);
+	                    .collect(Collectors.toList());
 	        } else {
 	            System.err.println("Expected a PetriNetPortObjectSpec but received a different type: " + specObj.getClass().getSimpleName());
-	            return new String[0];
+	            return Collections.emptyList(); 
 	        }
 	    }
 	}
@@ -288,41 +246,36 @@ public final class PNReplayerTableNodeSettings implements DefaultNodeSettings {
     @Layout(DialogLayout.ModelMoves.class)
 	@Widget(title = "Model Move Cost", description = "The default cost for a model move in a non-negative\r\n"
 			+ "	integer. By default, it is 1.")
-	@NumberInputWidget(min = 0)
+    @NumberInputWidget(minValidation=IsNonNegativeValidation.class)
 	int model_move_cost = 1;	
     
-//    @Layout(DialogLayout.ModelMoves.class)
-//   	@Widget(title = "Silent Model Move Cost", description = "The default cost for a silent model move in a non-negative\r\n"
-//   			+ "	integer. By default, it is 0.")
-//   	@NumberInputWidget(min = 0)
-//   	int silent_model_move_cost = 0;	 
     
     @Layout(DialogLayout.ModelMoves.class)
 	@Widget(title = "Enable Custom Model Move Costs", description = """
 	          Enable to assign custom costs for single model moves, overriding the default model move cost.
 	          """)
-	@Signal(id = customModelMoveCosts.class, condition = TrueCondition.class)
+    @ValueReference(CustomModelMoveCostsRef.class)
 	boolean custom_model_costs = false;
     
     @Layout(DialogLayout.ModelMoves.class)
     @Widget(title = "Custom Model Move Costs", description = "Assign custom costs for single model moves, overriding the default model move cost.")
     @ArrayWidget(addButtonText = "Custom Model Move Costs")
-    @Effect(signals = customModelMoveCosts.class, type = EffectType.SHOW)
+    @Effect(predicate = IsCustomModelCostsEnabled.class, type = EffectType.SHOW)
     public ModelMoveCosts[] model_move_costs = new ModelMoveCosts[0];
     
-    static final class ModelMoveCosts implements DefaultNodeSettings {
+    static final class ModelMoveCosts implements NodeParameters {
 
         @HorizontalLayout
         interface ModelMoveCostsLayout {
         }
 
         @Widget(title = "Model Move", description = "")
-        @ChoicesWidget(choices = ModelMoveChoices.class)
+        @ChoicesProvider(value = ModelMoveChoices.class)
         @Layout(ModelMoveCostsLayout.class)
         public String model_move;
 
         @Widget(title = "Cost", description = "")
-        @NumberInputWidget(min = 0)
+        @NumberInputWidget(minValidation=IsNonNegativeValidation.class)
         @Layout(ModelMoveCostsLayout.class)
         public int cost = 1;
     }
@@ -333,35 +286,36 @@ public final class PNReplayerTableNodeSettings implements DefaultNodeSettings {
     @Layout(DialogLayout.SynchronousMoves.class)
 	@Widget(title = "Synchronous Move Cost", description = "The default cost for a Synchronous move in a non-negative\r\n"
 			+ "	integer. By default, it is 0.")
-	@NumberInputWidget(min = 0)
+    @NumberInputWidget(minValidation=IsNonNegativeValidation.class)
 	int sync_move_cost = 0;	 
     
     @Layout(DialogLayout.SynchronousMoves.class)
 	@Widget(title = "Enable Custom Synchronous Move Costs", description = """
 	          Enable to assign custom costs for single synchronous moves, overriding the default synchronous move cost.
 	          """)
-	@Signal(id = customSynchronousMoveCosts.class, condition = TrueCondition.class)
+	@ValueReference(CustomSynchronousMoveCostsRef.class) 
 	boolean custom_sync_costs = false;
     
     @Layout(DialogLayout.SynchronousMoves.class)
     @Widget(title = "Custom Synchronous Move Costs", description = "Assign custom costs for single synchronous moves, overriding the default synchronous move cost.")
     @ArrayWidget(addButtonText = "Custom Synchronous Move Costs")
-    @Effect(signals = customSynchronousMoveCosts.class, type = EffectType.SHOW)
+    @Effect(predicate = IsCustomSyncCostsEnabled.class, type = EffectType.SHOW)
     public SynchronousMoveCosts[] sync_move_costs = new SynchronousMoveCosts[0];
     
-    static final class SynchronousMoveCosts implements DefaultNodeSettings {
+    
+    static final class SynchronousMoveCosts implements NodeParameters {
 
         @HorizontalLayout
         interface SynchronousMoveCostsLayout {
         }
 
         @Widget(title = "Synchronous Move", description = "")
-        @ChoicesWidget(choices = ModelMoveChoices.class)
+        @ChoicesProvider(value = ModelMoveChoices.class)
         @Layout(SynchronousMoveCostsLayout.class)
         public String sync_move;
 
         @Widget(title = "Cost", description = "")
-        @NumberInputWidget(min = 0)
+        @NumberInputWidget(minValidation=IsNonNegativeValidation.class)
         @Layout(SynchronousMoveCostsLayout.class)
         public int cost = 0;
         

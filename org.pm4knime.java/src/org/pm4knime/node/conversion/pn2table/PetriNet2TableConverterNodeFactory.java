@@ -2,13 +2,13 @@ package org.pm4knime.node.conversion.pn2table;
 
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.NodeFactory.NodeType;
-import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeSettings;
+import org.knime.node.parameters.NodeParameters;
 import org.knime.core.webui.node.impl.WebUINodeConfiguration;
 import org.knime.core.webui.node.impl.WebUINodeFactory;
 import org.pm4knime.portobject.PetriNetPortObject;
 
 
-@SuppressWarnings("restriction")
+
 public class PetriNet2TableConverterNodeFactory extends WebUINodeFactory<PetriNet2TableConverterNodeModel> {
 
 	PetriNet2TableConverterNodeModel node;

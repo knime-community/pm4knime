@@ -9,7 +9,7 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewRepresentation;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
 
-@SuppressWarnings("restriction")
+
 public class PT2PNConverterNodeFactory extends WebUINodeFactory<PT2PNConverterNodeModel> implements
 		WizardNodeFactoryExtension<PT2PNConverterNodeModel, JSGraphVizViewRepresentation, JSGraphVizViewValue> {
 

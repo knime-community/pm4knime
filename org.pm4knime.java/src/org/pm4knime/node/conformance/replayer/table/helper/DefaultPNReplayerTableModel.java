@@ -15,7 +15,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
-import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeSettings;
+import org.knime.core.webui.node.dialog.defaultdialog.NodeParametersUtil;
 import org.pm4knime.node.conformance.replayer.table.helper.DefaultPNReplayerTableUtil.ParameterGenerator;
 import org.pm4knime.node.conformance.replayer.table.helper.tableLibs.CostBasedCompleteManifestParamTable;
 import org.pm4knime.node.conformance.replayer.table.helper.tableLibs.IPNReplayAlgorithmTable;
@@ -43,7 +43,8 @@ import org.processmining.plugins.petrinet.replayer.algorithms.IPNReplayParameter
 import org.processmining.plugins.petrinet.replayresult.PNRepResult;
 
 
-@SuppressWarnings({"restriction"}) 
+
+@SuppressWarnings({"restriction", "rawtypes" })
 public class DefaultPNReplayerTableModel extends DefaultNodeModel {
 	private static final NodeLogger logger = NodeLogger.getLogger(DefaultPNReplayerTableModel.class);
 	private static final  String message  = "Replayer With Cost Tables";	
@@ -55,11 +56,8 @@ public class DefaultPNReplayerTableModel extends DefaultNodeModel {
 	protected static final int INPORT_PETRINET = 1;
 	private PNReplayerTableNodeSettings m_modelSettings;
     private final Class<PNReplayerTableNodeSettings> m_modelSettingsClass;
-//    SMAlignmentReplayParameterTable m_parameter;
 
-	
-//	SMAlignmentReplayParameterTable m_parameter;
-	// it can't belong to this class
+
 	String evClassDummy;
 	
 	RepResultPortObjectTable repResultPO;
@@ -72,15 +70,15 @@ public class DefaultPNReplayerTableModel extends DefaultNodeModel {
         // TODO: Specify the amount of input and output ports needed.
     	super(new PortType[] { BufferedDataTable.TYPE, PetriNetPortObject.TYPE }, new PortType[] {RepResultPortObjectTable.TYPE });
     	evClassDummy = "dummy";
-    	// need to initialize the parameters later, because it has different types there.
-//    	initializeParameter();
-    	m_modelSettingsClass = modelSettingsClass;  	
+    	m_modelSettingsClass = modelSettingsClass;
+    	try {
+            m_modelSettings = m_modelSettingsClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new IllegalStateException("Could not instantiate settings class: " + m_modelSettingsClass.getName(), e);
+        }
+    	  	
     }
-    
-//    protected void initializeParameter() {
-//    	m_parameter = new SMAlignmentReplayParameterTable(CFG_PARAMETER_NAME);
-//    	
-//    }
+
 
    
     @Override
@@ -186,9 +184,7 @@ public class DefaultPNReplayerTableModel extends DefaultNodeModel {
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
             throws InvalidSettingsException {
     	
-    	if (m_modelSettings == null) {
-            m_modelSettings = DefaultNodeSettings.createSettings(m_modelSettingsClass, inSpecs);
-        }
+
     	
     	if (!inSpecs[INPORT_LOG].getClass().equals(DataTableSpec.class))
 			throw new InvalidSettingsException("Input is not a valid table log!");
@@ -229,14 +225,14 @@ public class DefaultPNReplayerTableModel extends DefaultNodeModel {
     @Override
     protected final void saveSettingsTo(final NodeSettingsWO settings) {
         if (m_modelSettings != null) {
-            DefaultNodeSettings.saveSettings(m_modelSettingsClass, m_modelSettings, settings);
+        	NodeParametersUtil.saveSettings(m_modelSettingsClass, m_modelSettings, settings);
         }
     }
 
 
     @Override
     protected final void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_modelSettings = DefaultNodeSettings.loadSettings(settings, m_modelSettingsClass);
+        m_modelSettings = NodeParametersUtil.loadSettings(settings, m_modelSettingsClass);
     }
     
 

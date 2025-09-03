@@ -1,17 +1,22 @@
 package org.pm4knime.node.discovery.ilpminer.Table;
 
-import org.knime.core.webui.node.dialog.defaultdialog.layout.After;
-import org.knime.core.webui.node.dialog.defaultdialog.layout.Layout;
-import org.knime.core.webui.node.dialog.defaultdialog.layout.Section;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.ChoicesProvider;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.ChoicesWidget;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.NumberInputWidget;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.Widget;
+import java.util.List;
+
+import org.knime.node.parameters.layout.After;
+import org.knime.node.parameters.layout.Layout;
+import org.knime.node.parameters.layout.Section;
+import org.knime.node.parameters.NodeParametersInput;
+import org.knime.node.parameters.Widget;
+import org.knime.node.parameters.widget.choices.ChoicesProvider;
+import org.knime.node.parameters.widget.choices.StringChoicesProvider;
+import org.knime.node.parameters.widget.number.NumberInputWidget;
+import org.knime.node.parameters.widget.number.NumberInputWidgetValidation.MinValidation.IsNonNegativeValidation;
+import org.pm4knime.node.discovery.alpha.table.AlphaMinerTableNodeSettings.IsMaxOne;
 import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerSettings;
 import org.pm4knime.settingsmodel.SMILPMinerParameter;
 
 
-@SuppressWarnings("restriction")
+
 public final class ILPMinerTableNodeSettings extends DefaultTableMinerSettings {
 	
 	public static interface ILPMinerDialogLayout extends DialogLayout{
@@ -27,9 +32,9 @@ public final class ILPMinerTableNodeSettings extends DefaultTableMinerSettings {
 	}
 
 	
-	public static class ILPMinerChoicesProvider implements ChoicesProvider {
+	public static class ILPMinerChoicesProvider implements StringChoicesProvider {
 	    @Override
-	    public String[] choices(final DefaultNodeSettingsContext context) {
+	    public List<String> choices(final NodeParametersInput context) {
 	        return SMILPMinerParameter.CFG_FILTER_TYPES;
 	    }
 	}
@@ -42,18 +47,18 @@ public final class ILPMinerTableNodeSettings extends DefaultTableMinerSettings {
 			+ "            	<li>SLACK_VAR: the slack variable filter specifies what portion of constraints should be filtered out.</li>\r\n"
 			+ "            </ul>")
 	@Layout(ILPMinerDialogLayout.Settings.class)
-	@ChoicesWidget(choices = ILPMinerChoicesProvider.class)
-	String m_filterType = SMILPMinerParameter.CFG_FILTER_TYPES[0];
+	@ChoicesProvider(value = ILPMinerChoicesProvider.class)
+	String m_filterType = SMILPMinerParameter.CFG_FILTER_TYPES.get(0);
 	
 	
 	@Widget(title = "Noise Threshold", description = "Threshold for filtering out noise.")
 	@Layout(ILPMinerDialogLayout.Settings.class)
-	@NumberInputWidget(min = 0.0, max = 1.0)
+	@NumberInputWidget(minValidation=IsNonNegativeValidation.class, maxValidation=IsMaxOne.class)
 	double m_filterThreshold = 0.25;
 	
-	public static class ObjectiveFunctionChoicesProvider implements ChoicesProvider {
+	public static class ObjectiveFunctionChoicesProvider implements StringChoicesProvider {
 	    @Override
-	    public String[] choices(final DefaultNodeSettingsContext context) {
+	    public List<String> choices(final NodeParametersInput context) {
 	        return SMILPMinerParameter.CFG_LPOBJ_TYPES;
 	    }
 	}
@@ -66,13 +71,13 @@ public final class ILPMinerTableNodeSettings extends DefaultTableMinerSettings {
 			+ "      	    	<li>MINIMIZE_ARCS: minimize arcs.</li>\r\n"
 			+ "      	    </ul>")
 	@Layout(ILPMinerDialogLayout.Settings.class)
-	@ChoicesWidget(choices = ObjectiveFunctionChoicesProvider.class)
-	String m_lpObj = SMILPMinerParameter.CFG_LPOBJ_TYPES[0];
+	@ChoicesProvider(value = ObjectiveFunctionChoicesProvider.class)
+	String m_lpObj = SMILPMinerParameter.CFG_LPOBJ_TYPES.get(0);
 	
 	
-	public static class VTChoicesProvider implements ChoicesProvider {
+	public static class VTChoicesProvider implements StringChoicesProvider {
 	    @Override
-	    public String[] choices(final DefaultNodeSettingsContext context) {
+	    public List<String> choices(final NodeParametersInput context) {
 	        return SMILPMinerParameter.CFG_LPVAR_TYPES;
 	    }
 	}
@@ -84,12 +89,12 @@ public final class ILPMinerTableNodeSettings extends DefaultTableMinerSettings {
 			+ "            	<li>SINGLE: one variable per event.</li>\r\n"
 			+ "            </ul>")
 	@Layout(ILPMinerDialogLayout.Settings.class)
-	@ChoicesWidget(choices = VTChoicesProvider.class)
-	String m_lpVar = SMILPMinerParameter.CFG_LPVAR_TYPES[0];
+	@ChoicesProvider(value = VTChoicesProvider.class)
+	String m_lpVar = SMILPMinerParameter.CFG_LPVAR_TYPES.get(0);
 	
-	public static class DSChoicesProvider implements ChoicesProvider {
+	public static class DSChoicesProvider implements StringChoicesProvider {
 	    @Override
-	    public String[] choices(final DefaultNodeSettingsContext context) {
+	    public List<String> choices(final NodeParametersInput context) {
 	        return SMILPMinerParameter.CFG_DS_TYPES;
 	    }
 	}
@@ -100,7 +105,7 @@ public final class ILPMinerTableNodeSettings extends DefaultTableMinerSettings {
 			+ "            	<li>TRANSITION_PAIR: mine a connecting place between each pair of transitions.</li>\r\n"
 			+ "            </ul>")
 	@Layout(ILPMinerDialogLayout.Settings.class)
-	@ChoicesWidget(choices = DSChoicesProvider.class)
-	String m_ds = SMILPMinerParameter.CFG_DS_TYPES[0];
+	@ChoicesProvider(value = DSChoicesProvider.class)
+	String m_ds = SMILPMinerParameter.CFG_DS_TYPES.get(0);
 
 }

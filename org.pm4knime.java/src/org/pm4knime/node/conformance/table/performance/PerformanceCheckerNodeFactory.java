@@ -6,7 +6,7 @@ import org.knime.core.webui.node.impl.WebUINodeFactory;
 import org.pm4knime.portobject.RepResultPortObjectTable;
 
 
-@SuppressWarnings("restriction")
+
 public class PerformanceCheckerNodeFactory extends WebUINodeFactory<PerformanceCheckerNodeModel> {
 
 	PerformanceCheckerNodeModel node;

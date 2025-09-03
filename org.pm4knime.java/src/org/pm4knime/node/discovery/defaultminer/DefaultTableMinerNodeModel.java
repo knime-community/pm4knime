@@ -95,8 +95,15 @@ public abstract class DefaultTableMinerNodeModel<S extends DefaultTableMinerSett
 	protected PortObjectSpec[] configure(PortObjectSpec[] inSpecs, final S modelSettings) throws InvalidSettingsException {
 
 		m_settings = modelSettings;
-		if (!inSpecs[0].getClass().equals(DataTableSpec.class))
-			throw new InvalidSettingsException("Input is not a valid Table!");
+		
+		if (inSpecs[0] == null) {
+            return new PortObjectSpec[]{null};
+        }
+
+        if (!(inSpecs[0] instanceof DataTableSpec)) {
+            throw new InvalidSettingsException("Input port must be connected to a data table.");
+        }
+
 		DataTableSpec logSpec = (DataTableSpec) inSpecs[0];
 		if(modelSettings.e_classifier == null || modelSettings.t_classifier == null || modelSettings.time_classifier == null)
 			throw new InvalidSettingsException("Classifiers are not set! Please open the dialog and configure the node!");

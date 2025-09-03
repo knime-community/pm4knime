@@ -5,8 +5,8 @@ Bundle-SymbolicName: org.pm4knime.java;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Vendor: Fraunhofer Institute for Applied Information Technology
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.ui;bundle-version="[3.201.0,4.0.0)",
+ org.eclipse.core.runtime;bundle-version="[3.20.100,4.0.0)",
  org.knime.workbench.core;bundle-version="[5.0.0,6.0.0)",
  org.knime.workbench.repository;bundle-version="[5.0.0,6.0.0)",
  org.knime.base;bundle-version="[5.0.0,6.0.0)",
@@ -17,9 +17,9 @@ Require-Bundle: org.eclipse.ui,
  org.apache.commons.lang3;bundle-version="[3.9.0,4.0.0)",
  org.knime.python3;bundle-version="[5.0.0,6.0.0)",
  org.knime.conda;bundle-version="[5.0.0,6.0.0)",
- org.knime.ext.svg,
- org.knime.core.table,
- org.knime.core.ui
+ org.knime.ext.svg;bundle-version="[5.0.0,6.0.0)",
+ org.knime.core.table;bundle-version="[5.0.0,6.0.0)",
+ org.knime.core.ui;bundle-version="[5.0.0,6.0.0)"
 Export-Package: src
 Bundle-Activator: org.pm4knime.node.io.petrinet.reader.PetrinetReaderNodePlugin
 Bundle-ActivationPolicy: lazy
@@ -274,7 +274,10 @@ Bundle-ClassPath: org.pm4knime.java.jar,
  .,
  lib/XESStandard-latest.jar,
  lib/PNetReplayer-PM4KNIME.jar.zip
-Import-Package: org.knime.filehandling.core.connections,
+Import-Package: org.knime.core.columnar.access,
+ org.knime.core.table.access,
+ org.knime.core.table.schema,
+ org.knime.filehandling.core.connections,
  org.knime.filehandling.core.data.location.variable,
  org.knime.filehandling.core.defaultnodesettings,
  org.knime.filehandling.core.defaultnodesettings.filechooser,
@@ -284,7 +287,4 @@ Import-Package: org.knime.filehandling.core.connections,
  org.knime.filehandling.core.defaultnodesettings.status,
  org.knime.filehandling.core.port,
  org.knime.filehandling.core.util,
- org.knime.core.table.schema,
- org.knime.core.table.access,
- org.knime.core.columnar.access,
  org.knime.js.core.node

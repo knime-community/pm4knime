@@ -6,7 +6,7 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 import org.knime.core.webui.node.impl.WebUINodeConfiguration;
 import org.knime.core.webui.node.impl.WebUINodeFactory;
 
-@SuppressWarnings("restriction")
+
 public class TraceVariantVisNodeFactory extends WebUINodeFactory<TraceVariantVisNodeModel> implements WizardNodeFactoryExtension<TraceVariantVisNodeModel, TraceVariantVisViewRepresentation, TraceVariantVisViewValue> {
 	
 	TraceVariantVisNodeModel node;

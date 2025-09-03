@@ -1,5 +1,8 @@
 package org.pm4knime.settingsmodel;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -53,8 +56,8 @@ public class SMILPMinerParameter extends SettingsModel
 
 	public static final String CFG_KEY_CLASSIFIER = "Event Classifier";
 	public static final String CFG_KEY_FILTER_TYPE = "Filter Type";
-	public static final String[] CFG_FILTER_TYPES = {LPFilterType.NONE.name(), 
-			LPFilterType.SEQUENCE_ENCODING.name(), LPFilterType.SLACK_VAR.name()};
+	public static final List<String> CFG_FILTER_TYPES = Arrays.asList(LPFilterType.NONE.name(), 
+			LPFilterType.SEQUENCE_ENCODING.name(), LPFilterType.SLACK_VAR.name());
 	public static final String CFG_KEY_FILTER_THRESHOLD = "Noise Threshold";
 	public static final String CFG_KEY_MINER_ALGORITHM = "Miner Algorithm";
 	
@@ -65,17 +68,17 @@ public class SMILPMinerParameter extends SettingsModel
 	// advanced settings
 	// LP Objective
 	public static final String CFG_KEY_LPOBJ = "LP Objective";
-	public static final String[] CFG_LPOBJ_TYPES = { 
+	public static final List<String> CFG_LPOBJ_TYPES = Arrays.asList( 
 			LPObjectiveType.WEIGHTED_ABSOLUTE_PARIKH.name(), LPObjectiveType.WEIGHTED_RELATIVE_PARIKH.name(),
-			LPObjectiveType.UNWEIGHTED_PARIKH.name(), LPObjectiveType.MINIMIZE_ARCS.name()};
+			LPObjectiveType.UNWEIGHTED_PARIKH.name(), LPObjectiveType.MINIMIZE_ARCS.name());
 	// LP Variables
 	public static final String CFG_KEY_LPVAR = "LP Variable";
-	public static final String[] CFG_LPVAR_TYPES = {LPVariableType.DUAL.name(), LPVariableType.HYBRID.name(),
-			LPVariableType.SINGLE.name()};
+	public static final List<String> CFG_LPVAR_TYPES = Arrays.asList(LPVariableType.DUAL.name(), LPVariableType.HYBRID.name(),
+			LPVariableType.SINGLE.name());
 	// Discovery strategy 
 	public static final String CFG_KEY_DS = "Discovery Strategy";
-	public static final String[] CFG_DS_TYPES = {
-			 DiscoveryStrategyType.CAUSAL_FLEX_HEUR.name(), DiscoveryStrategyType.TRANSITION_PAIR.name(),};
+	public static final List<String> CFG_DS_TYPES = Arrays.asList(
+			 DiscoveryStrategyType.CAUSAL_FLEX_HEUR.name(), DiscoveryStrategyType.TRANSITION_PAIR.name());
 	
 	SettingsModelString m_lpObj, m_lpVar, m_ds;
 	
@@ -88,7 +91,7 @@ public class SMILPMinerParameter extends SettingsModel
 		m_configName = configName;
 		
 //		m_clf = new SettingsModelString(CFG_KEY_CLASSIFIER, "");
-		m_filterType = new SettingsModelString(CFG_KEY_FILTER_TYPE, CFG_FILTER_TYPES[0]);
+		m_filterType = new SettingsModelString(CFG_KEY_FILTER_TYPE, CFG_FILTER_TYPES.get(0));
 		m_filterThreshold = new SettingsModelDoubleBounded(CFG_KEY_FILTER_THRESHOLD, 0.25, 0, 1.0);
 		m_filterThreshold.setEnabled(false);
 		
@@ -97,7 +100,7 @@ public class SMILPMinerParameter extends SettingsModel
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				// TODO Auto-generated method stub
-				if(m_filterType.getStringValue().equals(CFG_FILTER_TYPES[0])) {
+				if(m_filterType.getStringValue().equals(CFG_FILTER_TYPES.get(0))) {
 					m_filterThreshold.setEnabled(false);
 				}else
 					m_filterThreshold.setEnabled(true);
@@ -106,9 +109,9 @@ public class SMILPMinerParameter extends SettingsModel
 		});
 		
 		// advanced settings
-		m_lpObj = new SettingsModelString(CFG_KEY_LPOBJ, CFG_LPOBJ_TYPES[0]);
-		m_lpVar = new SettingsModelString(CFG_KEY_LPVAR, CFG_LPVAR_TYPES[0]);
-		m_ds = new SettingsModelString(CFG_KEY_DS, CFG_DS_TYPES[0]);
+		m_lpObj = new SettingsModelString(CFG_KEY_LPOBJ, CFG_LPOBJ_TYPES.get(0));
+		m_lpVar = new SettingsModelString(CFG_KEY_LPVAR, CFG_LPVAR_TYPES.get(0));
+		m_ds = new SettingsModelString(CFG_KEY_DS, CFG_DS_TYPES.get(0));
 		
 	}
 	

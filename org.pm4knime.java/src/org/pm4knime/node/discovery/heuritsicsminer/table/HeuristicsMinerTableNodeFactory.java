@@ -9,7 +9,7 @@ import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
 import org.pm4knime.portobject.PetriNetPortObject;
 
 
-@SuppressWarnings("restriction")
+
 public class HeuristicsMinerTableNodeFactory extends WebUINodeFactory<HeuristicsMinerTableNodeModel> implements WizardNodeFactoryExtension<HeuristicsMinerTableNodeModel, JSGraphVizViewRepresentation, JSGraphVizViewValue> {
 	
 	HeuristicsMinerTableNodeModel node;

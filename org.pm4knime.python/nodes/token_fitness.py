@@ -35,7 +35,7 @@ class FitnessChecker:
                                               description="The column that contains the timestamps."
                                                           "This column must have the type 'Local Date Time'.",
                                               port_index=0,
-                                              column_filter=knime_util.is_local_date)
+                                              column_filter=knime_util.is_date)
 
     def configure(self, configure_context: knext.ConfigurationContext, input_schema_1: knext.Schema,
                   input_schema_2: knext.Schema):

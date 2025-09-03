@@ -15,7 +15,7 @@ import org.pm4knime.portobject.ProcessTreePortObject;
 import org.pm4knime.portobject.ProcessTreePortObjectSpec;
 
 
-@SuppressWarnings("restriction")
+
 public class InductiveMinerTableNodeFactory extends WebUINodeFactory<InductiveMinerTableNodeModel> implements WizardNodeFactoryExtension<InductiveMinerTableNodeModel, JSGraphVizViewRepresentation, JSGraphVizViewValue> {
 
 	InductiveMinerTableNodeModel node;

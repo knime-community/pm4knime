@@ -12,8 +12,6 @@ import org.pm4knime.util.defaultnode.ReaderNodeSettings;
 public class BpmnReaderNodeFactory extends WebUINodeFactory<BpmnReaderNodeModel> implements
 		WizardNodeFactoryExtension<BpmnReaderNodeModel, JSGraphVizViewRepresentation, JSGraphVizViewValue> {
 
-	BpmnReaderNodeModel node;
-
 	private static final WebUINodeConfiguration CONFIG = WebUINodeConfiguration.builder()
 			.name("BPMN Reader").icon("../../read.png")
 			.shortDescription("Import a BPMN model.")

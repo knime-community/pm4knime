@@ -6,7 +6,7 @@ import org.knime.core.webui.node.impl.WebUINodeConfiguration;
 import org.knime.core.webui.node.impl.WebUINodeFactory;
 import org.pm4knime.portobject.XLogPortObject;
 
-@SuppressWarnings("restriction")
+
 public class XESWriterNodeFactory extends WebUINodeFactory<XESWriterNodeModel> {
 
     private static final WebUINodeConfiguration CONFIG = WebUINodeConfiguration.builder() //

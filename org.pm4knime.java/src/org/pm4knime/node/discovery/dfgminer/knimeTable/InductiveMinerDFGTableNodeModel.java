@@ -1,28 +1,18 @@
 package org.pm4knime.node.discovery.dfgminer.knimeTable;
 
-import java.io.File;
-import java.io.IOException;
-
-
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
-import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
-import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
-import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectHolder;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
-import org.knime.js.core.node.AbstractSVGWizardNodeModel;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewRepresentation;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
 import org.pm4knime.node.visualizations.jsgraphviz.util.WebUIJSViewNodeModel;
-import org.pm4knime.portobject.AbstractJSONPortObject;
 import org.pm4knime.portobject.DfgMsdPortObject;
 import org.pm4knime.portobject.DfgMsdPortObjectSpec;
 import org.pm4knime.portobject.ProcessTreePortObject;
@@ -31,7 +21,6 @@ import org.processmining.framework.packages.PackageManager.Canceller;
 
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree2processTree;
-import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.inductiveminer2.plugins.InductiveMinerWithoutLogPlugin;
 import org.processmining.plugins.inductiveminer2.withoutlog.dfgmsd.DfgMsd;
 import org.processmining.plugins.inductiveminer2.withoutlog.variants.MiningParametersIMWithoutLog;
@@ -49,7 +38,7 @@ public class InductiveMinerDFGTableNodeModel extends WebUIJSViewNodeModel<Induct
 	protected ProcessTreePortObject ptpo;
 	protected DfgMsdPortObject dfgMsdPO;
 	
-	private InductiveMinerDFGTableNodeSettings m_settings;
+	private InductiveMinerDFGTableNodeSettings m_settings = new InductiveMinerDFGTableNodeSettings();
 
 
 	protected InductiveMinerDFGTableNodeModel(Class<InductiveMinerDFGTableNodeSettings> class1) {

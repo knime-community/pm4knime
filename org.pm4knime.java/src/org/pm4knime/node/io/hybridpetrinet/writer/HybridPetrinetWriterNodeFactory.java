@@ -4,7 +4,7 @@ import org.knime.core.webui.node.impl.WebUINodeConfiguration;
 import org.knime.core.webui.node.impl.WebUINodeFactory;
 import org.pm4knime.portobject.HybridPetriNetPortObject;
 
-@SuppressWarnings("restriction")
+
 public class HybridPetrinetWriterNodeFactory extends WebUINodeFactory<HybridPetrinetWriterNodeModel> {
 
     private static final WebUINodeConfiguration CONFIG = WebUINodeConfiguration.builder() //

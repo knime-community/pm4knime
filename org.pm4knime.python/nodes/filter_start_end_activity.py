@@ -1,5 +1,6 @@
 import pm4py
 import knime.extension as knext
+from utils import knime_util
 import pandas as pd
 import pytz
 import logging
@@ -31,7 +32,8 @@ class OtherNode:
                                               port_index=0)
     column_param_time = knext.ColumnParameter(label="Time Column",
                                               description="The column that contains the timestamps.",
-                                              port_index=0)
+                                              port_index=0,
+                                              column_filter=knime_util.is_date))
 
     def configure(self, configure_context, input_schema_1):
         return input_schema_1

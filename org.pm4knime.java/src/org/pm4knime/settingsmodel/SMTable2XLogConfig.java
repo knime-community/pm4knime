@@ -19,13 +19,8 @@ import org.pm4knime.util.XLogSpecUtil;
 import org.processmining.log.csvimport.config.CSVConversionConfig;
 import org.processmining.log.csvimport.config.CSVConversionConfig.CSVEmptyCellHandlingMode;
 import org.processmining.log.csvimport.config.CSVConversionConfig.CSVErrorHandlingMode;
-/*
- * when is is used as a customized configuration node model, not extend SettingsModel. There exists
- * problem. 1. no key for instances.  2. if no key there, we can't refer to the instances with the same value. 
- * Not really, what I want to know is!! If in NodeDialog and NodeModel, they create different instances. 
- *  If the instances are different, how do they make sure with the same key, they could access the same values there? 
- *  If they are the same, then how does it work behind this? By using HashMap??
- */
+
+
 public class SMTable2XLogConfig extends SettingsModel{
 	
 	private final String m_configName;
@@ -35,13 +30,12 @@ public class SMTable2XLogConfig extends SettingsModel{
 	public static final String CFG_KEY_EMPTY_HANDLE_MODE = "Empty Cell Handling Mode";
 	public static final String CFG_KEY_ADD_START_EA = "Add Start Event Attribute";
 	
-	// we add the column configuration into this config model
-	// here we have two model to choose for caseID and eventID items
+
 	public static final String CFG_KEY_CASEID = "Case ID";
 	public static final String CFG_KEY_EVENTCLASS = "Event Class";
 	public static final String CFG_KEY_LIFECYCLE = "Life Cycle";
 	public static final String CFG_KEY_TIMESTAMP = "Time stamp";
-//	public static final String CFG_KEY_TS_FORMAT = "Time stamp format";
+
 	public static final String CFG_NO_OPTION = "MISSING";
 	
 	public static final String CFG_KEY_COLUMN_SET = "Column Set";
@@ -52,17 +46,16 @@ public class SMTable2XLogConfig extends SettingsModel{
 	
 	private SettingsModelString m_lifecycle = new SettingsModelString(CFG_KEY_LIFECYCLE, "");
 	private SettingsModelString m_timeStamp = new SettingsModelString(CFG_KEY_TIMESTAMP, "");
-	// allow user self define one
-//	private SettingsModelString m_tsFormat = new SettingsModelString(CFG_KEY_TS_FORMAT + " Date Format", "");
+
 	
 	private SettingsModelFilterString m_traceAttrSet = new SettingsModelFilterString(
 			XLogSpecUtil.CFG_KEY_TRACE_ATTRSET, new String[]{}, new String[]{}, false );
 	private SettingsModelFilterString m_eventAttrSet = new SettingsModelFilterString(
 			XLogSpecUtil.CFG_KEY_EVENT_ATTRSET, new String[]{}, new String[]{}, false );
 	
-	// for the factory, we can return the values later, but now we need to save the values here
+
 	private XFactory factory = XFactoryRegistry.instance().currentDefault();
-	// Various "expert" configuration options	
+
 	private CSVErrorHandlingMode errorHandlingMode = CSVErrorHandlingMode.OMIT_TRACE_ON_ERROR;
 	private CSVEmptyCellHandlingMode emptyCellHandlingMode = CSVEmptyCellHandlingMode.SPARSE;
 	

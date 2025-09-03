@@ -1,14 +1,15 @@
 package org.pm4knime.node.logmanipulation.filter.knimetable;
 
-import org.knime.core.webui.node.dialog.defaultdialog.layout.After;
-import org.knime.core.webui.node.dialog.defaultdialog.layout.Layout;
-import org.knime.core.webui.node.dialog.defaultdialog.layout.Section;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.NumberInputWidget;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.Widget;
+import org.knime.node.parameters.Widget;
+import org.knime.node.parameters.layout.After;
+import org.knime.node.parameters.layout.Layout;
+import org.knime.node.parameters.layout.Section;
+import org.knime.node.parameters.widget.number.NumberInputWidget;
+import org.knime.node.parameters.widget.number.NumberInputWidgetValidation.MinValidation.IsNonNegativeValidation;
 import org.pm4knime.util.defaultnode.DefaultTableNodeSettings;
 
 
-@SuppressWarnings("restriction")
+
 public final class FilterByFrequencyTableNodeSettings extends DefaultTableNodeSettings {
 
 	 
@@ -36,7 +37,7 @@ public final class FilterByFrequencyTableNodeSettings extends DefaultTableNodeSe
 	
 	@Widget(title = "Filtering Threshold", description = "The filtering threshold. It accepts both relative and absolute values (relative values between 0 and 1.0 and absolute integers greater than 1).")
 	@Layout(ExtendedDialogLayout.Settings.class)
-	@NumberInputWidget(min = 0.0)
+	@NumberInputWidget(minValidation=IsNonNegativeValidation.class)
 	double m_threshold = 0.2;
 	
 

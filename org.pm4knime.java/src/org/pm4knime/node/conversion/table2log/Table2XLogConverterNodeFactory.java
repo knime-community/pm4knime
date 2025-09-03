@@ -6,7 +6,7 @@ import org.knime.core.webui.node.impl.WebUINodeFactory;
 import org.pm4knime.portobject.XLogPortObject;
 
 
-@SuppressWarnings("restriction")
+
 public class Table2XLogConverterNodeFactory extends WebUINodeFactory<Table2XLogConverterNodeModel> {
 
 	Table2XLogConverterNodeModel node;

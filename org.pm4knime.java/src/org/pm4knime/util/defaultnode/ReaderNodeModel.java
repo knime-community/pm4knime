@@ -24,7 +24,7 @@ import org.pm4knime.node.visualizations.jsgraphviz.util.WebUIJSViewNodeModel;
 import org.pm4knime.portobject.AbstractJSONPortObject;
 import org.pm4knime.portobject.XLogPortObject;
 
-@SuppressWarnings("restriction")
+
 public abstract class ReaderNodeModel extends WebUIJSViewNodeModel<ReaderNodeSettings, JSGraphVizViewRepresentation, JSGraphVizViewValue> implements PortObjectHolder {
 	
 	

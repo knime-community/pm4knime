@@ -15,7 +15,7 @@ import org.knime.core.node.port.PortObjectHolder;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
-import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeSettings;
+import org.knime.core.webui.node.dialog.defaultdialog.NodeParametersUtil;
 import org.knime.js.core.node.AbstractSVGWizardNodeModel;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewRepresentation;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
@@ -58,6 +58,7 @@ import org.pm4knime.node.io.bpmn.writer.BPMNExporter;
  *
  * @author Sanjida Islam Ivy
  */
+
 
 @SuppressWarnings("restriction")
 public class PN2BPMNConverterNodeModel extends
@@ -503,10 +504,13 @@ public class PN2BPMNConverterNodeModel extends
 	// Configure the node based on input port object specifications
 	@Override
 	protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+<<<<<<< HEAD
 		// Check if the input is a valid PetriNetPortObjectSpec
 		if (m_settings == null) {
 			m_settings = DefaultNodeSettings.createSettings(m_settingsClass, inSpecs);
 		}
+=======
+>>>>>>> 1d9583de0d2e32f811a990273872b1e02c4079d8
 
 		PetriNetPortObjectSpec spec = (PetriNetPortObjectSpec) inSpecs[0];
 
@@ -532,13 +536,21 @@ public class PN2BPMNConverterNodeModel extends
 	protected void saveSettingsTo(final NodeSettingsWO settings) {
 		// TODO: generated method stub
 		if (m_settings != null) {
+<<<<<<< HEAD
 			DefaultNodeSettings.saveSettings(m_settingsClass, m_settings, settings);
+=======
+			NodeParametersUtil.saveSettings(m_settingsClass, m_settings, settings);
+>>>>>>> 1d9583de0d2e32f811a990273872b1e02c4079d8
 		}
 	}
 
 	@Override
 	protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
+<<<<<<< HEAD
 		m_settings = DefaultNodeSettings.loadSettings(settings, m_settingsClass);
+=======
+		m_settings = NodeParametersUtil.loadSettings(settings, m_settingsClass);
+>>>>>>> 1d9583de0d2e32f811a990273872b1e02c4079d8
 	}
 
 	/**

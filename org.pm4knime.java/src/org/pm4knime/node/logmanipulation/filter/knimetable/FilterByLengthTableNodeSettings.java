@@ -1,14 +1,15 @@
 package org.pm4knime.node.logmanipulation.filter.knimetable;
 
-import org.knime.core.webui.node.dialog.defaultdialog.layout.After;
-import org.knime.core.webui.node.dialog.defaultdialog.layout.Layout;
-import org.knime.core.webui.node.dialog.defaultdialog.layout.Section;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.NumberInputWidget;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.Widget;
+import org.knime.node.parameters.Widget;
+import org.knime.node.parameters.layout.After;
+import org.knime.node.parameters.layout.Layout;
+import org.knime.node.parameters.layout.Section;
+import org.knime.node.parameters.widget.number.NumberInputWidget;
+import org.knime.node.parameters.widget.number.NumberInputWidgetValidation.MinValidation;
 import org.pm4knime.util.defaultnode.DefaultTableNodeSettings;
 
 
-@SuppressWarnings("restriction")
+
 public final class FilterByLengthTableNodeSettings extends DefaultTableNodeSettings {
 
 	 
@@ -34,14 +35,23 @@ public final class FilterByLengthTableNodeSettings extends DefaultTableNodeSetti
 			+ "        When a negative value is given, the default value 1 is used instead. \r\n"
 			+ "        When a double value is given, it is casted down.")
 	@Layout(ExtendedDialogLayout.Settings.class)
-	@NumberInputWidget(min = 1)
+	@NumberInputWidget(minValidation=IsMinOne.class)
 	int m_minLength = 1;
+	
+	public static final class IsMinOne extends MinValidation {
+
+        @Override
+        public double getMin() {
+            return 1;
+        }
+
+    }
 	
 	@Widget(title = "Maximum Trace Length", description = "The maximum length of trace. It is a positive integer.\r\n"
 			+ "        When a negative value is given, the default value 1 is automatically set. \r\n"
 			+ "        When a double value is given, it is casted down.")
 	@Layout(ExtendedDialogLayout.Settings.class)
-	@NumberInputWidget(min = 1)
+	@NumberInputWidget(minValidation=IsMinOne.class)
 	int m_maxLength = 20;
 	
 

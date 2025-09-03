@@ -14,17 +14,14 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
-import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeSettings;
+import org.knime.core.webui.node.dialog.defaultdialog.NodeParametersUtil;
 import org.pm4knime.portobject.RepResultPortObjectTable;
 import org.pm4knime.node.conformance.precision.PrecCheckerInfoAssistant;
 import org.pm4knime.portobject.RepResultPortObjectSpecTable;
 import org.pm4knime.util.ReplayerUtil;
-import org.pm4knime.util.defaultnode.DefaultNodeModel;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.plugins.multietc.reflected.ReflectedLog;
 import org.processmining.plugins.multietc.res.MultiETCResult;
@@ -33,20 +30,12 @@ import org.processmining.plugins.petrinet.replayresult.PNMatchInstancesRepResult
 import org.processmining.plugins.petrinet.replayresult.PNRepResult;
 
 
+
 @SuppressWarnings("restriction")
 public class PrecisionCheckerNodeModel extends NodeModel {
 	private static final NodeLogger logger = NodeLogger.getLogger(PrecisionCheckerNodeModel.class);
 	
-//	final static String ALIGN_1 = "1-Align Precision";
-//	final static String ALIGN_ALL = "All-Align Precision";
-//	final static String ALIGN_REPRE = "Representative-Align Precision";
-//	final static String ETC = "ETC Precision (no invisible/duplicates allowed)";
-//	
-//	private final SettingsModelBoolean m_isOrdered =  new SettingsModelBoolean(
-//			MultiETCSettings.REPRESENTATION, true);
-//	private final SettingsModelString m_algorithm =  new SettingsModelString(
-//			MultiETCSettings.ALGORITHM, ALIGN_1);
-	
+
 	protected PrecisionCheckerNodeSettings m_settings = new PrecisionCheckerNodeSettings();
 
     private final Class<PrecisionCheckerNodeSettings> m_settingsClass;
@@ -80,17 +69,11 @@ public class PrecisionCheckerNodeModel extends NodeModel {
     	
 		PNMatchInstancesRepResult matchResult = ReplayerUtil.convert2MatchInstances(repResult, exec);
 		
-		// create reflected log. Due to loading Petri net will change its transition id, 
-		// so the new loaded version differs from the transitions from anet
 		ReflectedLog refLog = ReplayerUtil.extractRefLog(matchResult, anet);
-		// make refLog with the corresponding version in anet
 		MultiETCSettings sett = getParameter();
-		// check cancellation of node before the precision checking
-		// based on match result, get the precision indication
 		Object[] result = ReplayerUtil.checkMultiETC(refLog, anet, sett);
 		MultiETCResult res = (MultiETCResult) result[0];
-		
-		// convert result into a table 
+
 		String tableName = "Precision Table with " + sett.getAlgorithm() +"-" + sett.getRepresentation(); 
 		DataTableSpec tSpec = PrecCheckerInfoAssistant.createGlobalStatsTableSpec(tableName);
     	BufferedDataContainer tBuf = exec.createDataContainer(tSpec);
@@ -146,7 +129,7 @@ public class PrecisionCheckerNodeModel extends NodeModel {
     protected void saveSettingsTo(final NodeSettingsWO settings) {
          // TODO: generated method stub
     	if (m_settings != null) {
-            DefaultNodeSettings.saveSettings(m_settingsClass, m_settings, settings);
+    		NodeParametersUtil.saveSettings(m_settingsClass, m_settings, settings);
         }
     }
 
@@ -157,7 +140,7 @@ public class PrecisionCheckerNodeModel extends NodeModel {
 	@Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-    	m_settings = DefaultNodeSettings.loadSettings(settings, m_settingsClass);
+    	m_settings = NodeParametersUtil.loadSettings(settings, m_settingsClass);
     }
 
 	@Override

@@ -76,13 +76,13 @@ public class InductiveMinerTableNodeModel extends DefaultTableMinerNodeModel<Ind
 		private MiningParametersIM createParameters() throws InvalidSettingsException {
 			MiningParametersIM param;
 
-			if (m_settings.m_variant.equals(InductiveMinerTableNodeSettings.variantList[0]))
+			if (m_settings.m_variant.equals(InductiveMinerTableNodeSettings.variantList.get(0)))
 				param = new MiningParametersIM();
-			else if (m_settings.m_variant.equals(InductiveMinerTableNodeSettings.variantList[1]))
+			else if (m_settings.m_variant.equals(InductiveMinerTableNodeSettings.variantList.get(1)))
 				param = new MiningParametersIMInfrequent();
-			else if (m_settings.m_variant.equals(InductiveMinerTableNodeSettings.variantList[2]))
+			else if (m_settings.m_variant.equals(InductiveMinerTableNodeSettings.variantList.get(2)))
 				param = new MiningParametersIMInfrequent();
-			else if (m_settings.m_variant.equals(InductiveMinerTableNodeSettings.variantList[3]))
+			else if (m_settings.m_variant.equals(InductiveMinerTableNodeSettings.variantList.get(3)))
 				param = new MiningParametersIMLifeCycle();
 			else
 				throw new InvalidSettingsException("unknown inductive miner type ");

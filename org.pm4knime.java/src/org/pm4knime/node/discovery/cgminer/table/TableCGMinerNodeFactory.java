@@ -1,10 +1,6 @@
 package org.pm4knime.node.discovery.cgminer.table;
 
 import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-import org.knime.core.node.NodeFactory.NodeType;
 import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 import org.knime.core.webui.node.impl.WebUINodeConfiguration;
 import org.knime.core.webui.node.impl.WebUINodeFactory;
@@ -13,7 +9,7 @@ import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
 import org.pm4knime.portobject.CausalGraphPortObject;
 
 
-@SuppressWarnings("restriction")
+
 public class TableCGMinerNodeFactory extends WebUINodeFactory<TableCGMinerNodeModel> implements WizardNodeFactoryExtension<TableCGMinerNodeModel, JSGraphVizViewRepresentation, JSGraphVizViewValue> {
 	TableCGMinerNodeModel node;
 

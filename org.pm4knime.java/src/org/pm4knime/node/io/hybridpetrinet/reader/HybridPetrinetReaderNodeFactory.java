@@ -8,7 +8,7 @@ import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
 import org.pm4knime.portobject.HybridPetriNetPortObject;
 import org.pm4knime.util.defaultnode.ReaderNodeSettings;
 
-@SuppressWarnings("restriction")
+
 public class HybridPetrinetReaderNodeFactory extends WebUINodeFactory<HybridPetrinetReaderNodeModel> implements
 		WizardNodeFactoryExtension<HybridPetrinetReaderNodeModel, JSGraphVizViewRepresentation, JSGraphVizViewValue> {
 

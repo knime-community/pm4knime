@@ -22,7 +22,7 @@ import org.pm4knime.util.PetriNetUtil;
 import org.pm4knime.util.WriterUtil;
 
 
-@SuppressWarnings("restriction") // uses the restricted WebUI API
+ // uses the restricted WebUI API
 final class PetrinetWriterNodeModel extends WebUINodeModel<PetrinetWriterNodeSettings> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(PetrinetWriterNodeModel.class);
@@ -38,8 +38,6 @@ final class PetrinetWriterNodeModel extends WebUINodeModel<PetrinetWriterNodeSet
         CheckUtils.checkSettingNotNull(settings.m_outputFile, "Output path must be present.");
         CheckUtils.checkSetting(StringUtils.isNotBlank(settings.m_outputFile), "Output path may not be blank: \"%s\"",
             settings.m_outputFile);
-
-        CheckUtils.checkArgument(settings.m_timeoutSeconds >= 0, "Timeout must be non-negative");
 
         final var outputPath = pathWithExtension(settings.m_outputFile, settings.getExtension());
         final var url = WriterUtil.toURL(outputPath, WriterUtil::handleInvalidPathSetting);

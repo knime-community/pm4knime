@@ -5,7 +5,7 @@ import org.knime.core.webui.node.impl.WebUINodeConfiguration;
 import org.knime.core.webui.node.impl.WebUINodeFactory;
 
 
-@SuppressWarnings("restriction")
+
 public final class MergeTableNodeFactory extends WebUINodeFactory<MergeTableNodeModel> {
 
 	MergeTableNodeModel node;

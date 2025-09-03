@@ -9,7 +9,7 @@ import org.pm4knime.portobject.DfgMsdPortObject;
 import org.pm4knime.portobject.ProcessTreePortObject;
 
 
-@SuppressWarnings("restriction")
+
 public final class InductiveMinerDFGTableNodeFactory extends WebUINodeFactory<InductiveMinerDFGTableNodeModel> implements WizardNodeFactoryExtension<InductiveMinerDFGTableNodeModel, JSGraphVizViewRepresentation, JSGraphVizViewValue> {
 
     private InductiveMinerDFGTableNodeModel node;
