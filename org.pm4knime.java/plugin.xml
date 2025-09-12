@@ -923,11 +923,22 @@
         </Module>
      
     </extension>
-                                                        
-
-
-
-
+    
+    
+     <extension point="org.knime.python3.types.PythonPortObjectConverter">
+        <Module modulePath="python" moduleName="utils.petri_net_type">
+            <KnimeToPythonPortObjectConverter
+                JavaConverterClass="org.pm4knime.portobject.PetriNetPortObjectConverter"
+                PythonConverterClass="PetriNetPortConverter">
+            </KnimeToPythonPortObjectConverter>
+            <PythonToKnimePortObjectConverter
+                JavaConverterClass="org.pm4knime.portobject.PetriNetPortObjectConverter"
+                PythonConverterClass="PetriNetPortConverter">
+            </PythonToKnimePortObjectConverter>
+        </Module>
+    </extension>
+    
+    
 
 
 
