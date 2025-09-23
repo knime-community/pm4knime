@@ -293,25 +293,25 @@
         
         
         
-        <node category-path="/community/processmining/conversion" factory-class="org.pm4knime.node.conversion.pn2table.PetriNet2TableConverterNodeFactory"/>
+        <node category-path="/community/processmining/conversion" deprecated="true" factory-class="org.pm4knime.node.conversion.pn2table.PetriNet2TableConverterNodeFactory"/>
                                         		
         
         
         
         
-        <node category-path="/community/processmining/conversion" factory-class="org.pm4knime.node.conversion.table2pn.Table2PetriNetConverterNodeFactory"/>
+        <node category-path="/community/processmining/conversion" deprecated="true" factory-class="org.pm4knime.node.conversion.table2pn.Table2PetriNetConverterNodeFactory"/>
                                         		
         
         
         
         
-        <node category-path="/community/processmining/conversion" factory-class="org.pm4knime.node.conversion.hpn2table.HybridPetriNet2TableConverterNodeFactory"/>
+        <node category-path="/community/processmining/conversion" deprecated="true" factory-class="org.pm4knime.node.conversion.hpn2table.HybridPetriNet2TableConverterNodeFactory"/>
                                         		
         
         
         
         
-        <node category-path="/community/processmining/conversion" factory-class="org.pm4knime.node.conversion.table2hpn.Table2HybridPetriNetConverterNodeFactory"/>
+        <node category-path="/community/processmining/conversion" deprecated="true" factory-class="org.pm4knime.node.conversion.table2hpn.Table2HybridPetriNetConverterNodeFactory"/>
                                         		
 		
         
