@@ -281,3 +281,46 @@ def convert_port_object_to_pm4py(petri_net_data):
             target_obj.in_arcs.add(arc)
 
     return net, initial_marking, final_marking
+
+
+def convert_pm4py_to_port_object(net, initial_marking, final_marking):
+    nodes = []
+    links = []
+        
+    for place in net.places:
+        is_initial = place in initial_marking and initial_marking[place] > 0
+        is_final = place in final_marking and final_marking[place] > 0
+        
+        node = Node(
+            id=place.name,
+            type="place",
+            label="",
+            initial=is_initial,
+            final=is_final
+        )
+        nodes.append(node)
+    
+    for transition in net.transitions:
+        if transition.label is None or transition.label == "None":
+            display_label = ""
+        else:
+            display_label = transition.label
+        
+        node = Node(
+            id=transition.name,
+            type="transition",
+            label=display_label,
+            initial=False,
+            final=False
+        )
+        nodes.append(node)
+    
+    for arc in net.arcs:
+        link = Link(
+            source=arc.source.name,
+            target=arc.target.name
+        )
+        links.append(link)
+    
+    spec = PetriNetSpec()
+    return PetriNetPortObject(spec, nodes, links)

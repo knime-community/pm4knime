@@ -77,13 +77,13 @@ public class PetriNetPortObjectConverter
                             finalMarkingPlaces.add(place);
                         }
                     } else if ("transition".equals(type)) {
-                        Transition transition = net.addTransition(id);
+                        Transition transition = net.addTransition(label);  
                         
                         if (label == null || label.isEmpty()) {
                             transition.setInvisible(true);
                         }
                         
-                        transitionMap.put(id, transition);
+                        transitionMap.put(id, transition);  
                     }
                 }
             }
