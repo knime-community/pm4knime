@@ -200,6 +200,7 @@ public class PetriNetPortObject extends AbstractJSONPortObject {
 
 	    result.put("links", links);
 	    
+//	    System.out.println(result);
 	    return result;
 	}
 	

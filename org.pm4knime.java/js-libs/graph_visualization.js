@@ -203,10 +203,10 @@ function createPaper(nodes, edges) {
 			};
 			let tokens = 0;
 
-			if (node.f_marking === true) {
+			if (node.final === true) {
 				attrs[".root"]["stroke-width"] = 4;
 			}
-			if (node.i_marking === true) {
+			if (node.initial === true) {
 				tokens = 1;
 			}
 
