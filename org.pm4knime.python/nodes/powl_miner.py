@@ -50,7 +50,7 @@ class POWL_Miner(knext.PythonNode):
                                               description="The column that contains the timestamps."
                                                           "This column must have the type 'Local Date Time'.",
                                               port_index=0,
-                                              column_filter=knime_util.is_date)
+                                              column_filter=knime_util.is_type_timestamp)
 
     def configure(self, configure_context: knext.ConfigurationContext, input_schema_1: knext.Schema):
         for par in [self.column_param_case, self.column_param_time, self.column_param_activity]:
@@ -67,6 +67,7 @@ class POWL_Miner(knext.PythonNode):
             inplace=True)
     
         event_log = event_log.sort_values(by=["case:concept:name", "time:timestamp"])
+        
         powl = powl_disc.apply(event_log, variant=POWLDiscoveryVariant.MAXIMAL)
         pn_1, init_1, final_1 = powl_to_pn(powl)
         
