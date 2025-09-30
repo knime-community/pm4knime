@@ -65,13 +65,13 @@ class TimeFilter:
 
     def execute(self, exec_context, input_1):
         event_log = input_1.to_pandas()
-
+    
         # exec_context.set_warning("This is a warning")
         # LOGGER.warning(event_log.dtypes)
-        event_log[self.column_param_time + "UTC"] = pd.to_datetime(event_log[self.column_param_time])
+        event_log[self.column_param_time + "UTC"] = pd.to_datetime(event_log[self.column_param_time], utc=True)
         # LOGGER.warning(event_log[self.column_param_time + "UTC"])
         event_log = event_log.sort_values(by=[self.column_param_case, self.column_param_time + "UTC"])
-
+    
         mode = 'traces_contained'
         if self.logging_verbosity == FilteringModes.INTERSECTING.name:
             mode = 'traces_intersecting'
@@ -79,16 +79,16 @@ class TimeFilter:
             mode = 'events'
         elif self.logging_verbosity != FilteringModes.CONTAINED.name:
             raise ValueError("Unknown filtering mode: " + self.logging_verbosity)
-        
+    
         start_dt_naive = datetime.datetime.combine(self.start_time_field, datetime.time.min)
         end_dt_naive = datetime.datetime.combine(self.end_time_field, datetime.time.max)
-
+    
         # Make the new datetime objects timezone-aware to match the event log
         start_dt_aware = pytz.utc.localize(start_dt_naive)
         end_dt_aware = pytz.utc.localize(end_dt_naive)
-
+    
         filtered_log = pm4py.filter_time_range(event_log,
-                                               start_dt_naive,
+                                               start_dt_aware,
                                                end_dt_aware,
                                                mode=mode,
                                                case_id_key=self.column_param_case,
