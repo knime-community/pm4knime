@@ -39,7 +39,7 @@ class TimeFilter:
     column_param_time = knext.ColumnParameter(label="Time Column",
                                               description="The column that contains the timestamps.",
                                               port_index=0,
-                                              column_filter=knime_util.is_date)
+                                              column_filter=knime_util.is_type_timestamp)
 
     logging_verbosity = knext.EnumParameter(
         label="Filtering Mode",
@@ -68,8 +68,7 @@ class TimeFilter:
 
         # exec_context.set_warning("This is a warning")
         # LOGGER.warning(event_log.dtypes)
-        event_log[self.column_param_time + "UTC"] = pd.to_datetime(event_log[self.column_param_time],
-                                                                   format='%Y-%m-%d %H:%M:%S').dt.tz_localize(pytz.utc)
+        event_log[self.column_param_time + "UTC"] = pd.to_datetime(event_log[self.column_param_time])
         # LOGGER.warning(event_log[self.column_param_time + "UTC"])
         event_log = event_log.sort_values(by=[self.column_param_case, self.column_param_time + "UTC"])
 
