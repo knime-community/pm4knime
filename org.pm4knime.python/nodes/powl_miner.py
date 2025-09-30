@@ -60,17 +60,22 @@ class POWL_Miner(knext.PythonNode):
 
     def execute(self, exec_context, input_1):
         event_log = input_1.to_pandas()
-        event_log["time:timestamp"] = pd.to_datetime(event_log[self.column_param_time],
-                                                     format='%Y-%m-%d %H:%M:%S').dt.tz_localize(pytz.utc)
+    
+        event_log = event_log[[self.column_param_case, self.column_param_activity, self.column_param_time]].copy()
+    
         event_log.rename(
-            columns={self.column_param_case: 'case:concept:name', self.column_param_activity: 'concept:name'},
+            columns={self.column_param_case: 'case:concept:name', 
+                     self.column_param_activity: 'concept:name', 
+                     self.column_param_time: 'time:timestamp'},
             inplace=True)
     
+        event_log["time:timestamp"] = pd.to_datetime(event_log["time:timestamp"].astype(str), utc=True)
+    
         event_log = event_log.sort_values(by=["case:concept:name", "time:timestamp"])
-        
+    
         powl = powl_disc.apply(event_log, variant=POWLDiscoveryVariant.MAXIMAL)
-        pn_1, init_1, final_1 = powl_to_pn(powl)
-        
+        pn_1, init_1, final_1 = powl_to_pn(powl)    
+    
         petri_net_port_object = convert_pm4py_to_port_object(pn_1, init_1, final_1)
     
         powl_vis = visualize_powl(powl, parameters={"format": "svg"})

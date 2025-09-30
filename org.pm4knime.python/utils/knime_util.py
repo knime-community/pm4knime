@@ -3,7 +3,7 @@ import knime.extension as knext
 
 LOGGER = logging.getLogger(__name__)
 
-# Strings of IDs of date/time value factories
+
 ZONED_DATE_TIME_ZONE_VALUE = "org.knime.core.data.v2.time.ZonedDateTimeValueFactory2"
 LOCAL_TIME_VALUE = "org.knime.core.data.v2.time.LocalTimeValueFactory"
 LOCAL_DATE_VALUE = "org.knime.core.data.v2.time.LocalDateValueFactory"
@@ -69,6 +69,7 @@ def is_binary(column: knext.Column) -> bool:
 
 def is_date(column: knext.Column) -> bool:
     return column.ktype == knext.datetime()
+
 
 def is_zoned_datetime(column: knext.Column) -> bool:
     """
