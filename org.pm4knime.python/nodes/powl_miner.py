@@ -20,7 +20,7 @@ from utils.petri_net_type import convert_pm4py_to_port_object
 LOGGER = logging.getLogger(__name__)
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-path_to_icon = os.path.abspath(os.path.join(script_dir, "..", "icon", "category-conformance.png"))
+path_to_icon = os.path.abspath(os.path.join(script_dir, "..", "icon", "category-discovery.png"))
 
 petri_net_port_type = knext.nodes.get_port_type_for_id(
     "org.pm4knime.portobject.PetriNetPortObject"
