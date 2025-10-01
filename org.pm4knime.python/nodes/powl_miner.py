@@ -35,7 +35,7 @@ petri_net_port_type = knext.nodes.get_port_type_for_id(
     short_description="Discover a Partially Ordered Workflow Model (POWL) from an event table.",
     description="Discover a Partially Ordered Workflow Model (POWL) from an event log.")
 @knext.input_table(name="Event Table", description="An Event Table.")
-@knext.output_port(name="Petri Net", description="A Petri Net port object.", port_type=petri_net_port_type)
+@knext.output_port(name="Petri Net", description="A Petri Net.", port_type=petri_net_port_type)
 @knext.output_image(name="POWL Model", description="An SVG image of a POWL model.")
 @knext.output_view(name="POWL Model", description="A POWL model.")
 
