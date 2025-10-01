@@ -4,13 +4,10 @@ import pandas as pd
 import os
 import logging
 import pytz
-from pm4py.algo.discovery.powl.inductive.variants.powl_discovery_varaints import POWLDiscoveryVariant
-from pm4py.visualization.powl.visualizer import apply as visualize_powl
-from pm4py.algo.discovery.powl import algorithm as powl_disc
-from pm4py.objects.conversion.powl.converter import apply as powl_to_pn
+import powl
+from powl.visualization.powl import visualizer as powl_visualizer
 from utils import knime_util
 from utils.petri_net_type import PetriNetPortObject, PetriNetSpec, Node, Link 
-from pm4py.algo.analysis.workflow_net.variants import petri_net
 from utils.petri_net_type import petri_net_to_df
 from pm4py.objects.petri_net.exporter.variants.pnml import export_petri_tree, Parameters
 from pm4py.util import exec_utils, constants
@@ -51,6 +48,12 @@ class POWL_Miner(knext.PythonNode):
                                                           "This column must have the type 'Local Date Time'.",
                                               port_index=0,
                                               column_filter=knime_util.is_type_timestamp)
+    column_param_threshold = knext.DoubleParameter(label="Noise Filtering Threshold (0.0 = No Filtering)",
+                                                   description="The field that contains the noise filtering threshold."
+                                                                "Set the threshold for DFG frequency filtering.",
+                                                   default_value=0.0,
+                                                   min_value=0.0,
+                                                   max_value=1.0)
 
     def configure(self, configure_context: knext.ConfigurationContext, input_schema_1: knext.Schema):
         for par in [self.column_param_case, self.column_param_time, self.column_param_activity]:
@@ -58,26 +61,32 @@ class POWL_Miner(knext.PythonNode):
                 raise ValueError("Parameters not set!")
         return None
 
+
     def execute(self, exec_context, input_1):
         event_log = input_1.to_pandas()
     
-        event_log = event_log[[self.column_param_case, self.column_param_activity, self.column_param_time]].copy()
-    
+        event_log.drop(
+            columns=[c for c in event_log.columns 
+                     if c not in [self.column_param_case, self.column_param_activity, self.column_param_time]],
+            inplace=True
+        )
+        
         event_log.rename(
             columns={self.column_param_case: 'case:concept:name', 
                      self.column_param_activity: 'concept:name', 
                      self.column_param_time: 'time:timestamp'},
             inplace=True)
     
-        event_log["time:timestamp"] = pd.to_datetime(event_log["time:timestamp"].astype(str), utc=True)
+        event_log["time:timestamp"] = pd.to_datetime(event_log["time:timestamp"], utc=True)
     
         event_log = event_log.sort_values(by=["case:concept:name", "time:timestamp"])
     
-        powl = powl_disc.apply(event_log, variant=POWLDiscoveryVariant.MAXIMAL)
-        pn_1, init_1, final_1 = powl_to_pn(powl)    
+        powl_model = powl.discover(event_log, dfg_frequency_filtering_threshold=self.column_param_threshold)
+        
+        pn_1, init_1, final_1 = powl.convert_to_petri_net(powl_model)
     
         petri_net_port_object = convert_pm4py_to_port_object(pn_1, init_1, final_1)
     
-        powl_vis = visualize_powl(powl, parameters={"format": "svg"})
+        powl_vis = powl_visualizer.apply(powl_model)
     
         return petri_net_port_object, powl_vis, knext.view_svg(powl_vis)
