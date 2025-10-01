@@ -24,7 +24,7 @@ petri_net_port_type = knext.nodes.get_port_type_for_id(
     short_description="Evaluate the simplicity of a Petri net.",
     description="This node evaluates the simplicity of the input Petri net. The criteria used for simplicity is the inverse arc degree (https://pm4py.fit.fraunhofer.de/documentation#item-8-4)."
 )
-@knext.input_port(name="Petri Net", description="A Petri Net port object.", port_type=petri_net_port_type)
+@knext.input_port(name="Petri Net", description="A Petri Net.", port_type=petri_net_port_type)
 @knext.output_table(name="Metrics Table",
                     description="A metrics table with a simplicity score. The computed score is a number between 0 and 1, where 0 stands for the lowest simplicity and 1 stands for the highest simplicity.")
 class SimplicityChecker:
