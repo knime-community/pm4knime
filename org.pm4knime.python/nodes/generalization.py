@@ -27,7 +27,7 @@ petri_net_port_type = knext.nodes.get_port_type_for_id(
     description="This node evaluates the generalization of the input Petri net with respect to the input event log. A model is considered to be general if the elements of the model are visited enough often during replaying the log on the model (https://pm4py.fit.fraunhofer.de/documentation#item-8-3)."
 )
 @knext.input_table(name="Event Table", description="An Event Table.")
-@knext.input_port(name="Petri Net", description="A Petri Net port object.", port_type=petri_net_port_type)
+@knext.input_port(name="Petri Net", description="A Petri Net.", port_type=petri_net_port_type)
 @knext.output_table(name="Metrics Table",
                     description="A metrics table with a generalization score. The computed score is a number between 0 and 1, where 0 stands for the lowest generalization and 1 stands for the highest generalization.")
 class GeneralizationChecker:
