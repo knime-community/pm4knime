@@ -55,7 +55,7 @@ class PrecisionChecker:
         
         net, initial_marking, final_marking = convert_port_object_to_pm4py(petri_net)
 
-        event_log[self.column_param_time + "UTC"] = pd.to_datetime(event_log[self.column_param_time])
+        event_log[self.column_param_time + "UTC"] = pd.to_datetime(event_log[self.column_param_time], utc=True)
         event_log = event_log.sort_values(by=[self.column_param_case, self.column_param_time + "UTC"])
 
         precision = pm4py.precision_token_based_replay(log=event_log,
