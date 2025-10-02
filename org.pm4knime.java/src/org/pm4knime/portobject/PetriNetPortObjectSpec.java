@@ -3,7 +3,6 @@ package org.pm4knime.portobject;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 
 import javax.swing.JComponent;

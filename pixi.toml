@@ -27,4 +27,5 @@ build = {features = ["build"], no-default-feature = true}
 debug = {features = ["debug"]}
 
 [pypi-dependencies]
-pm4py = ">=2.7.16, <3"
+powl = "*"
+pm4py = "*"

@@ -22,9 +22,6 @@ import org.knime.core.node.port.PortTypeRegistry;
 import org.pm4knime.util.PetriNetUtil;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.models.graphbased.directed.DirectedGraphEdge;
-import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
-import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeReduce.ReductionFailedException;
-import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
@@ -155,51 +152,56 @@ public class PetriNetPortObject extends AbstractJSONPortObject {
 		// TODO Auto-generated method stub
 		
 	}
-	
+		
 	public Map<String, List<?>> getJSON() {
-		Map<String, List<?>> result = new HashMap<>();
-		
-		Set<Place> finalMarkingPlaces = new TreeSet<Place>();
-		for (Marking setMarkings : m_anet.getFinalMarkings())
-			finalMarkingPlaces.addAll(setMarkings);	
-		
-		List<Node> nodes = new ArrayList<>();
-		
-		for(Place place : m_anet.getNet().getPlaces()) {
-			if(m_anet.getInitialMarking().contains(place))
-				nodes.add(new PlaceNode(place.getId().toString(), "place", "", true, false));
-			else if (finalMarkingPlaces.contains(place))
-				nodes.add(new PlaceNode(place.getId().toString(), "place", "", false, true));
-			else
-				nodes.add(new PlaceNode(place.getId().toString(), "place", "", false, false));
-		}
-		
-		for (Transition transition : m_anet.getNet().getTransitions())
-		{
-			String label = transition.getLabel();
-			if (transition.isInvisible())
-				nodes.add(new Node(transition.getId().toString(), "transition", ""));
-			else 
-				nodes.add(new Node(transition.getId().toString(), "transition", label));
-		}
-		
-		result.put("nodes", nodes);
-		
-		List<Link> links = new ArrayList<>();
-		
-		for (DirectedGraphEdge<?, ?> edge : m_anet.getNet().getEdges())
-		{
-			String source = edge.getSource().getId().toString();
-			String target = edge.getTarget().getId().toString();
-			links.add(new Link(source, target));
-		}
+	    Map<String, List<?>> result = new HashMap<>();
+	    
+	    Set<Place> finalMarkingPlaces = new TreeSet<Place>();
+	    for (Marking setMarkings : m_anet.getFinalMarkings())
+	        finalMarkingPlaces.addAll(setMarkings);	
+	    
+	    List<Map<String, Object>> nodes = new ArrayList<>();
+	    
+	    for(Place place : m_anet.getNet().getPlaces()) {
+	        Map<String, Object> placeNode = new HashMap<>();
+	        placeNode.put("id", place.getId().toString());
+	        placeNode.put("type", "place");
+	        placeNode.put("label", "");
+	        placeNode.put("initial", m_anet.getInitialMarking().contains(place));
+	        placeNode.put("final", finalMarkingPlaces.contains(place));
+	        nodes.add(placeNode);
+	    }
+	    
+	    for (Transition transition : m_anet.getNet().getTransitions()) {
+	        Map<String, Object> transitionNode = new HashMap<>();
+	        transitionNode.put("id", transition.getId().toString());
+	        transitionNode.put("type", "transition");
+	        
+	        String label = transition.getLabel();
+	        if (transition.isInvisible()) {
+	            transitionNode.put("label", "");
+	        } else {
+	            transitionNode.put("label", label != null ? label : "");
+	        }
+	        
+	        nodes.add(transitionNode);
+	    }
+	    
+	    result.put("nodes", nodes);
+	    
+	    List<Map<String, Object>> links = new ArrayList<>();
+	    
+	    for (DirectedGraphEdge<?, ?> edge : m_anet.getNet().getEdges()) {
+	        Map<String, Object> link = new HashMap<>();
+	        link.put("source", edge.getSource().getId().toString());
+	        link.put("target", edge.getTarget().getId().toString());
+	        links.add(link);
+	    }
 
-		result.put("links", links);
-		
-		return result;
-		
+	    result.put("links", links);
+	    
+	    return result;
 	}
-	
 	
 	
 }
