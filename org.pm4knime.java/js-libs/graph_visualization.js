@@ -221,7 +221,7 @@ function createPaper(nodes, edges) {
 			});
 		}
 		else if (node.type === "activity") {
-			const fontSize = 22;
+			const fontSize = 14;
 			const textWidth = estimateTextWidth(node.label, fontSize);
 			const transitionWidth = Math.max(textWidth + 10, 20);
 			node.width = transitionWidth;
@@ -249,7 +249,7 @@ function createPaper(nodes, edges) {
 			});
 		}
 		else if (node.type === "transition") {
-			const fontSize = 22; // the font size of the labels must be set in the css file
+			const fontSize = 14; // the font size of the labels must be set in the css file
 			const textWidth = estimateTextWidth(node.label, fontSize);
 			const transitionWidth = Math.max(textWidth + 10, 20);
 			node.width = transitionWidth;
@@ -277,7 +277,7 @@ function createPaper(nodes, edges) {
 			});
 		}
 		else if (node.type === "artificial start") {
-			const fontSize = 22;
+			const fontSize = 14;
 			const textWidth = estimateTextWidth(node.label, fontSize);
 			const transitionWidth = Math.max(textWidth + 10, 20);
 			node.width = transitionWidth;
@@ -306,7 +306,7 @@ function createPaper(nodes, edges) {
 			});
 		}
 		else if (node.type === "artificial end") {
-			const fontSize = 22;
+			const fontSize = 14;
 			const textWidth = estimateTextWidth(node.label, fontSize);
 			const transitionWidth = Math.max(textWidth + 10, 20);
 			node.width = transitionWidth;
@@ -335,7 +335,7 @@ function createPaper(nodes, edges) {
 			});
 		}
 		else if (node.type === "manual") {
-			const fontSize = 22;
+			const fontSize = 14;
 			const textWidth = estimateTextWidth(node.label, fontSize);
 			const transitionWidth = Math.max(textWidth + 10, 20);
 			node.width = transitionWidth;
@@ -364,7 +364,7 @@ function createPaper(nodes, edges) {
 			});
 		}
 		else if (node.type === "automatic") {
-			const fontSize = 22;
+			const fontSize = 14;
 			const textWidth = estimateTextWidth(node.label, fontSize);
 			const transitionWidth = Math.max(textWidth + 10, 20);
 			node.width = transitionWidth;
@@ -393,7 +393,7 @@ function createPaper(nodes, edges) {
 			});
 		}
 		else if (node.type === "operator") {
-			const fontSize = 22;
+			const fontSize = 14;
 			const textWidth = estimateTextWidth(node.label, fontSize);
 			const transitionWidth = Math.max(textWidth + 10, 20);
 			node.width = transitionWidth;
@@ -633,7 +633,7 @@ function createPaper(nodes, edges) {
 		});
 
 		nodes.forEach((node) => {
-			// const fontSize = 22;
+			// const fontSize = 14;
 			// const textWidth = estimateTextWidth(node.label, fontSize);
 			// const transitionWidth = Math.max(textWidth + 10, 20);
 			g.setNode(node.id, {
