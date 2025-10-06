@@ -59,7 +59,7 @@ class TimeFilter:
     def configure(self, configure_context: knext.ConfigurationContext, input_schema_1: knext.Schema):
         for par in [self.column_param_case, self.column_param_time, self.start_time_field, self.end_time_field]:
             if par is None or par == "":
-                raise ValueError("Parameters not set!")
+                raise knext.InvalidParametersError("Parameters not set! Please configure the node!")
 
         return input_schema_1
 

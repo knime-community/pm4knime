@@ -46,7 +46,7 @@ class FitnessChecker:
                   petri_net_spec: PetriNetSpec):
         for par in [self.column_param_case, self.column_param_time, self.column_param_activity]:
             if par is None or par == "":
-                raise ValueError("Parameters not set!")
+                raise knext.InvalidParametersError("Parameters not set! Please configure the node!")
         return None
 
     def execute(self, exec_context, input_1, petri_net: PetriNetPortObject):

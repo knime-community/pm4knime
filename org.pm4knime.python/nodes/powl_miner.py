@@ -29,8 +29,8 @@ petri_net_port_type = knext.nodes.get_port_type_for_id(
             icon_path=path_to_icon,
             category="/community/processmining/discovery")
 @knime_util.create_node_description(
-    short_description="Discover a Partially Ordered Workflow Model (POWL) from an event table.",
-    description="Discover a Partially Ordered Workflow Model (POWL) from an event log.")
+    short_description="Discover a Partially Ordered Workflow Model (POWL 2.0) from an event table.",
+    description="Discover a Partially Ordered Workflow Model (POWL 2.0) from an event log.")
 @knext.input_table(name="Event Table", description="An Event Table.")
 @knext.output_port(name="Petri Net", description="A Petri Net.", port_type=petri_net_port_type)
 @knext.output_image(name="POWL Model", description="An SVG image of a POWL model.")
@@ -44,13 +44,11 @@ class POWL_Miner(knext.PythonNode):
                                                   description="The column that contains the activities.",
                                                   port_index=0)
     column_param_time = knext.ColumnParameter(label="Time Column",
-                                              description="The column that contains the timestamps."
-                                                          "This column must have the type 'Local Date Time'.",
+                                              description="The column that contains the timestamps.",
                                               port_index=0,
                                               column_filter=knime_util.is_type_timestamp)
     column_param_threshold = knext.DoubleParameter(label="Noise Filtering Threshold (0.0 = No Filtering)",
-                                                   description="The field that contains the noise filtering threshold."
-                                                                "Set the threshold for DFG frequency filtering.",
+                                                   description="Set the threshold for DFG frequency filtering.",
                                                    default_value=0.0,
                                                    min_value=0.0,
                                                    max_value=1.0)
@@ -58,7 +56,7 @@ class POWL_Miner(knext.PythonNode):
     def configure(self, configure_context: knext.ConfigurationContext, input_schema_1: knext.Schema):
         for par in [self.column_param_case, self.column_param_time, self.column_param_activity]:
             if par is None or par == "":
-                raise ValueError("Parameters not set!")
+                raise knext.InvalidParametersError("Parameters not set! Please configure the node!")
         return None
 
 
