@@ -3,15 +3,11 @@ package org.pm4knime.portobject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
 import javax.swing.JComponent;
@@ -47,8 +43,6 @@ public class PetriNetPortObject extends AbstractJSONPortObject {
 			+ "Places within the final marking are highlighted with a heavier border.";
 	
 	
-	// use AcceptingPetriNet as the model
-	// m_anet: a field that carries anet
 	AcceptingPetriNet m_anet ;
 	PetriNetPortObjectSpec m_spec;
 	public PetriNetPortObject() {}
@@ -206,7 +200,7 @@ public class PetriNetPortObject extends AbstractJSONPortObject {
 	
 	@Override
 	public boolean equals(Object obj) {
-	    if (this == obj) return true;
+		if (this == obj) return true;
 	    if (obj == null || getClass() != obj.getClass()) return false;
 
 	    PetriNetPortObject other = (PetriNetPortObject) obj;
@@ -215,23 +209,23 @@ public class PetriNetPortObject extends AbstractJSONPortObject {
 	    AcceptingPetriNet net2 = other.m_anet;
 
 	    // Compare transitions
-	    List<String> transitions1 = getNormalizedTransitions(net1);
-	    List<String> transitions2 = getNormalizedTransitions(net2);
+	    List<String> transitions1 = PetriNetUtil.getNormalizedTransitions(net1.getNet());
+	    List<String> transitions2 = PetriNetUtil.getNormalizedTransitions(net2.getNet());
 	    if (!transitions1.equals(transitions2)) return false;
 
 	    // Compare place structures
-	    List<String> places1 = getNormalizedPlaces(net1);
-	    List<String> places2 = getNormalizedPlaces(net2);
+	    List<String> places1 = PetriNetUtil.getNormalizedPlaces(net1.getNet());
+	    List<String> places2 = PetriNetUtil.getNormalizedPlaces(net2.getNet());
 	    if (!places1.equals(places2)) return false;
 
 	    // Compare initial markings
-	    Set<String> initMarking1 = getNormalizedMarking(net1.getInitialMarking(), net1);
-	    Set<String> initMarking2 = getNormalizedMarking(net2.getInitialMarking(), net2);
+	    Set<String> initMarking1 = PetriNetUtil.getNormalizedMarking(net1.getInitialMarking(), net1.getNet());
+	    Set<String> initMarking2 = PetriNetUtil.getNormalizedMarking(net2.getInitialMarking(), net2.getNet());
 	    if (!initMarking1.equals(initMarking2)) return false;
 
 	    // Compare final markings
-	    Set<Set<String>> finalMarkings1 = getNormalizedFinalMarkings(net1);
-	    Set<Set<String>> finalMarkings2 = getNormalizedFinalMarkings(net2);
+	    Set<Set<String>> finalMarkings1 = PetriNetUtil.getNormalizedMarkings(net1.getFinalMarkings(), net1.getNet());
+	    Set<Set<String>> finalMarkings2 = PetriNetUtil.getNormalizedMarkings(net2.getFinalMarkings(), net2.getNet());
 	    return finalMarkings1.equals(finalMarkings2);
 	}
 
@@ -240,62 +234,11 @@ public class PetriNetPortObject extends AbstractJSONPortObject {
 	    AcceptingPetriNet net = this.m_anet;
 
 	    int result = 17;
-	    result = 31 * result + getNormalizedTransitions(net).hashCode();
-	    result = 31 * result + getNormalizedPlaces(net).hashCode();
-	    result = 31 * result + getNormalizedMarking(net.getInitialMarking(), net).hashCode();
-	    result = 31 * result + getNormalizedFinalMarkings(net).hashCode();
+	    result = 31 * result + PetriNetUtil.getNormalizedTransitions(net.getNet()).hashCode();
+	    result = 31 * result + PetriNetUtil.getNormalizedPlaces(net.getNet()).hashCode();
+	    result = 31 * result + PetriNetUtil.getNormalizedMarking(net.getInitialMarking(), net.getNet()).hashCode();
+	    result = 31 * result + PetriNetUtil.getNormalizedMarkings(net.getFinalMarkings(), net.getNet()).hashCode();
 	    return result;
-	}
-
-	private List<String> getNormalizedTransitions(AcceptingPetriNet net) {
-	    return net.getNet().getTransitions().stream()
-	        .map(t -> (t.getLabel() != null ? t.getLabel() : "") + "|" + t.isInvisible())
-	        .sorted()
-	        .collect(Collectors.toList());
-	}
-
-	private List<String> getNormalizedPlaces(AcceptingPetriNet net) {
-	    List<String> placeStructures = new ArrayList<>();
-
-	    for (Place p : net.getNet().getPlaces()) {
-	        String placeRep = normalizePlace(p, net);
-	        placeStructures.add(placeRep);
-	    }
-
-	    Collections.sort(placeStructures);
-	    return placeStructures;
-	}
-	
-	private String normalizePlace(Place p, AcceptingPetriNet net) {
-	    List<String> incoming = net.getNet().getInEdges(p).stream()
-	        .map(e -> labelOfTransition((Transition) e.getSource()))
-	        .sorted()
-	        .collect(Collectors.toList());
-
-	    List<String> outgoing = net.getNet().getOutEdges(p).stream()
-	        .map(e -> labelOfTransition((Transition) e.getTarget()))
-	        .sorted()
-	        .collect(Collectors.toList());
-
-	    return "(" + incoming + "," + outgoing + ")";
-	}
-
-	private Set<String> getNormalizedMarking(Marking marking, AcceptingPetriNet net) {
-	    return marking.stream()
-	        .map(p -> normalizePlace(p, net))
-	        .collect(Collectors.toCollection(TreeSet::new));
-	}
-
-	private Set<Set<String>> getNormalizedFinalMarkings(AcceptingPetriNet net) {
-	    Set<Set<String>> normalized = new TreeSet<>(Comparator.comparing(Set::toString));
-	    for (Marking m : net.getFinalMarkings()) {
-	        normalized.add(getNormalizedMarking(m, net));
-	    }
-	    return normalized;
-	}
-
-	private String labelOfTransition(Transition t) {
-	    return t.getLabel() != null ? t.getLabel() : "";
 	}
 	
 }

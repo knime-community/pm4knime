@@ -16,6 +16,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.knime.core.node.CanceledExecutionException;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
@@ -29,6 +31,7 @@ import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.util.Pair;
 import org.processmining.models.connections.GraphLayoutConnection;
 import org.processmining.models.graphbased.AbstractGraphElement;
+import org.processmining.models.graphbased.directed.DirectedGraphEdge;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetEdge;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetNode;
 import org.processmining.models.graphbased.directed.petrinet.elements.Arc;
@@ -236,6 +239,21 @@ public class HybridPetriNetUtil {
 			e.printStackTrace();
 		}
 		return net;
+	}
+
+	public static Set<String> getInformalArcs(ExtendedHybridPetrinet net) {
+	    Set<String> informalArcs = new TreeSet<>();
+
+	    for (DirectedGraphEdge<?, ?> edge : net.getEdges()) {
+	        if (edge.getSource() instanceof Transition && edge.getTarget() instanceof Transition) {
+	            String sourceLabel = PetriNetUtil.labelOfTransition((Transition) edge.getSource());
+	            String targetLabel = PetriNetUtil.labelOfTransition((Transition) edge.getTarget());
+	            String arcType = edge.getClass().getSimpleName();
+	            informalArcs.add(sourceLabel + "->" + targetLabel + ":" + arcType);
+	        }
+	    }
+
+	    return informalArcs;
 	}
 	
 }
