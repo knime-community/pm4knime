@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Collections;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,8 +71,91 @@ public class CausalGraphPortObject extends AbstractJSONPortObject {
 		return "Nodes: " + cg.getNodes().size() + ", Edges: " + cg.getEdges().size();
 	}
 
-	public boolean equals(Object o) {
-		return cg.equals(o);
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null || getClass() != obj.getClass()) return false;
+
+		CausalGraphPortObject other = (CausalGraphPortObject) obj;
+
+		ExtendedCausalGraph cg1 = this.cg;
+		ExtendedCausalGraph cg2 = other.cg;
+
+		if (cg1 == null && cg2 == null) return true;
+		if (cg1 == null || cg2 == null) return false;
+
+		List<String> nodes1 = getNormalizedNodes(cg1);
+		List<String> nodes2 = getNormalizedNodes(cg2);
+		if (!nodes1.equals(nodes2)) return false;
+
+		List<String> edges1 = getNormalizedEdges(cg1);
+		List<String> edges2 = getNormalizedEdges(cg2);
+		return edges1.equals(edges2);
+	}
+
+	@Override
+	public int hashCode() {
+		if (cg == null) return 0;
+
+		int result = 17;
+		result = 31 * result + getNormalizedNodes(cg).hashCode();
+		result = 31 * result + getNormalizedEdges(cg).hashCode();
+		return result;
+	}
+
+
+	private List<String> getNormalizedNodes(ExtendedCausalGraph cg) {
+		List<String> normalizedNodes = new ArrayList<>();
+		
+		for (HybridDirectedGraphNode node : cg.getNodes()) {
+			String nodeType = getNodeType(node.getLabel());
+			String normalized = node.getLabel() + "|" + nodeType;
+			normalizedNodes.add(normalized);
+		}
+		
+		Collections.sort(normalizedNodes);
+		return normalizedNodes;
+	}
+
+
+	private List<String> getNormalizedEdges(ExtendedCausalGraph cg) {
+		List<String> normalizedEdges = new ArrayList<>();
+		
+		for (DirectedGraphEdge<?, ?> edge : cg.getEdges()) {
+			String sourceLabel = ((HybridDirectedGraphNode) edge.getSource()).getLabel();
+			String targetLabel = ((HybridDirectedGraphNode) edge.getTarget()).getLabel();
+			String edgeType = getEdgeType(edge);
+			
+			String normalized = sourceLabel + "->" + targetLabel + "|" + edgeType;
+			normalizedEdges.add(normalized);
+		}
+		
+		Collections.sort(normalizedEdges);
+		return normalizedEdges;
+	}
+
+	
+	private String getNodeType(String label) {
+		if (label.equals("start")) {
+			return "artificial start";
+		} else if (label.equals("end")) {
+			return "artificial end";
+		} else {
+			return "activity";
+		}
+	}
+
+	
+	private String getEdgeType(DirectedGraphEdge<?, ?> edge) {
+		if (edge instanceof HybridDirectedSureGraphEdge) {
+			return "sure";
+		} else if (edge instanceof HybridDirectedUncertainGraphEdge) {
+			return "uncertain";
+		} else if (edge instanceof HybridDirectedLongDepGraphEdge) {
+			return "longdep";
+		} else {
+			return "unknown";
+		}
 	}
 		
 	@Override
@@ -404,8 +488,5 @@ public class CausalGraphPortObject extends AbstractJSONPortObject {
 		return result;
 		
 	}
-
-
-
-
+	
 }
