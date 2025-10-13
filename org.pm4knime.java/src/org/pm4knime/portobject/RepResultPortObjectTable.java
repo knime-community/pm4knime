@@ -72,6 +72,10 @@ public class RepResultPortObjectTable implements PortObject {
 	public RepResultPortObjectTable(PNRepResult repResult,TableEventLog log, DataTable tableLog, AcceptingPetriNet anet) { // PetriNetPortObject pnPO,
 		this.repResult = repResult;
 		// this.pnPO = pnPO;
+		
+//		System.out.println("=== PNRepResult ===");
+//		System.out.println("Info map: " + repResult.getInfo());
+		
 		this.log = log;
 		this.tableLog = tableLog;
 		this.anet = anet;
@@ -118,6 +122,40 @@ public class RepResultPortObjectTable implements PortObject {
 	public String getSummary() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+	    if (this == obj) {
+	        return true;
+	    }
+	    if (obj == null || getClass() != obj.getClass()) {
+	        return false;
+	    }
+	    
+	    RepResultPortObjectTable other = (RepResultPortObjectTable) obj;
+	    
+	    if (this.repResult == null && other.repResult == null) return true;
+	    if (this.repResult == null || other.repResult == null) return false;
+	    
+	    Map<String, Object> info1 = new HashMap<>(this.repResult.getInfo());
+	    Map<String, Object> info2 = new HashMap<>(other.repResult.getInfo());
+	    
+	    info1.remove("Calculation Time (ms)");
+	    info2.remove("Calculation Time (ms)");
+	    
+	    return info1.equals(info2);
+	}
+
+	@Override
+	public int hashCode() {
+	    int result = 17;
+	    if (repResult != null && repResult.getInfo() != null) {
+	        Map<String, Object> info = new HashMap<>(repResult.getInfo());
+	        info.remove("Calculation Time (ms)");
+	        result = 31 * result + info.hashCode();
+	    }
+	    return result;
 	}
 
 	@Override

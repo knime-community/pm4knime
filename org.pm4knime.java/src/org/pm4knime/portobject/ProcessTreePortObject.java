@@ -137,7 +137,6 @@ public class ProcessTreePortObject extends AbstractJSONPortObject {
         for (org.processmining.processtree.Node node : tree.getNodes()) {
             if (node instanceof AbstractBlock) {
                 AbstractBlock block_node = ((AbstractBlock) node);
-                // Get parent node representation
                 String parentType = getNodeTypeAndName(node);
                 if (node instanceof AbstractBlock.Seq) {
                     int order = 1;
