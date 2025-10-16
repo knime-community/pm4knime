@@ -225,7 +225,7 @@ function createPaper(nodes, edges) {
 			const textWidth = estimateTextWidth(node.label, fontSize);
 			const transitionWidth = Math.max(textWidth + 10, 20);
 			node.width = transitionWidth;
-			node.height = 50;
+			node.height = 35;
 			element = new pn.Transition({
 				position: node.position,
 				size: { width: transitionWidth, height: 50 },
@@ -253,7 +253,7 @@ function createPaper(nodes, edges) {
 			const textWidth = estimateTextWidth(node.label, fontSize);
 			const transitionWidth = Math.max(textWidth + 10, 20);
 			node.width = transitionWidth;
-			node.height = 50;
+			node.height = 35;
 			element = new pn.Transition({
 				position: node.position,
 				size: { width: transitionWidth, height: 50 },
@@ -281,7 +281,7 @@ function createPaper(nodes, edges) {
 			const textWidth = estimateTextWidth(node.label, fontSize);
 			const transitionWidth = Math.max(textWidth + 10, 20);
 			node.width = transitionWidth;
-			node.height = 50;
+			node.height = 35;
 
 			var element = new pn.Transition({
 				position: node.position,
@@ -310,7 +310,7 @@ function createPaper(nodes, edges) {
 			const textWidth = estimateTextWidth(node.label, fontSize);
 			const transitionWidth = Math.max(textWidth + 10, 20);
 			node.width = transitionWidth;
-			node.height = 50;
+			node.height = 35;
 
 			var element = new pn.Transition({
 				position: node.position,
@@ -339,7 +339,7 @@ function createPaper(nodes, edges) {
 			const textWidth = estimateTextWidth(node.label, fontSize);
 			const transitionWidth = Math.max(textWidth + 10, 20);
 			node.width = transitionWidth;
-			node.height = 50;
+			node.height = 35;
 
 			var element = new pn.Transition({
 				position: node.position,
@@ -368,7 +368,7 @@ function createPaper(nodes, edges) {
 			const textWidth = estimateTextWidth(node.label, fontSize);
 			const transitionWidth = Math.max(textWidth + 10, 20);
 			node.width = transitionWidth;
-			node.height = 50;
+			node.height = 35;
 
 			var element = new pn.Transition({
 				position: node.position,
@@ -397,7 +397,7 @@ function createPaper(nodes, edges) {
 			const textWidth = estimateTextWidth(node.label, fontSize);
 			const transitionWidth = Math.max(textWidth + 10, 20);
 			node.width = transitionWidth;
-			node.height = 50;
+			node.height = 35;
 			var operatorSymbol = "";
 
 			if (node.label === "xlp") {
