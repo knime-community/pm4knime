@@ -761,10 +761,7 @@
             <importResource relativePath="js-libs/variantExplorer.js" type="JAVASCRIPT"/>
                                                                         
             
-            
-            
-            
-            <importResource relativePath="js-libs/variantExplorer.css" type="CSS"/>
+
             <webDependency webResourceBundleID="bootstrap_3.3.6"> </webDependency>                                                       
 
     
