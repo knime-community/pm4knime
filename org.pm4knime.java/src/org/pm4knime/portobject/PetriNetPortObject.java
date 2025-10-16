@@ -43,8 +43,6 @@ public class PetriNetPortObject extends AbstractJSONPortObject {
 			+ "Places within the final marking are highlighted with a heavier border.";
 	
 	
-	// use AcceptingPetriNet as the model
-	// m_anet: a field that carries anet
 	AcceptingPetriNet m_anet ;
 	PetriNetPortObjectSpec m_spec;
 	public PetriNetPortObject() {}
@@ -67,10 +65,6 @@ public class PetriNetPortObject extends AbstractJSONPortObject {
 		return "Transitions: " + m_anet.getNet().getTransitions().size() + ", Places: " + m_anet.getNet().getPlaces().size();
 	}
 
-	public boolean equals(Object o) {
-		return m_anet.equals(o);
-	}
-	
 	
 	@Override
 	public PetriNetPortObjectSpec getSpec() {
@@ -203,5 +197,48 @@ public class PetriNetPortObject extends AbstractJSONPortObject {
 	    return result;
 	}
 	
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+	    if (obj == null || getClass() != obj.getClass()) return false;
+
+	    PetriNetPortObject other = (PetriNetPortObject) obj;
+
+	    AcceptingPetriNet net1 = this.m_anet;
+	    AcceptingPetriNet net2 = other.m_anet;
+
+	    // Compare transitions
+	    List<String> transitions1 = PetriNetUtil.getNormalizedTransitions(net1.getNet());
+	    List<String> transitions2 = PetriNetUtil.getNormalizedTransitions(net2.getNet());
+	    if (!transitions1.equals(transitions2)) return false;
+
+	    // Compare place structures
+	    List<String> places1 = PetriNetUtil.getNormalizedPlaces(net1.getNet());
+	    List<String> places2 = PetriNetUtil.getNormalizedPlaces(net2.getNet());
+	    if (!places1.equals(places2)) return false;
+
+	    // Compare initial markings
+	    Set<String> initMarking1 = PetriNetUtil.getNormalizedMarking(net1.getInitialMarking(), net1.getNet());
+	    Set<String> initMarking2 = PetriNetUtil.getNormalizedMarking(net2.getInitialMarking(), net2.getNet());
+	    if (!initMarking1.equals(initMarking2)) return false;
+
+	    // Compare final markings
+	    Set<Set<String>> finalMarkings1 = PetriNetUtil.getNormalizedMarkings(net1.getFinalMarkings(), net1.getNet());
+	    Set<Set<String>> finalMarkings2 = PetriNetUtil.getNormalizedMarkings(net2.getFinalMarkings(), net2.getNet());
+	    return finalMarkings1.equals(finalMarkings2);
+	}
+
+	@Override
+	public int hashCode() {
+	    AcceptingPetriNet net = this.m_anet;
+
+	    int result = 17;
+	    result = 31 * result + PetriNetUtil.getNormalizedTransitions(net.getNet()).hashCode();
+	    result = 31 * result + PetriNetUtil.getNormalizedPlaces(net.getNet()).hashCode();
+	    result = 31 * result + PetriNetUtil.getNormalizedMarking(net.getInitialMarking(), net.getNet()).hashCode();
+	    result = 31 * result + PetriNetUtil.getNormalizedMarkings(net.getFinalMarkings(), net.getNet()).hashCode();
+	    return result;
+	}
 	
 }

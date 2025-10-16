@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,6 +27,7 @@ import org.processmining.plugins.inductiveminer2.helperclasses.graphs.IntGraph;
 import org.processmining.plugins.inductiveminer2.plugins.DfgMsdImportPlugin;
 import org.processmining.plugins.inductiveminer2.plugins.DfgMsdVisualisationPlugin;
 import org.processmining.plugins.inductiveminer2.withoutlog.dfgmsd.DfgMsd;
+	
 
 public class DfgMsdPortObject extends AbstractJSONPortObject {
 
@@ -54,6 +56,98 @@ public class DfgMsdPortObject extends AbstractJSONPortObject {
 	public String getSummary() {
 		// TODO Auto-generated method stub
 		return "Nodes: " + dfm.getDirectlyFollowsGraph().getNumberOfNodes();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+	    if (this == obj) return true;
+	    if (obj == null || getClass() != obj.getClass()) return false;
+
+	    DfgMsdPortObject other = (DfgMsdPortObject) obj;
+
+	    DfgMsd dfm1 = this.dfm;
+	    DfgMsd dfm2 = other.dfm;
+
+	    if (dfm1 == null && dfm2 == null) return true;
+	    if (dfm1 == null || dfm2 == null) return false;
+
+	    List<String> activities1 = getNormalizedActivities(dfm1);
+	    List<String> activities2 = getNormalizedActivities(dfm2);
+	    if (!activities1.equals(activities2)) return false;
+
+	    Map<String, Long> startActivities1 = getNormalizedStartActivities(dfm1);
+	    Map<String, Long> startActivities2 = getNormalizedStartActivities(dfm2);
+	    if (!startActivities1.equals(startActivities2)) return false;
+
+	    Map<String, Long> endActivities1 = getNormalizedEndActivities(dfm1);
+	    Map<String, Long> endActivities2 = getNormalizedEndActivities(dfm2);
+	    if (!endActivities1.equals(endActivities2)) return false;
+
+	    List<String> dfgEdges1 = getNormalizedDfgEdges(dfm1);
+	    List<String> dfgEdges2 = getNormalizedDfgEdges(dfm2);
+	    return dfgEdges1.equals(dfgEdges2);
+	}
+
+	@Override
+	public int hashCode() {
+	    if (dfm == null) return 0;
+
+	    int result = 17;
+	    result = 31 * result + getNormalizedActivities(dfm).hashCode();
+	    result = 31 * result + getNormalizedStartActivities(dfm).hashCode();
+	    result = 31 * result + getNormalizedEndActivities(dfm).hashCode();
+	    result = 31 * result + getNormalizedDfgEdges(dfm).hashCode();
+	    return result;
+	}
+
+	private List<String> getNormalizedActivities(DfgMsd dfm) {
+	    List<String> activities = new ArrayList<>();
+	    for (String activity : dfm.getAllActivities()) {
+	        activities.add(activity);
+	    }
+	    Collections.sort(activities);
+	    return activities;
+	}
+
+	private Map<String, Long> getNormalizedStartActivities(DfgMsd dfm) {
+	    Map<String, Long> startActivities = new HashMap<>();
+	    for (int activityIndex : dfm.getStartActivities()) {
+	        String activityName = dfm.getActivityOfIndex(activityIndex);
+	        long cardinality = dfm.getStartActivities().getCardinalityOf(activityIndex);
+	        startActivities.put(activityName, cardinality);
+	    }
+	    return startActivities;
+	}
+
+	private Map<String, Long> getNormalizedEndActivities(DfgMsd dfm) {
+	    Map<String, Long> endActivities = new HashMap<>();
+	    for (int activityIndex : dfm.getEndActivities()) {
+	        String activityName = dfm.getActivityOfIndex(activityIndex);
+	        long cardinality = dfm.getEndActivities().getCardinalityOf(activityIndex);
+	        endActivities.put(activityName, cardinality);
+	    }
+	    return endActivities;
+	}
+
+	private List<String> getNormalizedDfgEdges(DfgMsd dfm) {
+	    List<String> edges = new ArrayList<>();
+	    IntGraph g = dfm.getDirectlyFollowsGraph();
+	    
+	    for (long edge : g.getEdges()) {
+	        long weight = g.getEdgeWeight(edge);
+	        if (weight > 0) {
+	            int source = g.getEdgeSource(edge);
+	            int target = g.getEdgeTarget(edge);
+	            String sourceActivity = dfm.getActivityOfIndex(source);
+	            String targetActivity = dfm.getActivityOfIndex(target);
+	            
+	            String normalized = sourceActivity + "->" + targetActivity + ":" + weight;
+	            edges.add(normalized);
+	        }
+	    }
+	    
+	    Collections.sort(edges);
+	    return edges;
 	}
 
 	@Override
