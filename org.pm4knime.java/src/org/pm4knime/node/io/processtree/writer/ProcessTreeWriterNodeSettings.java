@@ -1,8 +1,8 @@
 package org.pm4knime.node.io.processtree.writer;
 
+import org.knime.core.webui.node.dialog.defaultdialog.internal.file.FileSelection;
 import org.knime.core.webui.node.dialog.defaultdialog.internal.file.FileWriterWidget;
 import org.knime.node.parameters.Widget;
-import org.pm4knime.util.NodeSettingsUtils;
 import org.pm4knime.util.defaultnode.WriterNodeSettings;
 
 
@@ -17,7 +17,7 @@ public final class ProcessTreeWriterNodeSettings extends WriterNodeSettings {
                 """ 
     )
 	@FileWriterWidget(fileExtension = "ptml")
-	String m_outputFile = NodeSettingsUtils.getPathInUserHomeDir("process_tree.ptml");
+	public FileSelection m_outputFile = new FileSelection();
 
 	public String getExtension() {
 		// TODO Auto-generated method stub
