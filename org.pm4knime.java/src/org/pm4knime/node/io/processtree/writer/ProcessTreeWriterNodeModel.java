@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -109,7 +110,7 @@ final class ProcessTreeWriterNodeModel extends WebUINodeModel<ProcessTreeWriterN
 	private String pathWithExtension(final String path, final ProcessTreeWriterNodeSettings settings) {
 		String ext = settings.getExtension();
 		
-		if (!path.endsWith(ext)) {
+		if (!path.toLowerCase(Locale.US).endsWith(ext.toLowerCase(Locale.US))) {
 			return path + ext;
 		}
 		return path;
