@@ -8,7 +8,7 @@ import org.pm4knime.portobject.ProcessTreePortObject;
 public class ProcessTreeWriterNodeFactory extends WebUINodeFactory<ProcessTreeWriterNodeModel> {
 
     private static final WebUINodeConfiguration CONFIG = WebUINodeConfiguration.builder() //
-        .name("ProcessTree Writer") //
+        .name("Process Tree Writer") //
         .icon("../../write.png") //
         .shortDescription("Export a process tree into a PTML file.") //
         .fullDescription("""
