@@ -1,6 +1,7 @@
 package org.pm4knime.node.conformance.replayer.table.helper;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +9,11 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.knime.core.data.DataColumnSpec;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.DomainValuesProvider;
+import org.knime.core.webui.node.dialog.defaultdialog.widget.choices.DomainChoicesUtil;
+import org.knime.core.webui.node.dialog.defaultdialog.widget.handler.ErrorHandlingSingleton;
+import org.knime.core.webui.node.dialog.defaultdialog.widget.handler.WidgetHandlerException;
 import org.knime.node.parameters.NodeParameters;
 import org.knime.node.parameters.NodeParametersInput;
 import org.knime.node.parameters.layout.After;
@@ -31,6 +36,7 @@ import org.knime.node.parameters.updates.ValueReference;
 import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerSettings.TimeColumnsProvider;
 import org.pm4knime.portobject.PetriNetPortObjectSpec;
 import org.pm4knime.util.ReplayerUtil;
+import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerSettings.StringCellColumnsProvider;
 
 
@@ -155,6 +161,16 @@ public final class PNReplayerTableNodeSettings implements NodeParameters {
         public String getSelectedColumn() {
             return m_selectedColumnSupplier.get();
         }
+        
+        @Override
+		public List<String> computeState(final NodeParametersInput context) {
+        	try {
+                return DomainChoicesUtil.getChoicesByContextAndColumn(context, getSelectedColumn());
+            } catch (WidgetHandlerException e) { 
+                return List.of();
+            }
+        }
+        
     }
 
 
@@ -173,6 +189,7 @@ public final class PNReplayerTableNodeSettings implements NodeParameters {
 	        m_domainValues = initializer.computeFromProvidedState(SelectedColumnDomainValuesProvider.class);
 	        initializer.computeAfterOpenDialog();
 	    }
+	    
 	
 	}
 
@@ -226,19 +243,25 @@ public final class PNReplayerTableNodeSettings implements NodeParameters {
 	        Object specObj = context.getInPortSpecs()[1];
 	        
 	        if (specObj == null) {
-	            return Collections.emptyList(); 
+	        	 return Collections.emptyList();
 	        }
 
 	        if (specObj instanceof PetriNetPortObjectSpec) { // Check if the object is an instance of DataTableSpec
 	        	PetriNetPortObjectSpec specs = (PetriNetPortObjectSpec) specObj;
 
-	        	return specs.getTransitions().stream()
+	        	Collection<Transition> transitions = specs.getTransitions();
+	            if (transitions == null) {
+	                // Optionally log for debugging
+	                return Collections.emptyList();
+	            }
+	        	
+	        	return transitions.stream()
 	                    .filter(s -> !s.isInvisible())
 	                    .map(s -> s.getLabel())
 	                    .collect(Collectors.toList());
 	        } else {
 	            System.err.println("Expected a PetriNetPortObjectSpec but received a different type: " + specObj.getClass().getSimpleName());
-	            return Collections.emptyList(); 
+	            return Collections.emptyList();
 	        }
 	    }
 	}
