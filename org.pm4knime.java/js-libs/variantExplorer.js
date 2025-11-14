@@ -21,6 +21,11 @@ varExplorer = (function() {
     };
 
     view.getSVG = () => {
+    
+	   if (!_dataUrl) {
+	       console.warn("getSVG called before _dataUrl is ready");
+	       return null;   
+	   }
    
         
        var img = new Image();
