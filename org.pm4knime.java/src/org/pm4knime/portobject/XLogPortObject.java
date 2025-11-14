@@ -32,6 +32,18 @@ import org.processmining.plugins.log.ui.logdialog.SlickerOpenLogSettings;
 import org.xesstandard.model.XesLog;
 import org.xesstandard.xml.XesXmlParserLenient;
 
+import org.deckfour.xes.extension.std.XConceptExtension;
+import org.deckfour.xes.model.XTrace;
+import org.deckfour.xes.model.XEvent;
+
+import org.knime.core.node.BufferedDataContainer;
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.node.ExecutionContext;
+import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.BufferedDataContainer;
+import org.pm4knime.portobject.XLogPortObject;
+
+
 public class XLogPortObject extends AbstractPortObject {
 
 	/**
@@ -51,6 +63,9 @@ public class XLogPortObject extends AbstractPortObject {
 	public XLogPortObject(XLog log) {
 		// TODO Auto-generated constructor stub
 		this.log = log;
+		
+		System.out.println(" ==== ");
+		System.out.println(log);
 	}
 
 	public XLog getLog() {
@@ -65,7 +80,68 @@ public class XLogPortObject extends AbstractPortObject {
 	public String getSummary() {
 		return "Traces: " + log.size();
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+	    if (this == obj) {
+	        return true;
+	    }
+	    if (obj == null || getClass() != obj.getClass()) {
+	        return false;
+	    }
+	    
+	    XLogPortObject other = (XLogPortObject) obj;
+	    
+	    if (this.log == null && other.log == null) return true;
+	    if (this.log == null || other.log == null) return false;
+	    
+	    if (this.log.size() != other.log.size()) {
+	        return false;
+	    }
+	    
+	    return compareLogsAsTraces(this.log, other.log);
+	}
 
+	private boolean compareLogsAsTraces(XLog log1, XLog log2) {
+	    if (log1.size() != log2.size()) {
+	        return false;
+	    }
+	    
+	    for (int i = 0; i < log1.size(); i++) {
+	        XTrace trace1 = log1.get(i);
+	        XTrace trace2 = log2.get(i);
+	        
+	        if (trace1.size() != trace2.size()) {
+	            return false;
+	        }
+	        
+	        for (int j = 0; j < trace1.size(); j++) {
+	            XEvent event1 = trace1.get(j);
+	            XEvent event2 = trace2.get(j);
+	            
+	            if (!compareEvents(event1, event2)) {
+	                return false;
+	            }
+	        }
+	    }
+	    
+	    return true;
+	}
+
+	private boolean compareEvents(XEvent event1, XEvent event2) {
+	    String name1 = XConceptExtension.instance().extractName(event1);
+	    String name2 = XConceptExtension.instance().extractName(event2);
+	    
+	    return (name1 != null && name1.equals(name2)) || (name1 == null && name2 == null);
+	}
+	
+	@Override
+	public int hashCode() {
+	    int result = 17;
+	    result = 31 * result + (log != null ? log.size() : 0);
+	    return result;
+	}
+	
 	public void setSpec(XLogPortObjectSpec spec) {
 		m_spec = spec;
 	}

@@ -39,7 +39,7 @@ class TimeFilter:
     column_param_time = knext.ColumnParameter(label="Time Column",
                                               description="The column that contains the timestamps.",
                                               port_index=0,
-                                              column_filter=knime_util.is_date)
+                                              column_filter=knime_util.is_type_timestamp)
 
     logging_verbosity = knext.EnumParameter(
         label="Filtering Mode",
@@ -59,20 +59,19 @@ class TimeFilter:
     def configure(self, configure_context: knext.ConfigurationContext, input_schema_1: knext.Schema):
         for par in [self.column_param_case, self.column_param_time, self.start_time_field, self.end_time_field]:
             if par is None or par == "":
-                raise ValueError("Parameters not set!")
+                raise knext.InvalidParametersError("Parameters not set! Please configure the node!")
 
         return input_schema_1
 
     def execute(self, exec_context, input_1):
         event_log = input_1.to_pandas()
-
+    
         # exec_context.set_warning("This is a warning")
         # LOGGER.warning(event_log.dtypes)
-        event_log[self.column_param_time + "UTC"] = pd.to_datetime(event_log[self.column_param_time],
-                                                                   format='%Y-%m-%d %H:%M:%S').dt.tz_localize(pytz.utc)
+        event_log[self.column_param_time + "UTC"] = pd.to_datetime(event_log[self.column_param_time], utc=True)
         # LOGGER.warning(event_log[self.column_param_time + "UTC"])
         event_log = event_log.sort_values(by=[self.column_param_case, self.column_param_time + "UTC"])
-
+    
         mode = 'traces_contained'
         if self.logging_verbosity == FilteringModes.INTERSECTING.name:
             mode = 'traces_intersecting'
@@ -80,16 +79,16 @@ class TimeFilter:
             mode = 'events'
         elif self.logging_verbosity != FilteringModes.CONTAINED.name:
             raise ValueError("Unknown filtering mode: " + self.logging_verbosity)
-        
+    
         start_dt_naive = datetime.datetime.combine(self.start_time_field, datetime.time.min)
         end_dt_naive = datetime.datetime.combine(self.end_time_field, datetime.time.max)
-
+    
         # Make the new datetime objects timezone-aware to match the event log
         start_dt_aware = pytz.utc.localize(start_dt_naive)
         end_dt_aware = pytz.utc.localize(end_dt_naive)
-
+    
         filtered_log = pm4py.filter_time_range(event_log,
-                                               start_dt_naive,
+                                               start_dt_aware,
                                                end_dt_aware,
                                                mode=mode,
                                                case_id_key=self.column_param_case,

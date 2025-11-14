@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClassifier;
@@ -288,4 +291,57 @@ public class PetriNetUtil {
 		InputStream input = new ByteArrayInputStream(stringPN.getBytes());
 		return importFromStream(input);
 	}
+	
+	public static List<String> getNormalizedTransitions(Petrinet net) {
+	    return net.getTransitions().stream()
+	        .map(t -> (t.getLabel() != null ? t.getLabel() : "") + "|" + t.isInvisible())
+	        .sorted()
+	        .collect(Collectors.toList());
+	}
+
+	public static List<String> getNormalizedPlaces(Petrinet net) {
+	    List<String> placeStructures = new ArrayList<>();
+
+	    for (Place p : net.getPlaces()) {
+	        String placeRep = normalizePlace(p, net);
+	        placeStructures.add(placeRep);
+	    }
+
+	    Collections.sort(placeStructures);
+	    return placeStructures;
+	}
+	
+	public static String normalizePlace(Place p, Petrinet net) {
+	    List<String> incoming = net.getInEdges(p).stream()
+	        .map(e -> labelOfTransition((Transition) e.getSource()))
+	        .sorted()
+	        .collect(Collectors.toList());
+
+	    List<String> outgoing = net.getOutEdges(p).stream()
+	        .map(e -> labelOfTransition((Transition) e.getTarget()))
+	        .sorted()
+	        .collect(Collectors.toList());
+
+	    return "(" + incoming + "," + outgoing + ")";
+	}
+
+	public static Set<String> getNormalizedMarking(Marking marking, Petrinet net) {
+	    return marking.stream()
+	        .map(p -> normalizePlace(p, net))
+	        .collect(Collectors.toCollection(TreeSet::new));
+	}
+
+	public static Set<Set<String>> getNormalizedMarkings(Collection<Marking> markings, Petrinet net) {
+	    Set<Set<String>> normalized = new TreeSet<>(Comparator.comparing(Set::toString));
+	    for (Marking m : markings) {
+	        normalized.add(getNormalizedMarking(m, net));
+	    }
+	    return normalized;
+	}
+
+	public static String labelOfTransition(Transition t) {
+	    return t.getLabel() != null ? t.getLabel() : "";
+	}
+	
+	
 }

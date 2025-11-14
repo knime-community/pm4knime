@@ -22,9 +22,6 @@ import org.knime.core.node.port.PortTypeRegistry;
 import org.pm4knime.util.PetriNetUtil;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.models.graphbased.directed.DirectedGraphEdge;
-import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
-import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeReduce.ReductionFailedException;
-import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
@@ -46,8 +43,6 @@ public class PetriNetPortObject extends AbstractJSONPortObject {
 			+ "Places within the final marking are highlighted with a heavier border.";
 	
 	
-	// use AcceptingPetriNet as the model
-	// m_anet: a field that carries anet
 	AcceptingPetriNet m_anet ;
 	PetriNetPortObjectSpec m_spec;
 	public PetriNetPortObject() {}
@@ -70,10 +65,6 @@ public class PetriNetPortObject extends AbstractJSONPortObject {
 		return "Transitions: " + m_anet.getNet().getTransitions().size() + ", Places: " + m_anet.getNet().getPlaces().size();
 	}
 
-	public boolean equals(Object o) {
-		return m_anet.equals(o);
-	}
-	
 	
 	@Override
 	public PetriNetPortObjectSpec getSpec() {
@@ -155,51 +146,100 @@ public class PetriNetPortObject extends AbstractJSONPortObject {
 		// TODO Auto-generated method stub
 		
 	}
-	
+		
 	public Map<String, List<?>> getJSON() {
-		Map<String, List<?>> result = new HashMap<>();
-		
-		Set<Place> finalMarkingPlaces = new TreeSet<Place>();
-		for (Marking setMarkings : m_anet.getFinalMarkings())
-			finalMarkingPlaces.addAll(setMarkings);	
-		
-		List<Node> nodes = new ArrayList<>();
-		
-		for(Place place : m_anet.getNet().getPlaces()) {
-			if(m_anet.getInitialMarking().contains(place))
-				nodes.add(new PlaceNode(place.getId().toString(), "place", "", true, false));
-			else if (finalMarkingPlaces.contains(place))
-				nodes.add(new PlaceNode(place.getId().toString(), "place", "", false, true));
-			else
-				nodes.add(new PlaceNode(place.getId().toString(), "place", "", false, false));
-		}
-		
-		for (Transition transition : m_anet.getNet().getTransitions())
-		{
-			String label = transition.getLabel();
-			if (transition.isInvisible())
-				nodes.add(new Node(transition.getId().toString(), "transition", ""));
-			else 
-				nodes.add(new Node(transition.getId().toString(), "transition", label));
-		}
-		
-		result.put("nodes", nodes);
-		
-		List<Link> links = new ArrayList<>();
-		
-		for (DirectedGraphEdge<?, ?> edge : m_anet.getNet().getEdges())
-		{
-			String source = edge.getSource().getId().toString();
-			String target = edge.getTarget().getId().toString();
-			links.add(new Link(source, target));
-		}
+	    Map<String, List<?>> result = new HashMap<>();
+	    
+	    Set<Place> finalMarkingPlaces = new TreeSet<Place>();
+	    for (Marking setMarkings : m_anet.getFinalMarkings())
+	        finalMarkingPlaces.addAll(setMarkings);	
+	    
+	    List<Map<String, Object>> nodes = new ArrayList<>();
+	    
+	    for(Place place : m_anet.getNet().getPlaces()) {
+	        Map<String, Object> placeNode = new HashMap<>();
+	        placeNode.put("id", place.getId().toString());
+	        placeNode.put("type", "place");
+	        placeNode.put("label", "");
+	        placeNode.put("initial", m_anet.getInitialMarking().contains(place));
+	        placeNode.put("final", finalMarkingPlaces.contains(place));
+	        nodes.add(placeNode);
+	    }
+	    
+	    for (Transition transition : m_anet.getNet().getTransitions()) {
+	        Map<String, Object> transitionNode = new HashMap<>();
+	        transitionNode.put("id", transition.getId().toString());
+	        transitionNode.put("type", "transition");
+	        
+	        String label = transition.getLabel();
+	        if (transition.isInvisible()) {
+	            transitionNode.put("label", "");
+	        } else {
+	            transitionNode.put("label", label != null ? label : "");
+	        }
+	        
+	        nodes.add(transitionNode);
+	    }
+	    
+	    result.put("nodes", nodes);
+	    
+	    List<Map<String, Object>> links = new ArrayList<>();
+	    
+	    for (DirectedGraphEdge<?, ?> edge : m_anet.getNet().getEdges()) {
+	        Map<String, Object> link = new HashMap<>();
+	        link.put("source", edge.getSource().getId().toString());
+	        link.put("target", edge.getTarget().getId().toString());
+	        links.add(link);
+	    }
 
-		result.put("links", links);
-		
-		return result;
-		
+	    result.put("links", links);
+	    
+//	    System.out.println(result);
+	    return result;
 	}
 	
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+	    if (obj == null || getClass() != obj.getClass()) return false;
+
+	    PetriNetPortObject other = (PetriNetPortObject) obj;
+
+	    AcceptingPetriNet net1 = this.m_anet;
+	    AcceptingPetriNet net2 = other.m_anet;
+
+	    // Compare transitions
+	    List<String> transitions1 = PetriNetUtil.getNormalizedTransitions(net1.getNet());
+	    List<String> transitions2 = PetriNetUtil.getNormalizedTransitions(net2.getNet());
+	    if (!transitions1.equals(transitions2)) return false;
+
+	    // Compare place structures
+	    List<String> places1 = PetriNetUtil.getNormalizedPlaces(net1.getNet());
+	    List<String> places2 = PetriNetUtil.getNormalizedPlaces(net2.getNet());
+	    if (!places1.equals(places2)) return false;
+
+	    // Compare initial markings
+	    Set<String> initMarking1 = PetriNetUtil.getNormalizedMarking(net1.getInitialMarking(), net1.getNet());
+	    Set<String> initMarking2 = PetriNetUtil.getNormalizedMarking(net2.getInitialMarking(), net2.getNet());
+	    if (!initMarking1.equals(initMarking2)) return false;
+
+	    // Compare final markings
+	    Set<Set<String>> finalMarkings1 = PetriNetUtil.getNormalizedMarkings(net1.getFinalMarkings(), net1.getNet());
+	    Set<Set<String>> finalMarkings2 = PetriNetUtil.getNormalizedMarkings(net2.getFinalMarkings(), net2.getNet());
+	    return finalMarkings1.equals(finalMarkings2);
+	}
+
+	@Override
+	public int hashCode() {
+	    AcceptingPetriNet net = this.m_anet;
+
+	    int result = 17;
+	    result = 31 * result + PetriNetUtil.getNormalizedTransitions(net.getNet()).hashCode();
+	    result = 31 * result + PetriNetUtil.getNormalizedPlaces(net.getNet()).hashCode();
+	    result = 31 * result + PetriNetUtil.getNormalizedMarking(net.getInitialMarking(), net.getNet()).hashCode();
+	    result = 31 * result + PetriNetUtil.getNormalizedMarkings(net.getFinalMarkings(), net.getNet()).hashCode();
+	    return result;
+	}
 	
 }

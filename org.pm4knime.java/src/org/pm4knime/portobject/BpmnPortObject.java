@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class BpmnPortObject extends AbstractJSONPortObject {
 
 	private static final String ZIP_ENTRY_NAME = "BpmnPortObject";
 
-	static String model_xml;
+	private String model_xml;
 	static boolean enable_auto_layout;
 	BpmnPortObjectSpec m_spec;
 
@@ -62,11 +63,39 @@ public class BpmnPortObject extends AbstractJSONPortObject {
 	public String getSummary() {
 		return model_xml;
 	}
-
 	
-	public boolean equals(Object o) {
-		return model_xml.equals(o);
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null || getClass() != obj.getClass()) return false;
+
+		BpmnPortObject other = (BpmnPortObject) obj;
+
+		String xml1 = normalizeXml(this.model_xml);
+		String xml2 = normalizeXml(other.model_xml);
+		
+		return Objects.equals(xml1, xml2);
 	}
+
+	@Override
+	public int hashCode() {
+		int result = 17;
+		String normalized = normalizeXml(this.model_xml);
+		result = 31 * result + (normalized != null ? normalized.hashCode() : 0);
+		return result;
+	}
+
+	private String normalizeXml(String xml) {
+		if (xml == null) return null;
+		
+		String normalized = xml.replaceAll(">\\s+<", "><");
+		
+		normalized = normalized.replaceAll("node_[a-f0-9\\-]+", "NORMALIZED_ID");
+		normalized = normalized.replaceAll("id[a-f0-9]{32,}", "NORMALIZED_ID");
+		
+		return normalized;
+	}
+
 
 	@Override
 	public BpmnPortObjectSpec getSpec() {
@@ -95,8 +124,8 @@ public class BpmnPortObject extends AbstractJSONPortObject {
 
         DataOutputStream dataOut = new DataOutputStream(out);
         dataOut.writeBoolean(BpmnPortObject.enable_auto_layout); // Save static field
-        if (BpmnPortObject.model_xml != null) {
-            byte[] xmlBytes = BpmnPortObject.model_xml.getBytes(StandardCharsets.UTF_8);
+        if (this.model_xml != null) {
+            byte[] xmlBytes = this.model_xml.getBytes(StandardCharsets.UTF_8);
             dataOut.writeInt(xmlBytes.length);
             dataOut.write(xmlBytes);
         } else {
@@ -106,8 +135,8 @@ public class BpmnPortObject extends AbstractJSONPortObject {
         out.closeEntry();
     }
 	
-	public static String exportBPMNDiagram() throws Exception {		   
-		return model_xml;
+	public String exportBPMNDiagram() throws Exception {		   
+		return this.model_xml;
 	}
 	
 
@@ -132,16 +161,16 @@ public class BpmnPortObject extends AbstractJSONPortObject {
         BpmnPortObject.enable_auto_layout = dataIn.readBoolean();
         int len = dataIn.readInt();
         if (len == -1) {
-            BpmnPortObject.model_xml = null;
+            this.model_xml = null;
         } else if (len < 0) {
             throw new IOException("Invalid length for BPMN XML: " + len);
         } else if (len == 0) {
-            BpmnPortObject.model_xml = "";
+            this.model_xml = "";
         }
         else {
             byte[] xmlBytes = new byte[len];
             dataIn.readFully(xmlBytes); 
-            BpmnPortObject.model_xml = new String(xmlBytes, StandardCharsets.UTF_8);
+            this.model_xml = new String(xmlBytes, StandardCharsets.UTF_8);
         }
         in.closeEntry();
         System.out.println("BpmnPortObject: Load successful (static fields updated).");
@@ -157,7 +186,7 @@ public class BpmnPortObject extends AbstractJSONPortObject {
 	    int len = dataIn.readInt();
 	    byte[] xmlBytes = new byte[len];
 	    dataIn.readFully(xmlBytes);
-	    model_xml = new String(xmlBytes, StandardCharsets.UTF_8);
+	    String model_xml = new String(xmlBytes, StandardCharsets.UTF_8);
 		
 		
 		res = List.of(enable_auto_layout, model_xml);

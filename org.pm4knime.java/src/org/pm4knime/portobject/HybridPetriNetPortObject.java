@@ -25,6 +25,7 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.PortTypeRegistry;
 import org.pm4knime.node.visualizations.jsgraphviz.util.GraphvizHybridPetriNet;
 import org.pm4knime.util.HybridPetriNetUtil;
+import org.pm4knime.util.PetriNetUtil;
 import org.processmining.extendedhybridminer.models.hybridpetrinet.ExtendedHybridPetrinet;
 import org.processmining.models.graphbased.directed.DirectedGraphEdge;
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
@@ -54,13 +55,13 @@ public class HybridPetriNetPortObject extends AbstractJSONPortObject {
 			+ "(2) weak dependencies are represented by red dotted arcs (uncertain arcs); "
 			+ "(3) long-term dependencies are represented by orange solid arcs.";
 	
-	static ExtendedHybridPetrinet pn ;
+	ExtendedHybridPetrinet pn ;
 	HybridPetriNetPortObjectSpec m_spec;
 	
 	public HybridPetriNetPortObject() {}
 	
 	public HybridPetriNetPortObject(ExtendedHybridPetrinet pn) {
-		HybridPetriNetPortObject.pn = pn;
+		this.pn = pn;
 	}
 	
 	
@@ -77,10 +78,6 @@ public class HybridPetriNetPortObject extends AbstractJSONPortObject {
 		return "Transitions: " + pn.getTransitions().size() + ", Places: " + pn.getPlaces().size();
 	}
 
-	public boolean equals(Object o) {
-		return pn.equals(o);
-	}
-	
 	
 	@Override
 	public HybridPetriNetPortObjectSpec getSpec() {
@@ -229,4 +226,54 @@ public class HybridPetriNetPortObject extends AbstractJSONPortObject {
 		return result;
 		
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+	    if (obj == null || getClass() != obj.getClass()) return false;
+
+	    HybridPetriNetPortObject other = (HybridPetriNetPortObject) obj;
+	    ExtendedHybridPetrinet net1 = this.getPN();
+	    ExtendedHybridPetrinet net2 = other.getPN();
+	    
+	    // Compare transitions
+	    List<String> transitions1 = PetriNetUtil.getNormalizedTransitions(net1);
+	    List<String> transitions2 = PetriNetUtil.getNormalizedTransitions(net2);
+	    if (!transitions1.equals(transitions2)) return false;
+
+	    // Compare place structures
+	    List<String> places1 = PetriNetUtil.getNormalizedPlaces(net1);
+	    List<String> places2 = PetriNetUtil.getNormalizedPlaces(net2);
+	    if (!places1.equals(places2)) return false;
+	    
+		 // Compare informal arcs
+	    if (!HybridPetriNetUtil.getInformalArcs(net1).equals(HybridPetriNetUtil.getInformalArcs(net2))) return false;
+
+	    // Compare initial markings
+	    Set<String> initMarking1 = PetriNetUtil.getNormalizedMarking(net1.initialMarking, net1);
+	    Set<String> initMarking2 = PetriNetUtil.getNormalizedMarking(net2.initialMarking, net2);
+	    if (!initMarking1.equals(initMarking2)) return false;
+
+	    // Compare final markings
+	    Set<Set<String>> finalMarkings1 = PetriNetUtil.getNormalizedMarkings(net1.finalMarkings, net1);
+	    Set<Set<String>> finalMarkings2 = PetriNetUtil.getNormalizedMarkings(net2.finalMarkings, net2);
+	    return finalMarkings1.equals(finalMarkings2);
+	}
+
+	@Override
+	public int hashCode() {
+	    ExtendedHybridPetrinet net = this.getPN();
+
+	    int result = 17;
+	    result = 31 * result + PetriNetUtil.getNormalizedTransitions(net).hashCode();
+	    result = 31 * result + PetriNetUtil.getNormalizedPlaces(net).hashCode();
+	    result = 31 * result + HybridPetriNetUtil.getInformalArcs(net).hashCode();
+	    result = 31 * result + PetriNetUtil.getNormalizedMarking(net.initialMarking, net).hashCode();
+	    result = 31 * result + PetriNetUtil.getNormalizedMarkings(net.finalMarkings, net).hashCode();
+
+	    return result;
+	}
+
+	
+	
 }

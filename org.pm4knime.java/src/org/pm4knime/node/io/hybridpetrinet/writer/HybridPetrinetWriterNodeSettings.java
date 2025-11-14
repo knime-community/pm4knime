@@ -1,12 +1,12 @@
 package org.pm4knime.node.io.hybridpetrinet.writer;
 
 
+import org.knime.core.webui.node.dialog.defaultdialog.internal.file.FileSelection;
 import org.knime.core.webui.node.dialog.defaultdialog.internal.file.FileWriterWidget;
 import org.knime.node.parameters.Widget;
-import org.pm4knime.util.NodeSettingsUtils;
 import org.pm4knime.util.defaultnode.WriterNodeSettings;
 
-
+@SuppressWarnings("restriction")
 public final class HybridPetrinetWriterNodeSettings extends WriterNodeSettings {
 
 	@Widget( 
@@ -16,8 +16,9 @@ public final class HybridPetrinetWriterNodeSettings extends WriterNodeSettings {
                 The folder or workflow group in which the output file shall be written has to exist.
                 """ 
     )
+	
 	@FileWriterWidget(fileExtension = "pnml")
-	String m_outputFile = NodeSettingsUtils.getPathInUserHomeDir("hybrid_petri_net.pnml");
+	public FileSelection m_outputFile = new FileSelection();
 
 	public String getExtension() {
 		// TODO Auto-generated method stub

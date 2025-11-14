@@ -293,25 +293,25 @@
         
         
         
-        <node category-path="/community/processmining/conversion" factory-class="org.pm4knime.node.conversion.pn2table.PetriNet2TableConverterNodeFactory"/>
+        <node category-path="/community/processmining/conversion" deprecated="true" factory-class="org.pm4knime.node.conversion.pn2table.PetriNet2TableConverterNodeFactory"/>
                                         		
         
         
         
         
-        <node category-path="/community/processmining/conversion" factory-class="org.pm4knime.node.conversion.table2pn.Table2PetriNetConverterNodeFactory"/>
+        <node category-path="/community/processmining/conversion" deprecated="true" factory-class="org.pm4knime.node.conversion.table2pn.Table2PetriNetConverterNodeFactory"/>
                                         		
         
         
         
         
-        <node category-path="/community/processmining/conversion" factory-class="org.pm4knime.node.conversion.hpn2table.HybridPetriNet2TableConverterNodeFactory"/>
+        <node category-path="/community/processmining/conversion" deprecated="true" factory-class="org.pm4knime.node.conversion.hpn2table.HybridPetriNet2TableConverterNodeFactory"/>
                                         		
         
         
         
         
-        <node category-path="/community/processmining/conversion" factory-class="org.pm4knime.node.conversion.table2hpn.Table2HybridPetriNetConverterNodeFactory"/>
+        <node category-path="/community/processmining/conversion" deprecated="true" factory-class="org.pm4knime.node.conversion.table2hpn.Table2HybridPetriNetConverterNodeFactory"/>
                                         		
 		
         
@@ -761,10 +761,7 @@
             <importResource relativePath="js-libs/variantExplorer.js" type="JAVASCRIPT"/>
                                                                         
             
-            
-            
-            
-            <importResource relativePath="js-libs/variantExplorer.css" type="CSS"/>
+
             <webDependency webResourceBundleID="bootstrap_3.3.6"> </webDependency>                                                       
 
     
@@ -923,11 +920,22 @@
         </Module>
      
     </extension>
-                                                        
-
-
-
-
+    
+    
+     <extension point="org.knime.python3.types.PythonPortObjectConverter">
+        <Module modulePath="python" moduleName="utils.petri_net_type">
+            <KnimeToPythonPortObjectConverter
+                JavaConverterClass="org.pm4knime.portobject.PetriNetPortObjectConverter"
+                PythonConverterClass="PetriNetPortConverter">
+            </KnimeToPythonPortObjectConverter>
+            <PythonToKnimePortObjectConverter
+                JavaConverterClass="org.pm4knime.portobject.PetriNetPortObjectConverter"
+                PythonConverterClass="PetriNetPortConverter">
+            </PythonToKnimePortObjectConverter>
+        </Module>
+    </extension>
+    
+    
 
 
 
