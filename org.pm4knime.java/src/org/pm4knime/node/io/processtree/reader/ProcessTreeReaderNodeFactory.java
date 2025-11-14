@@ -15,7 +15,7 @@ public class ProcessTreeReaderNodeFactory extends WebUINodeFactory<ProcessTreeRe
 	ProcessTreeReaderNodeModel node;
 
 	private static final WebUINodeConfiguration CONFIG = WebUINodeConfiguration.builder()
-			.name("ProcessTree Reader").icon("../../read.png")
+			.name("Process Tree Reader").icon("../../read.png")
 			.shortDescription("Import a process tree from a PTML file.")
 			.fullDescription("Import a process tree from a PTML file.")
 			.modelSettingsClass(ReaderNodeSettings.class)
