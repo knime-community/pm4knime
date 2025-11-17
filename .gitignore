@@ -17,3 +17,5 @@ __pycache__/
 ivy-2.5.0.jar
 
 org.pm4knime.python/config.yml
+
+pixi.lock
