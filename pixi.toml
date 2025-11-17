@@ -5,15 +5,16 @@ platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 [tasks]
 
 [dependencies]
-python = "3.11.*"
+python = "*"
 knime-extension = "*"
 knime-python-base = "*"
-intervaltree = ">=3.1.0,<4"
-pydotplus = ">=2.0.2,<3"
-pip = ">=25.1.1,<26"
+knime-python-versions = "*"
+intervaltree = "*"
+pydotplus = "*"
+pip = "*"
 
 [feature.build.dependencies]
-python = "3.9.*"
+python = "*"
 knime-extension-bundling = "*"
 
 [feature.debug.dependencies]
