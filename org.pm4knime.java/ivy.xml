@@ -6,6 +6,12 @@
     </info>
 
     <dependencies>
+		
+		<!-- New Jackson versions to override what ProM requires -->
+	    <dependency org="com.fasterxml.jackson.core" name="jackson-databind"    rev="2.17.2"/>
+	    <dependency org="com.fasterxml.jackson.core" name="jackson-core"       rev="2.17.2"/>
+	    <dependency org="com.fasterxml.jackson.core" name="jackson-annotations" rev="2.17.2"/>
+		
     	<!-- ProM dependencies. -->
     	<!-- Please put every ProM dependency on a single line. -->
     	<!-- ProM framework. -->
@@ -29,7 +35,7 @@
     	<dependency org="prom" name="LogProjection" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="IncorporateNegativeInformation" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="XESStandard" rev="latest" changing="true" transitive="true"/>
-    	 <dependency org="prom" name="XESStandardConnector" rev="latest" changing="true" transitive="true"/>
+    	<dependency org="prom" name="XESStandardConnector" rev="latest" changing="true" transitive="true"/>
     	
     	
     	<!-- category: conformance and performance -->
@@ -37,5 +43,7 @@
     	<dependency org="prom" name="PNetAlignmentAnalysis" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="Performance" rev="latest" changing="true" transitive="true" />	
     	<dependency org="prom" name="ETConformance" rev="latest" changing="true" transitive="true" />	
+
+
     </dependencies>
 </ivy-module>
