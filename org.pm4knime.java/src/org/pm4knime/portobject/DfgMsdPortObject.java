@@ -22,10 +22,8 @@ import org.knime.core.node.port.PortObjectZipOutputStream;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.PortTypeRegistry;
 import org.processmining.models.graphbased.NodeID;
-import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveminer2.helperclasses.graphs.IntGraph;
 import org.processmining.plugins.inductiveminer2.plugins.DfgMsdImportPlugin;
-import org.processmining.plugins.inductiveminer2.plugins.DfgMsdVisualisationPlugin;
 import org.processmining.plugins.inductiveminer2.withoutlog.dfgmsd.DfgMsd;
 	
 
@@ -163,29 +161,9 @@ public class DfgMsdPortObject extends AbstractJSONPortObject {
 	}
 	@Override
 	public JComponent[] getViews() {
-		// TODO it has view which is
-		// we need to change the steps..
-		//JComponent viewPanel = DfgMsdVisualisationPlugin.fancy((DirectlyFollowsGraph) dfm);
-		//		JComponent viewPanel = getDotPanel();
-		//		viewPanel.setName("Directly Follows Model");
-		//		return new JComponent[] { viewPanel };
 		return new JComponent[] { };
 	}
 
-	public DotPanel getDotPanel() {
-
-		if(dfm != null) {
-			DotPanel navDot = DfgMsdVisualisationPlugin.fancy(dfm);
-
-			navDot.setName("Generated DFG Model");
-			return navDot;
-
-		}
-
-
-		return null;
-
-	}
 
 	@Override
 	protected void save(PortObjectZipOutputStream out, ExecutionMonitor exec)

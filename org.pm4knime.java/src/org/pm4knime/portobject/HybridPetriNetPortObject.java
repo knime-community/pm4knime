@@ -23,7 +23,6 @@ import org.knime.core.node.port.PortObjectZipInputStream;
 import org.knime.core.node.port.PortObjectZipOutputStream;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.PortTypeRegistry;
-import org.pm4knime.node.visualizations.jsgraphviz.util.GraphvizHybridPetriNet;
 import org.pm4knime.util.HybridPetriNetUtil;
 import org.pm4knime.util.PetriNetUtil;
 import org.processmining.extendedhybridminer.models.hybridpetrinet.ExtendedHybridPetrinet;
@@ -31,7 +30,6 @@ import org.processmining.models.graphbased.directed.DirectedGraphEdge;
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.semantics.petrinet.Marking;
-import org.processmining.plugins.graphviz.visualisation.DotPanel;
 
 
 public class HybridPetriNetPortObject extends AbstractJSONPortObject {
@@ -112,19 +110,6 @@ public class HybridPetriNetPortObject extends AbstractJSONPortObject {
 		return new JComponent[] {};
 	}
 	
-    public DotPanel getDotPanel() {
-		
-		if(pn != null) {
-			
-			DotPanel navDot;
-			navDot = new DotPanel(GraphvizHybridPetriNet.convert(pn));
-			navDot.setName("Generated hybrid petri net");
-			return navDot;
-			
-		}
-		return null;
-		
-	}
 
 	
 	@Override
