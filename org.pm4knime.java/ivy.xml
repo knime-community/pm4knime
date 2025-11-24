@@ -19,6 +19,12 @@
 	    <dependency org="com.google.protobuf" name="protobuf-java" rev="3.25.5" force="true"/>
 	    <dependency org="org.codehaus.jettison" name="jettison" rev="1.5.4" force="true"/>
 	    <dependency org="org.jdom" name="jdom2" rev="2.0.6.1" force="true"/>
+	    <dependency org="com.google.guava" name="guava" rev="16.0.1" force="true"/>
+		<dependency org="org.beanshell" name="bsh" rev="2.0b4" force="true"/>
+	    
+	    <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
+		<dependency org="javax.xml.bind" name="jaxb-api" rev="2.4.0-b180830.0359" force="true">
+		</dependency>
 	    
 
 		
@@ -36,9 +42,6 @@
     	<dependency org="prom" name="BPMNConversions" rev="latest" changing="true" transitive="true" />      
     	 
     	
-    	<!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
-		<dependency org="javax.xml.bind" name="jaxb-api" rev="2.4.0-b180830.0359"/>
-				
     	
     	<!-- category: manipulation -->
     	<dependency org="prom" name="LogEnhancement" rev="latest" changing="true" transitive="true" />
@@ -59,7 +62,30 @@
     	<exclude org="org.jdom" module="jdom"/> 
     	<exclude org="io.gatling.uncommons.maths" module="uncommons-maths"/>
     	<exclude org="org.mozilla" module="rhino"/>
-
+    	<exclude org="prom-libs" module="guava"/>
+		<exclude org="prom-libs" module="bsh"/>
+		
+		<exclude org="prom-libs" module="flanagan"/>
+		<exclude org="prom-libs" module="javabdd"/>
+		<exclude org="prom-libs" module="ujmp-complete"/>
+		<exclude org="prom-libs" module="gurobi"/>
+		<exclude org="prom-libs" module="jas-plotter"/>
+		<exclude org="prom-libs" module="javailp"/>
+		<exclude org="prom-libs" module="japura"/>
+		<exclude org="prom-libs" module="jbpt"/>
+		<exclude org="prom-libs" module="saxon"/>
+		<exclude org="prom-libs" module="simmetrics"/>
+		<exclude org="prom-libs" module="jargs"/>
+		<exclude org="prom-libs" module="org.eclipse.uml2.uml"/>
+		<exclude org="prom-libs" module="javacsv"/>
+		<exclude org="prom-libs" module="opencsv"/>
+		<exclude org="prom-libs" module="AccessCPN"/>
+		<exclude org="prom-libs" module="org.eclipse.emf.ecore"/>
+		<exclude org="prom-libs" module="YAWLEditor"/>
+		<exclude org="prom-libs" module="jmathplot"/>
+		<exclude org="prom-libs" module="FilterableSortableTablePanel"/>
+		<exclude org="prom-libs" module="openide-lookup"/>
+		<exclude org="prom-libs" module="jgrapht"/>
 
 
     </dependencies>
