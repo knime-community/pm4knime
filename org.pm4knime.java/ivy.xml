@@ -20,7 +20,6 @@
 	    <dependency org="org.codehaus.jettison" name="jettison" rev="1.5.4" force="true"/>
 	    <dependency org="org.jdom" name="jdom2" rev="2.0.6.1" force="true"/>
 	    <dependency org="com.google.guava" name="guava" rev="16.0.1" force="true"/>
-		<dependency org="org.beanshell" name="bsh" rev="2.0b4" force="true"/>
 	    
 	    <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
 		<dependency org="javax.xml.bind" name="jaxb-api" rev="2.4.0-b180830.0359" force="true">
@@ -86,6 +85,7 @@
 		<exclude org="prom-libs" module="FilterableSortableTablePanel"/>
 		<exclude org="prom-libs" module="openide-lookup"/>
 		<exclude org="prom-libs" module="jgrapht"/>
+		<exclude org="org.beanshell" module="bsh"/>
 
 
     </dependencies>
