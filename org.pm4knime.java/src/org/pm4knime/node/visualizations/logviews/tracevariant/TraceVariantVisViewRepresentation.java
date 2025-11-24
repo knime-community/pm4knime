@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
+import java.util.Objects;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -60,19 +59,13 @@ public class TraceVariantVisViewRepresentation extends JSONViewContent {
 			return false;
 		}
 		TraceVariantVisViewRepresentation other = (TraceVariantVisViewRepresentation)obj;
-		return new EqualsBuilder()
-				.append(data, other.data)
-                .isEquals() && new EqualsBuilder()
-				.append(variants, other.variants)
-                .isEquals();
+		return Objects.deepEquals(data, other.data)
+		        && Objects.equals(variants, other.variants);
 	}
 
 	@Override
 	public int hashCode() {
-		HashCodeBuilder b = new HashCodeBuilder();
-		b.append(data);
-		b.append(variants);
-		return b.toHashCode();
+		return Objects.hash(Arrays.deepHashCode(data), variants);
 	}
 
 	public void setData(String[] size) {
