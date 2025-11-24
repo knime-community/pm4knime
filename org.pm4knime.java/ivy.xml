@@ -15,6 +15,12 @@
 	    <dependency org="com.fasterxml.jackson.core" name="jackson-databind"    rev="2.19.2"/>
 	    <dependency org="com.fasterxml.jackson.core" name="jackson-core"       rev="2.19.2"/>
 	    <dependency org="com.fasterxml.jackson.core" name="jackson-annotations" rev="2.19.2"/>
+	    
+	    <dependency org="com.google.protobuf" name="protobuf-java" rev="3.25.5" force="true"/>
+	    <dependency org="org.codehaus.jettison" name="jettison" rev="1.5.4" force="true"/>
+	    <dependency org="org.jdom" name="jdom2" rev="2.0.6.1" force="true"/>
+	    
+
 		
     	<!-- ProM dependencies. -->
     	<!-- Please put every ProM dependency on a single line. -->
@@ -45,11 +51,16 @@
     	<!-- category: conformance and performance -->
     	<dependency org="prom" name="PNetAlignmentAnalysis" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="Performance" rev="latest" changing="true" transitive="true" />	
-    	<dependency org="prom" name="ETConformance" rev="latest" changing="true" transitive="true" />	
+    	<dependency org="prom" name="ETConformance" rev="latest" changing="true" transitive="true" />
+    		
     	
     	<!-- Global exclusions -->
     	<exclude org="prom" module="GraphViz"/>
-  
+    	<exclude org="org.jdom" module="jdom"/> 
+    	<exclude org="io.gatling.uncommons.maths" module="uncommons-maths"/>
+    	<exclude org="org.mozilla" module="rhino"/>
+
+
 
     </dependencies>
 </ivy-module>
