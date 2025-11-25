@@ -62,7 +62,6 @@
 
 	                <name name="**/*-tests.jar"/>
 	                <name name="**/*-test.jar"/>
-	                <name name="**/*test*.jar"/>
 
 	                <name name="**/*javadoc*.jar"/>
 	                <name name="**/*sources*.jar"/>
