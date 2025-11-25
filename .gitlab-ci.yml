@@ -9,7 +9,7 @@ mirror-to-github-and-create-pr:
     - when: never
   variables:
     GIT_DEPTH: "0"
-    GITHUB_REPO: "fit-process-mining/sbpm"
+    GITHUB_REPO: "pm4knime/pm4knime"
   script: |
     set -e
     echo "Mirroring GitLab '$CI_COMMIT_REF_NAME' -> GitHub 'dev'..."
