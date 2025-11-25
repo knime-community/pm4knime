@@ -75,7 +75,9 @@
     	<dependency org="prom" name="PNetAlignmentAnalysis" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="Performance" rev="latest" changing="true" transitive="true" />	
     	<dependency org="prom" name="ETConformance" rev="latest" changing="true" transitive="true" />
-    		
+    	
+    	
+ 		
     	
     	<!-- Global exclusions -->
     	<exclude org="prom" module="GraphViz"/>
@@ -117,7 +119,18 @@
 		<exclude org="javax.xml" module="jaxrpc"/>
 		<exclude org="javax.xml" module="saaj"/>
 		<exclude org="wsdl4j" module="wsdl4j"/>
-		<exclude org="com.google.guava" module="guava-testlib"/>		
+		<exclude org="com.google.guava" module="guava-testlib"/>	
+		
+		<exclude org="org.apache.ant" module="ant-antunit"/>
+		<exclude org="*" module="junit4-ant"/>
+		<exclude org="commons-collections" module="commons-collections-testframework"/>	
+		<exclude org="*" module="org.mozilla.javascript"/>	
+		<exclude org="dom4j" module="dom4j"/>
+		
+		<exclude org="commons-lang" module="commons-lang"/>
+		<exclude org="apache" module="commons-lang"/>
+		<exclude org="prom-libs" module="commons-lang"/>
+		<exclude org="*" module="jython-standalone"/>
 
 
     </dependencies>
