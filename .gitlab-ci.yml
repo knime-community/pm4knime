@@ -1,73 +1,47 @@
 stages:
   - mirror
 
-variables:
-  GIT_DEPTH: "0"
-  GITHUB_REPO: "pm4knime/pm4knime"  
-
 mirror-to-github-and-create-pr:
   stage: mirror
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev"'
-      when: always
+      when: on_success
     - when: never
-  script:
-    - echo "Mirroring '$CI_COMMIT_REF_NAME' pipeline commit to GitHub branch 'dev'..."
+  variables:
+    GIT_DEPTH: "0"
+    GITHUB_REPO: "fit-process-mining/sbpm"
+  script: |
+    set -e
+    echo "Mirroring GitLab '$CI_COMMIT_REF_NAME' -> GitHub 'dev'..."
+    git config user.name "fit-humam-kourani"
+    git config user.email "humam.kourani@fit.fraunhofer.de"
+    git fetch --unshallow || echo "Repo is already complete"
+    git remote remove github 2>/dev/null || true
+    git remote add github "https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git"
+    git push github "HEAD:refs/heads/dev"
 
-    - git config user.name "fit-humam-kourani"
-    - git config user.email "humam.kourani@fit.fraunhofer.de"
+    echo "Creating (or reusing) PR on GitHub: dev -> nightly"
+    GITHUB_OWNER="${GITHUB_REPO%/*}"
 
-    - git fetch --unshallow || echo "Repo is already complete"
+    resp=$(curl -sS \
+      -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+      -H "Accept: application/vnd.github+json" \
+      "https://api.github.com/repos/${GITHUB_REPO}/pulls?state=open&head=${GITHUB_OWNER}:dev&base=nightly")
 
-    - git remote remove github 2>/dev/null || true
-    - git remote add github "https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git"
+    if echo "$resp" | grep -q '"number":'; then
+      echo "Open PR already exists dev -> nightly. Done."
+      exit 0
+    fi
 
-    # push current HEAD to GitHub dev branch
-    - git push github "HEAD:refs/heads/dev"
+    curl -sS -X POST \
+      -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+      -H "Accept: application/vnd.github+json" \
+      "https://api.github.com/repos/${GITHUB_REPO}/pulls" \
+      -d "{
+        \"title\": \"Merge dev into nightly\",
+        \"head\": \"dev\",
+        \"base\": \"nightly\",
+        \"body\": \"Automated PR created by GitLab CI after mirroring to GitHub dev.\"
+      }"
 
-    - echo "Creating (or reusing) PR on GitHub: dev -> nightly"
-    - export GITHUB_OWNER="${GITHUB_REPO%/*}"
-
-    # check if an open PR already exists
-    - |
-      resp=$(curl -sS -w "\nHTTP_STATUS:%{http_code}\n" \
-        -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-        -H "Accept: application/vnd.github+json" \
-        "https://api.github.com/repos/${GITHUB_REPO}/pulls?state=open&head=${GITHUB_OWNER}:dev&base=nightly")
-
-      echo "$resp"
-      status=$(echo "$resp" | sed -n 's/HTTP_STATUS://p')
-      body=$(echo "$resp" | sed '/HTTP_STATUS:/d')
-
-      if [ "$status" -ne 200 ]; then
-        echo "Failed to list PRs. HTTP $status"
-        exit 1
-      fi
-
-      if echo "$body" | grep -q '"number":'; then
-        echo "Open PR already exists dev -> nightly. Done."
-        exit 0
-      fi
-
-    # create PR
-    - |
-      resp=$(curl -sS -w "\nHTTP_STATUS:%{http_code}\n" -X POST \
-        -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-        -H "Accept: application/vnd.github+json" \
-        "https://api.github.com/repos/${GITHUB_REPO}/pulls" \
-        -d "{
-          \"title\": \"Merge dev into nightly\",
-          \"head\": \"dev\",
-          \"base\": \"nightly\",
-          \"body\": \"Automated PR created by GitLab CI after mirroring to GitHub dev.\"
-        }")
-
-      echo "$resp"
-      status=$(echo "$resp" | sed -n 's/HTTP_STATUS://p')
-
-      if [ "$status" -ne 201 ]; then
-        echo "PR creation failed. HTTP $status"
-        exit 1
-      fi
-
-      echo "PR created successfully."
+    echo "PR created successfully."
