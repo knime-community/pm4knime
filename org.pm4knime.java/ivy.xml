@@ -19,12 +19,33 @@
 	    <dependency org="com.google.protobuf" name="protobuf-java" rev="3.25.5" force="true"/>
 	    <dependency org="org.codehaus.jettison" name="jettison" rev="1.5.4" force="true"/>
 	    <dependency org="org.jdom" name="jdom2" rev="2.0.6.1" force="true"/>
-	    <dependency org="com.google.guava" name="guava" rev="16.0.1" force="true"/>
+	    <dependency org="com.google.guava" name="guava" rev="33.5.0-jre" force="true"/>
 	    
-	    <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
-		<dependency org="javax.xml.bind" name="jaxb-api" rev="2.4.0-b180830.0359" force="true">
+	    <dependency org="org.apache.ant" name="ant" rev="1.10.15" force="true"/>
+	    <dependency org="com.google.code.gson" name="gson" rev="2.13.2" force="true"/>
+	    <dependency org="org.apache.commons" name="commons-compress" rev="1.28.0" force="true"/>
+	    <dependency org="commons-io" name="commons-io" rev="2.21.0" force="true"/>
+	    <dependency org="org.apache.commons" name="commons-lang3" rev="3.20.0" force="true"/>
+	    <dependency org="net.sourceforge.collections" name="collections-generic" rev="4.01" force="true"/>
+	    <dependency org="org.dom4j" name="dom4j" rev="2.2.0" force="true"/>
+	    
+	    <dependency org="commons-beanutils" name="commons-beanutils" rev="1.11.0" force="true"/>
+	    <dependency org="com.fasterxml.util" name="java-merge-sort" rev="1.1.0" force="true"/>
+	    
+	    <dependency org="org.mozilla" name="rhino" rev="1.8.0" force="true"/>
+	    <dependency org="xalan" name="xalan" rev="2.7.3" force="true"/>
+		<dependency org="xalan" name="serializer" rev="2.7.3" force="true"/>
+		
+		<dependency org="org.mapdb" name="mapdb" rev="2.0-beta13" force="true">
+		  <artifact name="mapdb" type="jar" ext="jar"/>
 		</dependency>
-	    
+		<dependency org="org.lz4" name="lz4-java" rev="1.8.0" force="true">
+		  <artifact name="lz4-java" type="jar" ext="jar"/>
+		</dependency>
+		<dependency org="javax.xml.bind" name="jaxb-api" rev="2.3.1" force="true"/>
+		<dependency org="org.glassfish.jaxb" name="jaxb-runtime" rev="2.3.9" force="true"/>
+		<dependency org="com.sun.activation" name="javax.activation" rev="1.2.0" force="true"/>
+
 
 		
     	<!-- ProM dependencies. -->
@@ -59,8 +80,9 @@
     	<!-- Global exclusions -->
     	<exclude org="prom" module="GraphViz"/>
     	<exclude org="org.jdom" module="jdom"/> 
+    	<exclude org="org.jdom" module="jdom-legacy"/>
     	<exclude org="io.gatling.uncommons.maths" module="uncommons-maths"/>
-    	<exclude org="org.mozilla" module="rhino"/>
+    	<exclude org="org.mozilla" module="javascript"/>
     	<exclude org="prom-libs" module="guava"/>
 		<exclude org="prom-libs" module="bsh"/>
 		
@@ -86,6 +108,16 @@
 		<exclude org="prom-libs" module="openide-lookup"/>
 		<exclude org="prom-libs" module="jgrapht"/>
 		<exclude org="org.beanshell" module="bsh"/>
+		
+		<exclude org="prom-libs" module="ant"/>
+		<exclude org="net.sourceforge.f2j" module="arpack_combined_all"/>
+		<exclude org="prom-libs" module="arpack_combined_all"/>
+		<exclude org="prom" module="ApacheUtils"/>
+		<exclude org="axis" module="axis"/>
+		<exclude org="javax.xml" module="jaxrpc"/>
+		<exclude org="javax.xml" module="saaj"/>
+		<exclude org="wsdl4j" module="wsdl4j"/>
+		<exclude org="com.google.guava" module="guava-testlib"/>		
 
 
     </dependencies>
