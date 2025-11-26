@@ -162,17 +162,26 @@
 	<target name="strip-embedded-js" depends="copy-deps"
 		description="REBUILD ProM jars without vulnerable embedded JS">
 
-			<strip-jar
-		        jarIncludes="BasicUtils-*.jar"
-		        excludes="jquery/**"/>
-
-		    <strip-jar
-		        jarIncludes="DirectlyFollowsModelMiner-*.jar"
-		    	excludes="jquery/**"/>
-
-		    <strip-jar
-		        jarIncludes="InductiveMiner-*.jar"
-		    	excludes="jquery/**"/>
+		    <strip-jar jarIncludes="BasicUtils-latest.jar"               excludes="jquery/**"/>
+		    <strip-jar jarIncludes="DirectlyFollowsModelMiner-latest.jar" excludes="jquery/**"/>
+		    <strip-jar jarIncludes="InductiveMiner-latest.jar"           excludes="jquery/**"/>	
+			<strip-jar jarIncludes="EfficientStorage-latest.jar"         excludes="jquery/**"/>
+		    <strip-jar jarIncludes="ExtendedHybridMiner-latest.jar"      excludes="jquery/**"/>
+		    <strip-jar jarIncludes="InductiveMinerDeprecated-latest.jar" excludes="jquery/**"/>
+		    <strip-jar jarIncludes="InductiveVisualMiner-latest.jar"     excludes="jquery/**"/>
+		    <strip-jar jarIncludes="Log-latest.jar"                      excludes="jquery/**"/>
+		    <strip-jar jarIncludes="LogDialog-latest.jar"                excludes="jquery/**"/>
+		    <strip-jar jarIncludes="LogProjection-latest.jar"            excludes="jquery/**"/>
+		    <strip-jar jarIncludes="Murata-latest.jar"                   excludes="jquery/**"/>
+		    <strip-jar jarIncludes="PNAnalysis-latest.jar"               excludes="jquery/**"/>
+		    <strip-jar jarIncludes="PetriNets-latest.jar"                excludes="jquery/**"/>
+		    <strip-jar jarIncludes="ProM-Contexts-latest.jar"            excludes="jquery/**"/>
+		    <strip-jar jarIncludes="ProM-Framework-latest.jar"           excludes="jquery/**"/>
+		    <strip-jar jarIncludes="ProM-Models-latest.jar"              excludes="jquery/**"/>
+		    <strip-jar jarIncludes="ProM-Plugins-latest.jar"             excludes="jquery/**"/>
+		    <strip-jar jarIncludes="TransitionSystems-latest.jar"        excludes="jquery/**"/>
+		    <strip-jar jarIncludes="Widgets-latest.jar"                  excludes="jquery/**"/>
+		
 
 		</target>
 
