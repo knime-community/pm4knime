@@ -8,7 +8,41 @@
 	1. get working space directory
 	2. to get the pm4knime-maven directory
 	3. set the library  -->
-	<property name="lib.dir" value="reg-lib" />			
+	<property name="lib.dir" value="reg-lib" />	
+	
+	<!-- Rebuild any jar matching a pattern, excluding given paths.
+	     Core Ant only: assumes pattern matches exactly one jar. -->
+	<macrodef name="strip-jar">
+	    <attribute name="jarIncludes"/>
+	    <attribute name="excludes"/>
+
+	    <sequential>
+
+	        <!-- make these properties local to each macro call -->
+	        <local name="stripjar.jar"/>
+	        <local name="stripjar.tmp"/>
+
+	        <!-- find jar -->
+	        <path id="stripjar.path">
+	            <fileset dir="${plugin.lib.dir}" includes="@{jarIncludes}"/>
+	        </path>
+
+	        <pathconvert property="stripjar.jar" refid="stripjar.path"/>
+
+	        <echo message="Stripping jar: ${stripjar.jar}"/>
+
+	        <!-- rebuild jar without excluded entries -->
+	        <tempfile property="stripjar.tmp" suffix=".jar"/>
+
+	        <zip destfile="${stripjar.tmp}">
+	            <zipfileset src="${stripjar.jar}" excludes="@{excludes}"/>
+	        </zip>
+
+	        <move file="${stripjar.tmp}" tofile="${stripjar.jar}" overwrite="true"/>
+
+	    </sequential>
+	</macrodef>
+
 	
 	<target name="lib-retrieve" description="retrieve jars only from prom, prom-libs">
 		<ivy:retrieve pattern="reg-lib/[artifact]-[revision].[ext]">
@@ -123,8 +157,26 @@
 	    </manifest>
 
 	</target>
+	
+	
+	<target name="strip-embedded-js" depends="copy-deps"
+		description="REBUILD ProM jars without vulnerable embedded JS">
+
+			<strip-jar
+		        jarIncludes="BasicUtils-*.jar"
+		        excludes="jquery/**"/>
+
+		    <strip-jar
+		        jarIncludes="DirectlyFollowsModelMiner-*.jar"
+		    	excludes="jquery/**"/>
+
+		    <strip-jar
+		        jarIncludes="InductiveMiner-*.jar"
+		    	excludes="jquery/**"/>
+
+		</target>
 
 
 	
-	<target name="main" depends="set ,lib-resolve, copy-deps, update-bundle-classpath"/> 
+	<target name="main" depends="set ,lib-resolve, copy-deps, strip-embedded-js, update-bundle-classpath"/> 
 </project>
