@@ -22,6 +22,8 @@ import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XLog;
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionContext;
 import org.pm4knime.node.conformance.replayer.table.helper.tableLibs.TableEventLog;
 import org.pm4knime.node.conformance.replayer.table.helper.tableLibs.TransEvClassMappingTable;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
@@ -148,10 +150,11 @@ public class PetriNetUtil {
 		return mapping;
 	}
 	
-	public static TransEvClassMappingTable constructMapping(TableEventLog log, Petrinet net,  String eventClassifier, String dummyEvent) {
+	public static TransEvClassMappingTable constructMapping(TableEventLog log, Petrinet net,  String eventClassifier, String dummyEvent) throws CanceledExecutionException {
 		TransEvClassMappingTable mapping = new TransEvClassMappingTable(eventClassifier, dummyEvent);
 		// here we need dummy event to map invisible transition. Even if there is no corresponding event classes, we also need to map them
 		for (Transition t : net.getTransitions()) {
+//			exec.checkCanceled();
 			boolean mapped = false;
 			for (String activity : log.getActivties()) {
 
