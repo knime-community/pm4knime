@@ -6,6 +6,48 @@
     </info>
 
     <dependencies>
+
+		<!-- new versions of dependencies to override what ProM requires -->
+		<dependency org="com.thoughtworks.xstream" name="xstream" rev="1.4.21" force="true"/>
+		<dependency org="org.xerial" name="sqlite-jdbc" rev="3.51.0.0" force="true"/>
+		<dependency org="org.python" name="jython-standalone" rev="2.7.4" force="true"/>
+		
+	    <dependency org="com.fasterxml.jackson.core" name="jackson-databind"    rev="2.19.2"/>
+	    <dependency org="com.fasterxml.jackson.core" name="jackson-core"       rev="2.19.2"/>
+	    <dependency org="com.fasterxml.jackson.core" name="jackson-annotations" rev="2.19.2"/>
+	    
+	    <dependency org="com.google.protobuf" name="protobuf-java" rev="3.25.5" force="true"/>
+	    <dependency org="org.codehaus.jettison" name="jettison" rev="1.5.4" force="true"/>
+	    <dependency org="org.jdom" name="jdom2" rev="2.0.6.1" force="true"/>
+	    <dependency org="com.google.guava" name="guava" rev="33.5.0-jre" force="true"/>
+	    
+	    <dependency org="org.apache.ant" name="ant" rev="1.10.15" force="true"/>
+	    <dependency org="com.google.code.gson" name="gson" rev="2.13.2" force="true"/>
+	    <dependency org="org.apache.commons" name="commons-compress" rev="1.28.0" force="true"/>
+	    <dependency org="commons-io" name="commons-io" rev="2.21.0" force="true"/>
+	    <dependency org="org.apache.commons" name="commons-lang3" rev="3.20.0" force="true"/>
+	    <dependency org="net.sourceforge.collections" name="collections-generic" rev="4.01" force="true"/>
+	    <dependency org="org.dom4j" name="dom4j" rev="2.2.0" force="true"/>
+	    
+	    <dependency org="commons-beanutils" name="commons-beanutils" rev="1.11.0" force="true"/>
+	    <dependency org="com.fasterxml.util" name="java-merge-sort" rev="1.1.0" force="true"/>
+	    
+	    <dependency org="org.mozilla" name="rhino" rev="1.8.0" force="true"/>
+	    <dependency org="xalan" name="xalan" rev="2.7.3" force="true"/>
+		<dependency org="xalan" name="serializer" rev="2.7.3" force="true"/>
+		
+		<dependency org="org.mapdb" name="mapdb" rev="2.0-beta13" force="true">
+		  <artifact name="mapdb" type="jar" ext="jar"/>
+		</dependency>
+		<dependency org="org.lz4" name="lz4-java" rev="1.8.0" force="true">
+		  <artifact name="lz4-java" type="jar" ext="jar"/>
+		</dependency>
+		<dependency org="javax.xml.bind" name="jaxb-api" rev="2.3.1" force="true"/>
+		<dependency org="org.glassfish.jaxb" name="jaxb-runtime" rev="2.3.9" force="true"/>
+		<dependency org="com.sun.activation" name="javax.activation" rev="1.2.0" force="true"/>
+
+
+		
     	<!-- ProM dependencies. -->
     	<!-- Please put every ProM dependency on a single line. -->
     	<!-- ProM framework. -->
@@ -20,22 +62,76 @@
     	<dependency org="prom" name="BPMNConversions" rev="latest" changing="true" transitive="true" />      
     	 
     	
-    	<!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
-		<dependency org="javax.xml.bind" name="jaxb-api" rev="2.4.0-b180830.0359"/>
-				
     	
     	<!-- category: manipulation -->
     	<dependency org="prom" name="LogEnhancement" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="LogProjection" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="IncorporateNegativeInformation" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="XESStandard" rev="latest" changing="true" transitive="true"/>
-    	 <dependency org="prom" name="XESStandardConnector" rev="latest" changing="true" transitive="true"/>
+    	<dependency org="prom" name="XESStandardConnector" rev="latest" changing="true" transitive="true"/>
     	
     	
     	<!-- category: conformance and performance -->
-    	<dependency org="prom" name="PNetReplayer" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="PNetAlignmentAnalysis" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="Performance" rev="latest" changing="true" transitive="true" />	
-    	<dependency org="prom" name="ETConformance" rev="latest" changing="true" transitive="true" />	
+    	<dependency org="prom" name="ETConformance" rev="latest" changing="true" transitive="true" />
+    	
+    	
+ 		
+    	
+    	<!-- Global exclusions -->
+    	<exclude org="prom" module="GraphViz"/>
+    	<exclude org="org.jdom" module="jdom"/> 
+    	<exclude org="org.jdom" module="jdom-legacy"/>
+    	<exclude org="io.gatling.uncommons.maths" module="uncommons-maths"/>
+    	<exclude org="org.mozilla" module="javascript"/>
+    	<exclude org="prom-libs" module="guava"/>
+		<exclude org="prom-libs" module="bsh"/>
+		
+		<exclude org="prom-libs" module="flanagan"/>
+		<exclude org="prom-libs" module="javabdd"/>
+		<exclude org="prom-libs" module="ujmp-complete"/>
+		<exclude org="prom-libs" module="gurobi"/>
+		<exclude org="prom-libs" module="jas-plotter"/>
+		<exclude org="prom-libs" module="javailp"/>
+		<exclude org="prom-libs" module="japura"/>
+		<exclude org="prom-libs" module="jbpt"/>
+		<exclude org="prom-libs" module="saxon"/>
+		<exclude org="prom-libs" module="simmetrics"/>
+		<exclude org="prom-libs" module="jargs"/>
+		<exclude org="prom-libs" module="org.eclipse.uml2.uml"/>
+		<exclude org="prom-libs" module="javacsv"/>
+		<exclude org="prom-libs" module="opencsv"/>
+		<exclude org="prom-libs" module="AccessCPN"/>
+		<exclude org="prom-libs" module="org.eclipse.emf.ecore"/>
+		<exclude org="prom-libs" module="YAWLEditor"/>
+		<exclude org="prom-libs" module="jmathplot"/>
+		<exclude org="prom-libs" module="FilterableSortableTablePanel"/>
+		<exclude org="prom-libs" module="openide-lookup"/>
+		<exclude org="prom-libs" module="jgrapht"/>
+		<exclude org="org.beanshell" module="bsh"/>
+		
+		<exclude org="prom-libs" module="ant"/>
+		<exclude org="net.sourceforge.f2j" module="arpack_combined_all"/>
+		<exclude org="prom-libs" module="arpack_combined_all"/>
+		<exclude org="prom" module="ApacheUtils"/>
+		<exclude org="axis" module="axis"/>
+		<exclude org="javax.xml" module="jaxrpc"/>
+		<exclude org="javax.xml" module="saaj"/>
+		<exclude org="wsdl4j" module="wsdl4j"/>
+		<exclude org="com.google.guava" module="guava-testlib"/>	
+		
+		<exclude org="org.apache.ant" module="ant-antunit"/>
+		<exclude org="*" module="junit4-ant"/>
+		<exclude org="commons-collections" module="commons-collections-testframework"/>	
+		<exclude org="*" module="org.mozilla.javascript"/>	
+		<exclude org="dom4j" module="dom4j"/>
+		
+		<exclude org="commons-lang" module="commons-lang"/>
+		<exclude org="apache" module="commons-lang"/>
+		<exclude org="prom-libs" module="commons-lang"/>
+		<exclude org="*" module="jython-standalone"/>
+
+
     </dependencies>
 </ivy-module>

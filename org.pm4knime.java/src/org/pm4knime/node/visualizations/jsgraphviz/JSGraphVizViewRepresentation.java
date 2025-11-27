@@ -4,14 +4,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.base.node.mine.decisiontree2.image.DecTreeToImageNodeFactory;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.js.core.JSONViewContent;
 
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.google.gson.Gson;
@@ -58,15 +57,12 @@ public class JSGraphVizViewRepresentation extends JSONViewContent {
 		}
 		
 		JSGraphVizViewRepresentation other = (JSGraphVizViewRepresentation)obj;
-		return new EqualsBuilder()
-				.append(json, other.json)
-                .isEquals();
+		return Objects.equals(json, other.json);
 	}
 
 	@Override
 	public int hashCode() {
-		 return new HashCodeBuilder().append(json)
-				 .toHashCode();
+		return Objects.hash(json);
 	}
 
 	

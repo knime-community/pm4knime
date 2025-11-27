@@ -25,9 +25,6 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.PortTypeRegistry;
 import org.pm4knime.util.connectors.prom.PM4KNIMEGlobalContext;
 import org.processmining.framework.plugin.PluginContext;
-import org.processmining.plugins.graphviz.visualisation.DotPanel;
-import org.processmining.plugins.inductiveVisualMiner.plugins.GraphvizProcessTree;
-import org.processmining.plugins.inductiveVisualMiner.plugins.GraphvizProcessTree.NotYetImplementedException;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.impl.AbstractBlock;
 import org.processmining.processtree.impl.ProcessTreeImpl;
@@ -212,18 +209,6 @@ public class ProcessTreePortObject extends AbstractJSONPortObject {
         return new JComponent[] {};
     }
 
-    public DotPanel getDotPanel() {
-        if (tree != null) {
-            try {
-                DotPanel navDot = new DotPanel(GraphvizProcessTree.convert(tree));
-                navDot.setName("Generated process tree");
-                return navDot;
-            } catch (NotYetImplementedException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
 
     public String toText() {
         Ptml ptml = new Ptml().marshall(tree);

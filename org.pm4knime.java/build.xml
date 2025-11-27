@@ -1,10 +1,48 @@
 <project xmlns:ivy="antlib:org.apache.ivy.ant" name="prom-wrapper" default="main">
 	<property name="ivy.home" value="${user.home}\.ivy2" />
+
+	<!-- ivy configuration to use everywhere -->
+	<property name="ivy.conf" value="default"/>
+
 	<!--  we could also store the values from lib into another folder
 	1. get working space directory
 	2. to get the pm4knime-maven directory
 	3. set the library  -->
-	<property name="lib.dir" value="reg-lib" />			
+	<property name="lib.dir" value="reg-lib" />	
+	
+	<!-- Rebuild any jar matching a pattern, excluding given paths.
+	     Core Ant only: assumes pattern matches exactly one jar. -->
+	<macrodef name="strip-jar">
+	    <attribute name="jarIncludes"/>
+	    <attribute name="excludes"/>
+
+	    <sequential>
+
+	        <!-- make these properties local to each macro call -->
+	        <local name="stripjar.jar"/>
+	        <local name="stripjar.tmp"/>
+
+	        <!-- find jar -->
+	        <path id="stripjar.path">
+	            <fileset dir="${plugin.lib.dir}" includes="@{jarIncludes}"/>
+	        </path>
+
+	        <pathconvert property="stripjar.jar" refid="stripjar.path"/>
+
+	        <echo message="Stripping jar: ${stripjar.jar}"/>
+
+	        <!-- rebuild jar without excluded entries -->
+	        <tempfile property="stripjar.tmp" suffix=".jar"/>
+
+	        <zip destfile="${stripjar.tmp}">
+	            <zipfileset src="${stripjar.jar}" excludes="@{excludes}"/>
+	        </zip>
+
+	        <move file="${stripjar.tmp}" tofile="${stripjar.jar}" overwrite="true"/>
+
+	    </sequential>
+	</macrodef>
+
 	
 	<target name="lib-retrieve" description="retrieve jars only from prom, prom-libs">
 		<ivy:retrieve pattern="reg-lib/[artifact]-[revision].[ext]">
@@ -20,8 +58,7 @@
  
 	<target name="lib-resolve" description="resolve jars only from the specific organization">
 		<ivy:settings file="ivysettings.xml" />
-		<ivy:retrieve file="${lib.project.dir}\ivy.xml" />
-		<ivy:resolve />
+		<ivy:resolve file="${lib.project.dir}\ivy.xml" conf="${ivy.conf}" />
 	</target>
 
 	<target name="print">
@@ -41,22 +78,114 @@
 		<mkdir dir="${dirPro}" />
 	</target>
 
-	<target name="copy-deps" description="no idea now to fix by using retrieve there">
-		<copy todir="${plugin.lib.dir}" overwrite="false" flatten="true">
-			<fileset dir="${ivy.home}\cache\prom" includes="**\*.jar">
-			</fileset>
-			<fileset dir="${ivy.home}\cache\prom-libs" includes="**\*.jar">
-			</fileset>
-			<fileset dir = "${lib.project.dir}\lib" includes="**\*.jar"> </fileset>
-		</copy>
-	</target>
+	<target name="copy-deps" depends="lib-resolve" description="retrieve only resolved runtime jars (no cache copy)">
 
-	<target name="clean-lib" description="clean the current lib directory ">
-		<echo>=== CLEAN ===</echo>
-		<delete failonerror="false">
-			<fileset dir="${plugin.lib.dir}" includes="**/*" />
-		</delete>
+		<!-- Get the resolved jars as a fileset -->
+	    <ivy:cachefileset setid="runtime.jars" conf="${ivy.conf}" type="jar"/>
+
+	    <!-- Filter that fileset by filename (because refid filesets can't have nested excludes) -->
+	    <restrict id="runtime.filtered">
+	        <fileset refid="runtime.jars"/>
+	        <not>
+	            <or>
+	                <name name="**/*-sources.jar"/>
+	                <name name="**/*-source.jar"/>
+	                <name name="**/*-src.jar"/>
+
+	                <name name="**/*-javadoc.jar"/>
+
+	                <name name="**/*-tests.jar"/>
+	                <name name="**/*-test.jar"/>
+
+	                <name name="**/*javadoc*.jar"/>
+	                <name name="**/*sources*.jar"/>
+	            </or>
+	        </not>
+	    </restrict>
+
+	    <!-- Copy only the filtered resources -->
+	    <copy todir="${plugin.lib.dir}" overwrite="false" flatten="true">
+	        <resources refid="runtime.filtered"/>
+	    </copy>
 
 	</target>
-	<target name="main" depends="set ,lib-resolve, copy-deps" /> 
+	
+	
+	<target name="update-bundle-classpath">
+
+		<path id="runtime.libs">
+	        <fileset dir="lib" includes="**/*.jar">
+
+	            <!-- exclude sources/javadoc/test jars -->
+	            <exclude name="**/*-sources.jar"/>
+	            <exclude name="**/*-source.jar"/>
+	            <exclude name="**/*-src.jar"/>
+
+	            <exclude name="**/*-javadoc.jar"/>
+
+	            <exclude name="**/*-tests.jar"/>
+	            <exclude name="**/*-test.jar"/>
+
+	            <exclude name="**/*javadoc*.jar"/>
+	            <exclude name="**/*sources*.jar"/>
+
+	        </fileset>
+	    </path>
+
+	    <pathconvert
+	        property="bundle.classpath.libs"
+	        refid="runtime.libs"
+	        pathsep=",">
+
+	        <mapper>
+	            <chainedmapper>
+	                <flattenmapper/>
+	                <globmapper from="*" to="lib/*"/>
+	            </chainedmapper>
+	        </mapper>
+
+	    </pathconvert>
+
+		<property
+	        name="bundle.classpath"
+	        value="org.pm4knime.java.jar,${bundle.classpath.libs}"/>
+
+	    <echo message="Bundle-ClassPath will be: ${bundle.classpath}"/>
+
+	    <manifest file="META-INF/MANIFEST.MF" mode="update">
+	        <attribute name="Bundle-ClassPath" value="${bundle.classpath}"/>
+	    </manifest>
+
+	</target>
+	
+	
+	<target name="strip-embedded-js" depends="copy-deps"
+		description="REBUILD ProM jars without vulnerable embedded JS">
+
+		    <strip-jar jarIncludes="BasicUtils-latest.jar"               excludes="jquery/**"/>
+		    <strip-jar jarIncludes="DirectlyFollowsModelMiner-latest.jar" excludes="jquery/**"/>
+		    <strip-jar jarIncludes="InductiveMiner-latest.jar"           excludes="jquery/**"/>	
+			<strip-jar jarIncludes="EfficientStorage-latest.jar"         excludes="jquery/**"/>
+		    <strip-jar jarIncludes="ExtendedHybridMiner-latest.jar"      excludes="jquery/**"/>
+		    <strip-jar jarIncludes="InductiveMinerDeprecated-latest.jar" excludes="jquery/**"/>
+		    <strip-jar jarIncludes="InductiveVisualMiner-latest.jar"     excludes="jquery/**"/>
+		    <strip-jar jarIncludes="Log-latest.jar"                      excludes="jquery/**"/>
+		    <strip-jar jarIncludes="LogDialog-latest.jar"                excludes="jquery/**"/>
+		    <strip-jar jarIncludes="LogProjection-latest.jar"            excludes="jquery/**"/>
+		    <strip-jar jarIncludes="Murata-latest.jar"                   excludes="jquery/**"/>
+		    <strip-jar jarIncludes="PNAnalysis-latest.jar"               excludes="jquery/**"/>
+		    <strip-jar jarIncludes="PetriNets-latest.jar"                excludes="jquery/**"/>
+		    <strip-jar jarIncludes="ProM-Contexts-latest.jar"            excludes="jquery/**"/>
+		    <strip-jar jarIncludes="ProM-Framework-latest.jar"           excludes="jquery/**"/>
+		    <strip-jar jarIncludes="ProM-Models-latest.jar"              excludes="jquery/**"/>
+		    <strip-jar jarIncludes="ProM-Plugins-latest.jar"             excludes="jquery/**"/>
+		    <strip-jar jarIncludes="TransitionSystems-latest.jar"        excludes="jquery/**"/>
+		    <strip-jar jarIncludes="Widgets-latest.jar"                  excludes="jquery/**"/>
+		
+
+		</target>
+
+
+	
+	<target name="main" depends="set ,lib-resolve, copy-deps, strip-embedded-js, update-bundle-classpath"/> 
 </project>
