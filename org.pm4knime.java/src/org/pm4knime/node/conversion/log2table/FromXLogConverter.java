@@ -88,10 +88,12 @@ public class FromXLogConverter {
 			for(XEvent event : trace) {
 				// test if this shallow copy, how?? If we change our values in trace if it changes too
 				// but actually this helps a lot for thi
+				exec.checkCanceled();
 				DataCell[] cells = tCells.clone();
 				
 				// check the event attribute 
 				for (String attrKey : event.getAttributes().keySet()) {
+					exec.checkCanceled();
 					int colIdx = spec.findColumnIndex(XLogSpecUtil.EVENT_ATTRIBUTE_PREFIX + attrKey);
 					if(colIdx >= 0) {
 						// if we already have the attributes there, put it there
@@ -100,6 +102,7 @@ public class FromXLogConverter {
 				}
 				
 				for(int i=0; i<colNum; i++) {
+					exec.checkCanceled();
 					if(cells[i]==null )
 						cells[i] = new MissingCell("?");
 				}
