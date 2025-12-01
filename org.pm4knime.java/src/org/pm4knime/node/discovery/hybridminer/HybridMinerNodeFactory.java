@@ -26,6 +26,7 @@ public final class HybridMinerNodeFactory extends WebUINodeFactory<HybridMinerNo
 			.addInputPort("Causal Graph", CausalGraphPortObject.TYPE ,"a causal graph")//
 			.addOutputPort("Hybrid Petri Net", HybridPetriNetPortObject.TYPE, "a hybrid Petri net")//
 			.nodeType(NodeType.Learner)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 

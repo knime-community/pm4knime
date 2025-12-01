@@ -32,6 +32,7 @@ public class InductiveMinerTableNodeFactory extends WebUINodeFactory<InductiveMi
 			.addInputPort("Table", BufferedDataTable.TYPE ,"an event table")//
 			.addOutputPort("Process Tree", ProcessTreePortObject.TYPE, "a process tree")//
 			.nodeType(NodeType.Learner)
+			.sinceVersion (2, 0, 0)
 			.build();
 
 
