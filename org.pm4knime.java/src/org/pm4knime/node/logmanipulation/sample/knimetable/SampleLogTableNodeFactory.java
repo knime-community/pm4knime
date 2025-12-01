@@ -20,6 +20,7 @@ public final class SampleLogTableNodeFactory extends WebUINodeFactory<SampleLogT
 			.addOutputPort("Table", BufferedDataTable.TYPE, "The sampled event table.")//
 			.addOutputPort("Table", BufferedDataTable.TYPE, "The event table that contains the removed traces.")//
 			.nodeType(NodeType.Manipulator)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 
