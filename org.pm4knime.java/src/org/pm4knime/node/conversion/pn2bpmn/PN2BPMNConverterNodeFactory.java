@@ -37,6 +37,7 @@ public class PN2BPMNConverterNodeFactory extends WebUINodeFactory<PN2BPMNConvert
 			.addInputPort("Petri net", PetriNetPortObject.TYPE, "a Petri net")//
 			.addOutputPort("BPMN", BpmnPortObject.TYPE ,"a Business Process Modeling Notation (BPMN)")//
 			.nodeType(NodeType.Manipulator)
+			.sinceVersion(3, 0, 0)
 			.build();
 
 
