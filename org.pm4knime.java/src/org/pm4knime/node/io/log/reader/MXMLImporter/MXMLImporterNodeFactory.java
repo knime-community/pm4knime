@@ -15,7 +15,9 @@ public class MXMLImporterNodeFactory extends WebUINodeFactory<MXMLImporterNodeMo
 			.fullDescription("This node imports an event log from an MXML file using the Open Naive method.")
 			.modelSettingsClass(MXMLImporterNodeSettings.class)
 			.addOutputPort("Event Log", XLogPortObject.TYPE, "an event log")
-			.nodeType(NodeType.Source).build();
+			.nodeType(NodeType.Source)
+			.sinceVersion(2, 0, 0)
+			.build();
 
 	public MXMLImporterNodeFactory() {
 		super(CONFIG);

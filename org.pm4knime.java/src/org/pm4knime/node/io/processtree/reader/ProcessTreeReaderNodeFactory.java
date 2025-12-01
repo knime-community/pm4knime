@@ -20,6 +20,7 @@ public class ProcessTreeReaderNodeFactory extends WebUINodeFactory<ProcessTreeRe
 			.fullDescription("Import a process tree from a PTML file.")
 			.modelSettingsClass(ReaderNodeSettings.class)
 			.addOutputPort("Process Tree", ProcessTreePortObject.TYPE, "a process tree")
+			.sinceVersion(2, 0, 0)
 			.nodeType(NodeType.Source).build();
 
 	public ProcessTreeReaderNodeFactory() {

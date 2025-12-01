@@ -15,6 +15,7 @@ public class XesImporterNodeFactory extends WebUINodeFactory<XesImporterNodeMode
 			.fullDescription("This node imports an event log from an XES file.")
 			.modelSettingsClass(XesImporterNodeSettings.class)
 			.addOutputPort("Event Log", XLogPortObject.TYPE, "an event log")
+			.sinceVersion(2, 0, 0)
 			.nodeType(NodeType.Source).build();
 
 	public XesImporterNodeFactory() {
