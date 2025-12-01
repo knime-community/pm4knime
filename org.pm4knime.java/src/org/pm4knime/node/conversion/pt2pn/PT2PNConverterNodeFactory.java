@@ -26,6 +26,7 @@ public class PT2PNConverterNodeFactory extends WebUINodeFactory<PT2PNConverterNo
 			.modelSettingsClass(EmptyNodeSettings.class)//
 			.addInputPort("Process Tree", ProcessTreePortObject.TYPE, "a process tree")//
 			.addOutputPort("Petri net", PetriNetPortObject.TYPE, "a Petri net")//
+			.sinceVersion(2, 0, 0)
 			.nodeType(NodeType.Manipulator).build();
 
 	public PT2PNConverterNodeFactory() {
