@@ -25,6 +25,7 @@ public class TableCGMinerNodeFactory extends WebUINodeFactory<TableCGMinerNodeMo
 			.addInputPort("Table", BufferedDataTable.TYPE ,"an event table")//
 			.addOutputPort("Causal Graph", CausalGraphPortObject.TYPE, "a causal graph")//
 			.nodeType(NodeType.Learner)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 
