@@ -24,6 +24,7 @@ public class PerformanceCheckerNodeFactory extends WebUINodeFactory<PerformanceC
 			.addOutputPort("Transition Performance Statistics", BufferedDataTable.TYPE, "performance statistical information for the different transitions in the Petri net (waiting time, synchronization time, and sojourn time).")//
 			.addOutputPort("Place Performance Statistics", BufferedDataTable.TYPE, "performance statistical information for the different places in the Petri net (waiting time, synchronization time, and sojourn time).")//
 			.nodeType(NodeType.Other)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 
