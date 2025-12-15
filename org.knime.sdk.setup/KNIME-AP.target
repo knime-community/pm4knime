@@ -36,7 +36,6 @@
 <unit id="org.knime.features.python2.feature.group" version="0.0.0"/>
 <unit id="org.knime.features.base.expressions.feature.group" version="0.0.0"/>
 <unit id="org.knime.features.python3.nodes.feature.group" version="0.0.0"/>
-<unit id="org.knime.python.features.llm.feature.group" version="0.0.0"/>
 
 <repository location="https://update.knime.com/analytics-platform/nightly/"/>
 </location>
