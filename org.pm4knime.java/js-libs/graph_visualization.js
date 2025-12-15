@@ -707,13 +707,15 @@ function createSVG(paper) {
 	const svgElement = paper.svg.cloneNode(true);
 	svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 	const bbox = paper.getContentBBox();
-	const width_with_padding = bbox.width + 2*padding_inside_paper;
-	const height_with_padding = bbox.width + 2*padding_inside_paper;
+	const padding = 30;  
+	
+	const width_with_padding = bbox.width + 2*padding;
+	const height_with_padding = bbox.height + 2*padding;
 
 	svgElement.setAttribute("width", width_with_padding);
 	svgElement.setAttribute("height", height_with_padding);
-	svgElement.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${width_with_padding} ${height_with_padding}`);
-
+	svgElement.setAttribute("viewBox", `${bbox.x - padding} ${bbox.y - padding} ${width_with_padding} ${height_with_padding}`);
+	
 	// Create a style element for the SVG
 	const cssStyle = document.createElement('style');
 	cssStyle.setAttribute('type', 'text/css');
