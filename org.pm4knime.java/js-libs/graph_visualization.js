@@ -708,7 +708,7 @@ function createSVG(paper) {
 	svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 	const bbox = paper.getContentBBox();
 	const width_with_padding = bbox.width + 2*padding_inside_paper;
-	const height_with_padding = bbox.width + 2*padding_inside_paper;
+	const height_with_padding = bbox.height + 2*padding_inside_paper;
 
 	svgElement.setAttribute("width", width_with_padding);
 	svgElement.setAttribute("height", height_with_padding);
