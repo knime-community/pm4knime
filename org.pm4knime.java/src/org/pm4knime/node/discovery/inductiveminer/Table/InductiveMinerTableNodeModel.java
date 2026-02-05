@@ -7,6 +7,7 @@ import org.deckfour.xes.classification.XEventAttributeClassifier;
 import org.deckfour.xes.classification.XEventClassifier;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
@@ -50,7 +51,7 @@ public class InductiveMinerTableNodeModel extends DefaultTableMinerNodeModel<Ind
 		protected AbstractJSONPortObject mine(BufferedDataTable log, final ExecutionContext exec) throws Exception {
 			logger.info("Begin: Inductive Miner");
 			String activityClassifier = m_settings.e_classifier;
-			IMLog imlog =  new BufferedTableIMLog(log, activityClassifier, m_settings.t_classifier);
+			IMLog imlog =  new BufferedTableIMLog(log, activityClassifier, m_settings.t_classifier, exec);
 			System.out.println("End of Generating Log");
 			MiningParametersIM param =  createParameters();
 			XEventClassifier classifi = new XEventAttributeClassifier(activityClassifier);
@@ -58,6 +59,12 @@ public class InductiveMinerTableNodeModel extends DefaultTableMinerNodeModel<Ind
 			Instant start = Instant.now();
 			EfficientTree ptE = InductiveMinerPlugin.mineTree(imlog, param,  new Canceller() {
 				public boolean isCancelled() {
+					try {
+						exec.checkCanceled();
+					} catch (CanceledExecutionException e) {
+						// TODO Auto-generated catch block
+						return true;
+					}
 					return false;
 				}
 			});
