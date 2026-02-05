@@ -24,6 +24,7 @@ public class JSVisCGNodeFactory extends WebUINodeFactory<JSGraphVizAbstractModel
 			.addInputPort("Causal Graph", CausalGraphPortObject.TYPE ,"a causal graph")//
 			.addOutputPort("Image", ImagePortObject.TYPE, "an SVG image")//
 			.nodeType(NodeType.Visualizer)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 	public JSVisCGNodeFactory() {

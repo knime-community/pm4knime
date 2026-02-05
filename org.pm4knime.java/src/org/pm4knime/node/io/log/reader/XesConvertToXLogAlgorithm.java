@@ -21,6 +21,7 @@ import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.xesstandard.model.XesAttribute;
 import org.xesstandard.model.XesClassifier;
@@ -59,13 +60,14 @@ public class XesConvertToXLogAlgorithm {
 	 * @return The XLog that results from converting the given log.
 	 * @throws CanceledExecutionException 
 	 */
-	public XLog convertToLog(XesLog log, ExecutionMonitor exec) throws CanceledExecutionException {
+	public XLog convertToLog(XesLog log, ExecutionContext exec) throws CanceledExecutionException {
 		// Create the factory.
 		factory = XFactoryRegistry.instance().currentDefault();
 		// Create an empty XLog.
 		XLog convertedLog = factory.createLog();
 		// Convert the extensions.
 		for (XesExtension extension : log.getExtensions()) {
+			exec.checkCanceled();
 			XExtension convertedExtension = convert(extension);
 			if (convertedExtension != null) {
 				convertedLog.getExtensions().add(convert(extension));
@@ -73,14 +75,17 @@ public class XesConvertToXLogAlgorithm {
 		}
 		// Convert the global event attributes.
 		for (XesAttribute attribute : log.getGlobalEventAttributes()) {
+			exec.checkCanceled();
 			convertedLog.getGlobalEventAttributes().add(convert(attribute));
 		}
 		// Convert the global trace attributes.
 		for (XesAttribute attribute : log.getGlobalTraceAttributes()) {
+			exec.checkCanceled();
 			convertedLog.getGlobalTraceAttributes().add(convert(attribute));
 		}
 		// Convert the event classifiers.
 		for (XesClassifier classifier : log.getEventClassifiers()) {
+			exec.checkCanceled();
 			convertedLog.getClassifiers().add(convert(classifier));
 		}
 		exec.checkCanceled();

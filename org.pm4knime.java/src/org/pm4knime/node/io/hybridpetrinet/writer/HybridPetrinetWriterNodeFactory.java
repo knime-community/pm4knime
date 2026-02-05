@@ -19,6 +19,7 @@ public class HybridPetrinetWriterNodeFactory extends WebUINodeFactory<HybridPetr
         .modelSettingsClass(HybridPetrinetWriterNodeSettings.class) //
         .addInputPort("Hybrid Petri Net", HybridPetriNetPortObject.TYPE, "a hybrid Petri net")
         .nodeType(NodeType.Sink)
+        .sinceVersion(2, 0, 0)
 		.build();
 
     public HybridPetrinetWriterNodeFactory() {

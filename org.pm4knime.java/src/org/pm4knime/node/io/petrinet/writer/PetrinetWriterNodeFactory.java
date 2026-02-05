@@ -27,6 +27,7 @@ public class PetrinetWriterNodeFactory extends WebUINodeFactory<PetrinetWriterNo
         .modelSettingsClass(PetrinetWriterNodeSettings.class) //
         .addInputPort("Petri Net", PetriNetPortObject.TYPE, "a Petri net")
         .nodeType(NodeType.Sink)
+        .sinceVersion(2, 0, 0)
 		.build();
 
     public PetrinetWriterNodeFactory() {

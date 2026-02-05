@@ -101,7 +101,7 @@ public class PerformanceCheckerNodeModel extends DefaultNodeModel implements Por
 		int[] default_costs = repResultPO.getDefaultMoveCosts();
 		Map<String, Integer>[] cost_maps = repResultPO.getMoveCostMaps();
 
-		PNManifestReplayerParameterTable manifestParameters = ParameterGenerator.getPerfParameter(log, anet, default_costs, cost_maps);
+		PNManifestReplayerParameterTable manifestParameters = ParameterGenerator.getPerfParameter(log, anet, default_costs, cost_maps, exec);
 		PNManifestFlattenerTable flattener = new PNManifestFlattenerTable(anet.getNet(), manifestParameters);
 		
 // check cancellation of node before sync

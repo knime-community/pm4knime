@@ -21,6 +21,7 @@ public class XESWriterNodeFactory extends WebUINodeFactory<XESWriterNodeModel> {
         .modelSettingsClass(XESWriterNodeSettings.class) //
         .addInputPort("Event Log", XLogPortObject.TYPE, "an event log")
         .nodeType(NodeType.Sink)
+        .sinceVersion(2, 0, 0)
 		.build();
 
     public XESWriterNodeFactory() {

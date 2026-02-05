@@ -20,6 +20,7 @@ public class TraceVariantVisNodeFactory extends WebUINodeFactory<TraceVariantVis
 			.addInputPort("Table", BufferedDataTable.TYPE ,"an event table")//
 			.addOutputPort("Image", ImagePortObject.TYPE, "an SVG image")//
 			.nodeType(NodeType.Visualizer)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 

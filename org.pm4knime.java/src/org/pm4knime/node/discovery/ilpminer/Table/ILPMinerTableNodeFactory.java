@@ -24,6 +24,7 @@ public class ILPMinerTableNodeFactory extends WebUINodeFactory<ILPMinerTableNode
 			.addInputPort("Table", BufferedDataTable.TYPE ,"an event table")//
 			.addOutputPort("Petri Net", PetriNetPortObject.TYPE, "a Petri net")//
 			.nodeType(NodeType.Learner)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 

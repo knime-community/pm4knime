@@ -28,6 +28,7 @@ public class JSGraphVizPNNodeFactory extends WebUINodeFactory<JSGraphVizAbstract
 			.addInputPort("Petri Net", PetriNetPortObject.TYPE ,"a Petri net")//
 			.addOutputPort("Image", ImagePortObject.TYPE, "an SVG image")//
 			.nodeType(NodeType.Visualizer)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 	public JSGraphVizPNNodeFactory() {

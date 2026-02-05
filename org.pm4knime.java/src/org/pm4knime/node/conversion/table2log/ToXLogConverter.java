@@ -85,6 +85,7 @@ public class ToXLogConverter {
 		
 		List<String> eventList = new ArrayList<>();
 		for (String col : all_columns) {
+			exec.checkCanceled();
 		    if (!traceSet.contains(col)) {
 		        eventList.add(col);
 		    }
@@ -159,6 +160,7 @@ public class ToXLogConverter {
 			
 			// get trace attributes 
 			for(int tIdx = 0; tIdx< traceColIndices.length ; tIdx++) {
+				exec.checkCanceled();
 				if(traceColVisited[tIdx])
 					continue; 
 				if(traceAttrMap.containsKey(traceList.get(tIdx))) {
@@ -209,6 +211,7 @@ public class ToXLogConverter {
 			// after this, we process other attributes, like resource, costs;; At this point, we need to differ their types 
 			// and add attributes to the currentEventClass...
 			for(int eIdx =0; eIdx< eventColIndices.length; eIdx++) {
+				exec.checkCanceled();
 				if(eventColVisited[eIdx])
 					continue;
 
