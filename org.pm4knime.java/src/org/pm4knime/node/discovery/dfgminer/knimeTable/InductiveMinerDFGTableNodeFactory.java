@@ -26,6 +26,7 @@ public final class InductiveMinerDFGTableNodeFactory extends WebUINodeFactory<In
 			.addInputPort("Directly-Follows Graph", DfgMsdPortObject.TYPE ,"a directly-follows graph")//
 			.addOutputPort("Process Tree", ProcessTreePortObject.TYPE, "a process tree")//
 			.nodeType(NodeType.Learner)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 

@@ -31,6 +31,7 @@ public class DfgMinerTableNodeFactory extends WebUINodeFactory<DfgMinerTableNode
 			.addInputPort("Table", BufferedDataTable.TYPE ,"an event table")//
 			.addOutputPort("Directly-Follows Graph", DfgMsdPortObject.TYPE, "a directly-follows graph")//
 			.nodeType(NodeType.Learner)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 

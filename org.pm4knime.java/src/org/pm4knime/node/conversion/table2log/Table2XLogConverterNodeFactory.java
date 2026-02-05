@@ -20,6 +20,7 @@ public class Table2XLogConverterNodeFactory extends WebUINodeFactory<Table2XLogC
 			.addInputPort("Table", BufferedDataTable.TYPE ,"an event table")//
 			.addOutputPort("Event Log", XLogPortObject.TYPE, "an event log")//
 			.nodeType(NodeType.Manipulator)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 

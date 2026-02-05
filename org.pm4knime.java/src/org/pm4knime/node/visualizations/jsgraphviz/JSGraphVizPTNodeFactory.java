@@ -32,6 +32,7 @@ public class JSGraphVizPTNodeFactory extends WebUINodeFactory<JSGraphVizAbstract
 			.addInputPort("Process Tree", ProcessTreePortObject.TYPE ,"a process tree")//
 			.addOutputPort("Image", ImagePortObject.TYPE, "an SVG image")//
 			.nodeType(NodeType.Visualizer)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 	public JSGraphVizPTNodeFactory() {

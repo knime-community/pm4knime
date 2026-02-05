@@ -98,18 +98,19 @@ public class XLog2TableConverterNodeModel extends NodeModel {
             final ExecutionContext exec) throws Exception {
     	logger.info("Start : Convert Event log to DataTable" );
     	XLogPortObject logPortObject = null ;
-    	for(PortObject obj: inData)
+    	for(PortObject obj: inData) {
+    		exec.checkCanceled();
         	if(obj instanceof XLogPortObject) {
         		logPortObject = (XLogPortObject)obj;
         		break;
         	}
+    	}
         
     	XLog log = logPortObject.getLog();
-    	
-    	DataTableSpec outSpec = createSpec();
-    	
+    	DataTableSpec outSpec = createSpec();    	
     	BufferedDataContainer bufCon = exec.createDataContainer(outSpec);
     	FromXLogConverter.convert(log, bufCon, exec);
+
     	
     	bufCon.close();
     	logger.info("End : Convert Event log to DataTable" );

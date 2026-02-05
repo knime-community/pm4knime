@@ -9,10 +9,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.knime.core.data.DataColumnSpec;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.DomainValuesProvider;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.choices.DomainChoicesUtil;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.handler.ErrorHandlingSingleton;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.handler.WidgetHandlerException;
 import org.knime.node.parameters.NodeParameters;
 import org.knime.node.parameters.NodeParametersInput;
@@ -30,7 +28,6 @@ import org.knime.node.parameters.updates.Effect;
 import org.knime.node.parameters.updates.Effect.EffectType;
 import org.knime.node.parameters.updates.EffectPredicate;
 import org.knime.node.parameters.updates.EffectPredicateProvider;
-import org.knime.node.parameters.updates.EffectPredicateProvider.PredicateInitializer;
 import org.knime.node.parameters.updates.ParameterReference;
 import org.knime.node.parameters.updates.ValueReference;
 import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerSettings.TimeColumnsProvider;

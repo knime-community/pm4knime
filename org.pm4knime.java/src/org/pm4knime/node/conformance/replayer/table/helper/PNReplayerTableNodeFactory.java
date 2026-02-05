@@ -47,6 +47,7 @@ public class PNReplayerTableNodeFactory extends WebUINodeFactory<DefaultPNReplay
 			.addInputPort("Petri Net", PetriNetPortObject.TYPE ,"a Petri net")//
 			.addOutputPort("Replay Result", RepResultPortObjectTable.TYPE, "replay result")//
 			.nodeType(NodeType.Other)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 

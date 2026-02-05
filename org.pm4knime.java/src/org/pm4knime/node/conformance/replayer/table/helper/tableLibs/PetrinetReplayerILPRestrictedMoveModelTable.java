@@ -10,7 +10,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionContext;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetGraph;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
@@ -80,7 +81,7 @@ public class PetrinetReplayerILPRestrictedMoveModelTable extends PetrinetReplaye
 	}
 
 	@Override
-	public PNRepResult replayLog(final PluginContext context, PetrinetGraph net, final TableEventLog log,
+	public PNRepResult replayLog(final PluginContext context,  final ExecutionContext exec, PetrinetGraph net, final TableEventLog log,
 			TransEvClassMappingTable mapping, final IPNReplayParameter param) {
 		final CostBasedCompleteManifestParamTable parameters = (CostBasedCompleteManifestParamTable) param;
 		this.restrictedTrans = parameters.getRestrictedTrans();
@@ -133,29 +134,28 @@ public class PetrinetReplayerILPRestrictedMoveModelTable extends PetrinetReplaye
 			//TObjectIntMap<PHead> head2int = new TObjectIntHashMap<PHead>(256 * 1024);
 			//List<State<PHead, T>> stateList = new ArrayList<State<PHead, T>>(256 * 1024);
 
-			int minCostMoveModel = getMinBoundMoveModel(parameters, delta, aStar, delegate);
 
-			final Canceller canceller = parameters.getCanceller() == null ? new Canceller() {
+			final Canceller canceller = new Canceller() {
 				public boolean isCancelled() {
-					if (context != null) {
-						return context.getProgress().isCancelled();
+					try {
+						exec.checkCanceled();
+						return false;
+					} catch (CanceledExecutionException e) {
+						return true;
 					}
-					return false;
 				}
-			} : parameters.getCanceller();
+			};
+			
+			int minCostMoveModel = getMinBoundMoveModel(parameters, exec, canceller, delta, aStar, delegate);
 
 			for (int i = 0; i < log.getTraces().size(); i++) {
-				if (parameters.getCanceller() != null) {
-					if (parameters.getCanceller().isCancelled()) {
-						break;
-					}
-				}
+				exec.checkCanceled();
 
 				PHeadTable initial = constructHead(delegate, initMarking, log.getTraces().get(i));
 				final TIntList unUsedIndices = new TIntArrayList();
 				final TIntIntMap trace2orgTrace = new TIntIntHashMap(log.getTraces().get(i).size(), 0.5f, -1, -1);
 				//TODO: ALlow for partially ordered traces
-				final Trace trace = getLinearTrace(log, i, delegate, unUsedIndices, trace2orgTrace);
+				final Trace trace = getLinearTrace(log, i, delegate, unUsedIndices, trace2orgTrace, exec);
 				int first = traces.get(trace);
 				if (first >= 0) {
 					doneMap.put(i, new Representative(first, unUsedIndices, trace2orgTrace));

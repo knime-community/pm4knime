@@ -22,6 +22,7 @@ public class FitnessCheckerNodeFactory extends WebUINodeFactory<FitnessCheckerNo
 			.addInputPort("Replay Result", RepResultPortObjectTable.TYPE ,"replay result")//
 			.addOutputPort("Fitness Statinfo", BufferedDataTable.TYPE, "fitness statistical information")//
 			.nodeType(NodeType.Other)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 

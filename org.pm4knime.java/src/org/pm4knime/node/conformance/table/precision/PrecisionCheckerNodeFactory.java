@@ -26,6 +26,7 @@ public class PrecisionCheckerNodeFactory extends WebUINodeFactory<PrecisionCheck
 			.addInputPort("Replay Result", RepResultPortObjectTable.TYPE ,"replay result")//
 			.addOutputPort("Precision Statinfo", BufferedDataTable.TYPE, "precision statistical information")//
 			.nodeType(NodeType.Other)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 

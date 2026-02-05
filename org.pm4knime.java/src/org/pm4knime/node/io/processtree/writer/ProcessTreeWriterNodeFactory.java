@@ -19,6 +19,7 @@ public class ProcessTreeWriterNodeFactory extends WebUINodeFactory<ProcessTreeWr
         .modelSettingsClass(ProcessTreeWriterNodeSettings.class) //
         .addInputPort("Process Tree", ProcessTreePortObject.TYPE, "a process tree")
         .nodeType(NodeType.Sink)
+        .sinceVersion(2, 0, 0)
 		.build();
 
     public ProcessTreeWriterNodeFactory() {
