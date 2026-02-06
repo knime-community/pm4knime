@@ -215,7 +215,7 @@ public class XLogPortObject extends AbstractPortObject {
 			XesLog xeslog = parser.parse(objIn);
 			exec.checkCanceled();
 			XesConvertToXLogAlgorithm convertor = new XesConvertToXLogAlgorithm();
-			XLog log = convertor.convertToLog(xeslog, (ExecutionContext) exec);
+			XLog log = convertor.convertToLog(xeslog, exec);
 			setLog(log);
 			setSpec((XLogPortObjectSpec) spec);
 		} catch (Exception e) {
