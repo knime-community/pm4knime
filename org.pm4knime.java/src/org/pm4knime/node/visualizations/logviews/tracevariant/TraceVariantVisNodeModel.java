@@ -1,8 +1,14 @@
 package org.pm4knime.node.visualizations.logviews.tracevariant;
 
-import org.knime.base.data.xml.SvgCell;
+import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.RowKey;
+import org.knime.core.data.def.DefaultRow;
+import org.knime.core.data.def.IntCell;
+import org.knime.core.data.def.StringCell;
 import org.knime.core.data.sort.BufferedDataTableSorter;
+import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
@@ -12,15 +18,15 @@ import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectHolder;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
-import org.knime.core.node.port.image.ImagePortObject;
-import org.knime.core.node.port.image.ImagePortObjectSpec;
-import org.knime.core.node.port.inactive.InactiveBranchPortObjectSpec;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.webui.node.dialog.defaultdialog.NodeParametersUtil;
 import org.knime.js.core.node.AbstractSVGWizardNodeModel;
 import org.pm4knime.portobject.AbstractJSONPortObject;
 import org.pm4knime.util.defaultnode.TraceVariantRepresentation;
 import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerNodeModel;
+
+import org.knime.core.data.DataRow;
+import org.pm4knime.util.defaultnode.TraceVariant;
 
 
 
@@ -29,18 +35,16 @@ public class TraceVariantVisNodeModel extends AbstractSVGWizardNodeModel<TraceVa
 
 	// Input and output port types
 	private static PortType[] IN_TYPES = {BufferedDataTable.TYPE};
-	private static PortType[] OUT_TYPES = {ImagePortObject.TYPE};
+	private static PortType[] OUT_TYPES = {BufferedDataTable.TYPE};
 	AbstractJSONPortObject port_obj;
 	
 	public static final String KEY_TRACE_CLASSIFIER = "Trace Classifier";
 	public static final String KEY_EVENT_CLASSIFIER = "Event Classifier";
 	public static final String KEY_CLASSIFIER_SET = "Classifier Set";
 	
-//	protected String t_classifier;
-//	protected String e_classifier;
-	protected Boolean generate_image = true;
 	
 	protected BufferedDataTable table;
+	protected TraceVariantRepresentation m_variants;
 	
 	protected TraceVariantVisNodeSettings m_settings = new TraceVariantVisNodeSettings();
 	private final Class<TraceVariantVisNodeSettings> m_settingsClass;
@@ -89,15 +93,18 @@ public class TraceVariantVisNodeModel extends AbstractSVGWizardNodeModel<TraceVa
 			throw new InvalidSettingsException("Input is not a valid Table!");
 		if(m_settings.e_classifier == null || m_settings.t_classifier == null)
 			throw new InvalidSettingsException("Classifiers are not set!");
-		PortObjectSpec imageSpec;
-		imageSpec = new ImagePortObjectSpec(SvgCell.TYPE);
-//		return new PortObjectSpec[]{imageSpec};
-        if (generateImage()) {
-        	return new PortObjectSpec[]{new ImagePortObjectSpec(SvgCell.TYPE)};
-        } else {
-        	return new PortObjectSpec[]{InactiveBranchPortObjectSpec.INSTANCE};
-        }
+		DataTableSpec variantSpec = createVariantTableSpec();
+		return new PortObjectSpec[]{variantSpec};
 	}
+
+	private DataTableSpec createVariantTableSpec() {
+		DataColumnSpec[] cols = new DataColumnSpec[] {
+	        new DataColumnSpecCreator("Frequency", IntCell.TYPE).createSpec(),
+	        new DataColumnSpecCreator("Activity Sequence", StringCell.TYPE).createSpec()
+	    };
+
+	    return new DataTableSpec(cols);
+}
 
 	@Override
 	protected void performExecuteCreateView(PortObject[] inObjects, ExecutionContext exec) throws Exception {
@@ -119,21 +126,54 @@ public class TraceVariantVisNodeModel extends AbstractSVGWizardNodeModel<TraceVa
 		}
 		representation.setData(data);
 		
-		TraceVariantRepresentation varinats = new TraceVariantRepresentation(table, m_settings.t_classifier, m_settings.e_classifier);
-		representation.setVariants(varinats);
+		m_variants = new TraceVariantRepresentation(table, m_settings.t_classifier, m_settings.e_classifier);
+		representation.setVariants(m_variants);
 	}
 	
 	@Override
 	protected boolean generateImage() {
-//		return true;
-        return generate_image;
+        return false;
     }
 	
 	@Override
     protected PortObject[] performExecuteCreatePortObjects(final PortObject svgImageFromView,
         final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        return new PortObject[]{svgImageFromView};
+		BufferedDataTable variantTable =
+	            createVariantOutputTable(exec);
+		return new PortObject[]{variantTable};
     }
+
+	private BufferedDataTable createVariantOutputTable(
+	        ExecutionContext exec) {
+	
+	    DataTableSpec spec = createVariantTableSpec();
+	
+	    BufferedDataContainer container =
+	            exec.createDataContainer(spec);
+	
+	    int id = 1;
+	
+	    for (TraceVariant v : m_variants.getVariants()) {
+	
+	        int freq = v.getFrequency();
+	
+	        // Join activities into one readable string
+	        String seq = String.join(" → ", v.getActivities());
+	
+	        DataRow row = new DefaultRow(
+	                new RowKey("Variant_" + id),
+	                new IntCell(freq),
+	                new StringCell(seq)
+	        );
+	
+	        container.addRowToTable(row);
+	        id++;
+	    }
+	
+	    container.close();
+	    return container.getTable();
+	}
+
 
 	@Override
 	protected void performReset() {
@@ -146,9 +186,6 @@ public class TraceVariantVisNodeModel extends AbstractSVGWizardNodeModel<TraceVa
 
 	@Override
 	protected void saveSettingsTo(NodeSettingsWO settings) {
-//		settings.addString(KEY_TRACE_CLASSIFIER, m_settings.t_classifier);
-//		settings.addString(KEY_EVENT_CLASSIFIER, m_settings.e_classifier);
-//		settings.addBoolean("generate_image", generate_image);		
 		if (m_settings != null) {
 			NodeParametersUtil.saveSettings(m_settingsClass, m_settings, settings);
         }
@@ -160,9 +197,6 @@ public class TraceVariantVisNodeModel extends AbstractSVGWizardNodeModel<TraceVa
 
 	@Override
 	protected void loadValidatedSettingsFrom(NodeSettingsRO settings) throws InvalidSettingsException {
-//		m_settings.t_classifier = settings.getString(KEY_TRACE_CLASSIFIER);
-//		m_settings.e_classifier = settings.getString(KEY_EVENT_CLASSIFIER);
-//		generate_image = settings.getBoolean("generate_image", false);	
 		m_settings = NodeParametersUtil.loadSettings(settings, m_settingsClass);
 	}
 
