@@ -70,49 +70,109 @@ public class FromXLogConverter {
 		}
 		return false; // they donot overlap their attributes, so what we need to do is just to create the spec there 
 	} 
-	static void convert(XLog log, BufferedDataContainer buf, ExecutionContext exec) throws CanceledExecutionException {
+	static void convert(XLog log, BufferedDataContainer eventBuf, BufferedDataContainer caseBuf, ExecutionContext exec) throws CanceledExecutionException {
 		
-		DataTableSpec spec = buf.getTableSpec();
-		
-		int colNum = spec.getColumnNames().length;
-		int eventCount = 0;
-		DataCell[] tCells = new DataCell[colNum];
-		for (XTrace trace : log) {
-			exec.checkCanceled();
-			for (String attrKey : trace.getAttributes().keySet()) {
-				int colIdx = spec.findColumnIndex(XLogSpecUtil.TRACE_ATTRIBUTE_PREFIX + attrKey);
-				if(colIdx >= 0) {
-					tCells[colIdx] = createDataCell(trace.getAttributes().get(attrKey));
-				}
-			}
-			for(XEvent event : trace) {
-				// test if this shallow copy, how?? If we change our values in trace if it changes too
-				// but actually this helps a lot for thi
-				exec.checkCanceled();
-				DataCell[] cells = tCells.clone();
-				
-				// check the event attribute 
-				for (String attrKey : event.getAttributes().keySet()) {
-					exec.checkCanceled();
-					int colIdx = spec.findColumnIndex(XLogSpecUtil.EVENT_ATTRIBUTE_PREFIX + attrKey);
-					if(colIdx >= 0) {
-						// if we already have the attributes there, put it there
-						cells[colIdx] = createDataCell(event.getAttributes().get(attrKey));
-					}
-				}
-				
-				for(int i=0; i<colNum; i++) {
-					exec.checkCanceled();
-					if(cells[i]==null )
-						cells[i] = new MissingCell("?");
-				}
-				
-				DataRow eventRow = new DefaultRow("Event " + (eventCount++), cells);	
-				buf.addRowToTable(eventRow);
-			}
-			
-		}
-		
+		DataTableSpec eventSpec = eventBuf.getTableSpec();
+	    DataTableSpec caseSpec  = caseBuf.getTableSpec();
+
+	    int eventColNum = eventSpec.getNumColumns();
+	    int caseColNum  = caseSpec.getNumColumns();
+
+	    int eventCount = 0;
+	    int caseCount  = 0;
+
+	    // reusable trace-level cells for event table
+	    DataCell[] traceCellsForEvents = new DataCell[eventColNum];
+
+	    for (XTrace trace : log) {
+
+	        exec.checkCanceled();
+
+	        /* ======================================================
+	         * 1) Fill TRACE attributes into event-template row
+	         * ====================================================== */
+	        // reset trace template
+	        for (int i = 0; i < eventColNum; i++) {
+	            traceCellsForEvents[i] = null;
+	        }
+
+	        for (String attrKey : trace.getAttributes().keySet()) {
+
+	            String colName =
+	                    XLogSpecUtil.TRACE_ATTRIBUTE_PREFIX + attrKey;
+
+	            int colIdx = eventSpec.findColumnIndex(colName);
+
+	            if (colIdx >= 0) {
+	                traceCellsForEvents[colIdx] =
+	                        createDataCell(trace.getAttributes().get(attrKey));
+	            }
+	        }
+
+	        /* ======================================================
+	         * 2) Create ONE CASE ROW (trace attributes only)
+	         * ====================================================== */
+	        DataCell[] caseCells = new DataCell[caseColNum];
+
+	        for (int i = 0; i < caseColNum; i++) {
+	            caseCells[i] = new MissingCell("?");
+	        }
+
+	        for (String attrKey : trace.getAttributes().keySet()) {
+
+	            String colName =
+	                    XLogSpecUtil.TRACE_ATTRIBUTE_PREFIX + attrKey;
+
+	            int colIdx = caseSpec.findColumnIndex(colName);
+
+	            if (colIdx >= 0) {
+	                caseCells[colIdx] =
+	                        createDataCell(trace.getAttributes().get(attrKey));
+	            }
+	        }
+
+	        DataRow caseRow =
+	                new DefaultRow("Case " + (caseCount++), caseCells);
+
+	        caseBuf.addRowToTable(caseRow);
+
+	        /* ======================================================
+	         * 3) Create EVENT ROWS (trace template + event attrs)
+	         * ====================================================== */
+	        for (XEvent event : trace) {
+
+	            exec.checkCanceled();
+
+	            // clone trace template
+	            DataCell[] eventCells = traceCellsForEvents.clone();
+
+	            // fill event attributes
+	            for (String attrKey : event.getAttributes().keySet()) {
+
+	                String colName =
+	                        XLogSpecUtil.EVENT_ATTRIBUTE_PREFIX + attrKey;
+
+	                int colIdx = eventSpec.findColumnIndex(colName);
+
+	                if (colIdx >= 0) {
+	                    eventCells[colIdx] =
+	                            createDataCell(event.getAttributes().get(attrKey));
+	                }
+	            }
+
+	            // fill missing values
+	            for (int i = 0; i < eventColNum; i++) {
+	                if (eventCells[i] == null) {
+	                    eventCells[i] = new MissingCell("?");
+	                }
+	            }
+
+	            DataRow eventRow =
+	                    new DefaultRow("Event " + (eventCount++), eventCells);
+
+	            eventBuf.addRowToTable(eventRow);
+	        }
+	    }
 	}
 	
 	static DataCell createDataCell(XAttribute attr) {
