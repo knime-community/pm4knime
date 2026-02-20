@@ -247,26 +247,12 @@ public class XLog2TableConverterNodeModel extends NodeModel {
 //    	}
    	
 
-    	m_inSpec = spec;
+    	m_inSpec = spec;   	
     	
-    	try {
-    		if(m_traceAttrSet.getIncludeList().isEmpty()) {
-            	Set<String> specTraceColumns = m_inSpec.getGTraceAttrMap().keySet();
-            	m_traceAttrSet.setIncludeList(specTraceColumns);
-            	m_traceAttrSet.setExcludeList(new String[0]);
-        	}
-        	
-        	if(m_eventAttrSet.getIncludeList().isEmpty()) {
-            	Set<String> specEventColumns = m_inSpec.getGEventAttrMap().keySet();
-            	m_eventAttrSet.setIncludeList(specEventColumns);
-            	m_eventAttrSet.setExcludeList(new String[0]);
-        	}
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    	}
-    	
-    	
-        return new PortObjectSpec[]{null};
+    	return new PortObjectSpec[]{
+    	        null,
+    	        null
+    	    };
     }
 
     /**
