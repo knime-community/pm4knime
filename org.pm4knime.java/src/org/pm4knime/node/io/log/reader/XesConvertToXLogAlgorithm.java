@@ -60,7 +60,7 @@ public class XesConvertToXLogAlgorithm {
 	 * @return The XLog that results from converting the given log.
 	 * @throws CanceledExecutionException 
 	 */
-	public XLog convertToLog(XesLog log, ExecutionContext exec) throws CanceledExecutionException {
+	public XLog convertToLog(XesLog log, ExecutionMonitor exec) throws CanceledExecutionException {
 		// Create the factory.
 		factory = XFactoryRegistry.instance().currentDefault();
 		// Create an empty XLog.
