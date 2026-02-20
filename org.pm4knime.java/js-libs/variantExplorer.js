@@ -9,6 +9,8 @@ var varExplorer = (function () {
     let _activityColorMap = {};
     let _totalFrequency = 0;
     const _variantSVGCache = new Map();
+    let _sortField = "frequency";
+	let _sortDirection = "desc";
 
     const BATCH_SIZE = 5;
 
@@ -57,7 +59,7 @@ var varExplorer = (function () {
 	    body.style.fontFamily = "Arial, sans-serif";
 	    body.style.color = "#0f172a";
 	
-	    // ✅ Add CSS to hide horizontal scrollbar
+	    // Add CSS to hide horizontal scrollbar
 	    let style = document.createElement("style");
 	    style.innerHTML = `
 		  .trace-scroll {
@@ -89,12 +91,86 @@ var varExplorer = (function () {
 	        "font-size:18px;font-weight:700;margin-bottom:8px;";
 	    body.appendChild(title);
 	
-	    // ---- Status Text ----
-	    let status = document.createElement("div");
-	    status.id = "status-text";
-	    status.style.cssText =
-	        "font-size:13px;color:#475569;margin-bottom:14px;";
-	    body.appendChild(status);
+	    
+	    // ---- Toolbar Row ----
+		let toolbar = document.createElement("div");
+		toolbar.style.cssText = `
+		  display:flex;
+		  justify-content:space-between;
+		  align-items:center;
+		  padding:6px 10px;
+		  border-radius:10px;
+		  background:#f1f5f9;
+		  font-size:13px;
+		  color:#475569;
+		  margin-bottom:14px;
+		`;
+		
+		let leftInfo = document.createElement("div");
+		leftInfo.id = "toolbar-info";
+		leftInfo.innerText = "Order variants";
+		
+		let rightControls = document.createElement("div");
+		rightControls.style.cssText = `
+		  display:flex;
+		  align-items:center;
+		  gap:6px;
+		`;
+		
+		let orderLabel = document.createElement("span");
+		orderLabel.innerText = "Order:";
+		orderLabel.style.fontSize = "12px";
+		orderLabel.style.color = "#64748b";
+		
+		let sortSelect = document.createElement("select");
+		sortSelect.id = "sort-select";
+		sortSelect.style.cssText = `
+		  font-size:12px;
+		  padding:2px 6px;
+		  border-radius:6px;
+		  border:1px solid rgba(15,23,42,0.12);
+		  background:#f8fafc;
+		  color:#0f172a;
+		  cursor:pointer;
+		  outline:none;
+		`;
+		
+		sortSelect.innerHTML = `
+		  <option value="frequency-desc">frequency ↓</option>
+		  <option value="frequency-asc">frequency ↑</option>
+		  <option value="length-desc">length ↓</option>
+		  <option value="length-asc">length ↑</option>
+		`;
+		
+		sortSelect.onchange = function () {
+		  applySorting(this.value);
+		};
+		
+		// ---- Expand All Toggle (Toolbar) ----
+		let expandBtn = document.createElement("button");
+		expandBtn.id = "expandall-btn";
+		expandBtn.innerText = "Expand labels";
+		expandBtn.style.cssText = `
+		  font-size:12px;
+		  padding:3px 8px;
+		  border-radius:6px;
+		  border:1px solid rgba(15,23,42,0.12);
+		  background:#f8fafc;
+		  color:#0f172a;
+		  cursor:pointer;
+		`;
+		
+		expandBtn.onclick = function () {
+		  toggleExpandAll(expandBtn);
+		};
+		
+		rightControls.appendChild(orderLabel);
+		rightControls.appendChild(sortSelect);
+		rightControls.appendChild(expandBtn);
+		toolbar.appendChild(leftInfo);
+		toolbar.appendChild(rightControls);
+		
+		body.appendChild(toolbar);
 	
 	    // ---- Container (cards) ----
 	    let container = document.createElement("div");
@@ -134,18 +210,6 @@ var varExplorer = (function () {
 	    exportBtn.style.cssText = buttonStyle("primary");
 	    exportBtn.onclick = exportVisibleAsSVG;
 	    btnDiv.appendChild(exportBtn);
-	
-	    // ---- Expand All Button ----
-	    let expandAllBtn = document.createElement("button");
-	    expandAllBtn.id = "expandall-btn";
-	    expandAllBtn.innerText = "Expand all";
-	    expandAllBtn.style.cssText = buttonStyle();
-	
-	    expandAllBtn.onclick = function () {
-	        toggleExpandAll(expandAllBtn);
-	    };
-	
-	    btnDiv.appendChild(expandAllBtn);
 	
 	    body.appendChild(btnDiv);
 	
@@ -230,7 +294,11 @@ var varExplorer = (function () {
 			traceWrap.style.msOverflowStyle = "none"; // IE/Edge
 			traceWrap.className = "trace-scroll";
             // initial expanded state for this row
-            const isExpanded = !!_expandedRows.get(i);
+             if (!_expandedRows.has(i)) {
+			    _expandedRows.set(i, false);
+			  }
+			
+			  const isExpanded = _expandedRows.get(i);
 
             let svg = buildVariantSVG(trace, _activityColorMap, isExpanded);
 
@@ -266,19 +334,27 @@ var varExplorer = (function () {
     
     function updateExpandAllButton() {
 
-    let btn = document.getElementById("expandall-btn");
-	    if (!btn) return;
+	  let btn = document.getElementById("expandall-btn");
+	  if (!btn) return;
 	
-	    // If all visible are expanded → show Collapse
-	    let allExpanded = true;
-	    for (let i = 0; i < _renderIndex; i++) {
-	        if (!_expandedRows.get(i)) {
-	            allExpanded = false;
-	            break;
-	        }
+	  // ✅ Nothing rendered yet → always collapsed state
+	  if (_renderIndex === 0) {
+	    btn.innerText = "Expand labels";
+	    return;
+	  }
+	
+	  let allExpanded = true;
+	
+	  for (let i = 0; i < _renderIndex; i++) {
+	
+	    // Treat undefined as collapsed
+	    if (_expandedRows.get(i) !== true) {
+	      allExpanded = false;
+	      break;
 	    }
+	  }
 	
-	    btn.innerText = allExpanded ? "Collapse all" : "Expand all";
+	  btn.innerText = allExpanded ? "Collapse labels" : "Expand labels";
 	}
     
 
@@ -313,20 +389,20 @@ var varExplorer = (function () {
     // =====================================================
     function buildVariantSVG(trace, activityColorMap, expanded) {
 
-        function shorten(text, maxLen = 16) {
+        function shorten(text, maxLen = 12) {
             return text.length > maxLen ? text.substring(0, maxLen) + "…" : text;
         }
 
         function computeBlockWidth(label) {
             // fits full label in expanded mode
-            return Math.max(170, label.length * 8.7);
+            return Math.max(140, label.length * 8.7);
         }
 
         const arrowTip = 20;
 
         // labels + widths
         const labels = trace.map(a => expanded ? a : shorten(a));
-        const widths = labels.map(l => expanded ? computeBlockWidth(l) : 170);
+        const widths = labels.map(l => expanded ? computeBlockWidth(l) : 140);
 
         const totalWidth = widths.reduce((a, b) => a + b, 0) + 40;
 
@@ -618,7 +694,7 @@ var varExplorer = (function () {
 	    }
 	
 	    // Update button label
-	    button.innerText = shouldExpand ? "Collapse all" : "Expand all";
+	    button.innerText = shouldExpand ? "Collapse labels" : "Expand labels";
 	
 	    // Re-render EXACTLY the same amount that was visible
 	    const container = document.getElementById("variantcontainer");
@@ -633,17 +709,93 @@ var varExplorer = (function () {
 	
 	    updateExpandAllButton();
 	}
+	
+	function handleSortClick(field) {
+
+	  if (_sortField === field) {
+	    // toggle direction
+	    _sortDirection = _sortDirection === "asc" ? "desc" : "asc";
+	  } else {
+	    // switch field
+	    _sortField = field;
+	    _sortDirection = "desc";
+	  }
+	
+	  applySorting();
+	  updateSortButtons();
+	}
+	
+	function applySorting(mode) {
+
+	  if (mode === "frequency-desc") {
+	    _allVariants.sort((a, b) => (b.frequency || 0) - (a.frequency || 0));
+	  }
+	
+	  if (mode === "frequency-asc") {
+	    _allVariants.sort((a, b) => (a.frequency || 0) - (b.frequency || 0));
+	  }
+	
+	  if (mode === "length-desc") {
+	    _allVariants.sort((a, b) =>
+	      (b.activities?.length || 0) - (a.activities?.length || 0)
+	    );
+	  }
+	
+	  if (mode === "length-asc") {
+	    _allVariants.sort((a, b) =>
+	      (a.activities?.length || 0) - (b.activities?.length || 0)
+	    );
+	  }
+	
+	  // Reset rendering
+	  _expandedRows.clear();
+	  _variantSVGCache.clear();
+	
+	  let container = document.getElementById("variantcontainer");
+	  if (container) container.innerHTML = "";
+	
+	  _renderIndex = 0;
+	
+	  let loadBtn = document.getElementById("load-btn");
+	  if (loadBtn) loadBtn.style.display = "inline-block";
+	
+	  renderNextBatch();
+	}
+	
+	function updateSortButtons() {
+
+	  document.querySelectorAll("[data-field]").forEach(btn => {
+	
+	    let field = btn.dataset.field;
+	
+	    btn.style.background = "white";
+	    btn.style.color = "#0f172a";
+	
+	    if (field === _sortField) {
+	      btn.style.background = "#0f172a";
+	      btn.style.color = "white";
+	
+	      btn.innerText =
+	        (field === "frequency" ? "Frequency" : "Trace length") +
+	        (_sortDirection === "desc" ? " ↓" : " ↑");
+	    } else {
+	      btn.innerText =
+	        field === "frequency" ? "Frequency" : "Trace length";
+	    }
+	  });
+	}
 
 	    
 
     // =====================================================
     // STATUS UPDATE
     // =====================================================
-    function updateStatus() {
-        let status = document.getElementById("status-text");
-        if (!status) return;
-        status.innerText = `Showing ${_renderIndex} of ${_allVariants.length} variants`;
-    }
+    function updateStatus() {	 
+	  let info = document.getElementById("toolbar-info");
+	  if (info) {
+	    info.innerText = `Showing ${_renderIndex} of ${_allVariants.length} variants`;
+	  }
+	}
 
     // =====================================================
     // HELPERS: Colors
