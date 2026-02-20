@@ -118,7 +118,6 @@ var varExplorer = (function () {
 		`;
 		
 		let orderLabel = document.createElement("span");
-		orderLabel.innerText = "Order:";
 		orderLabel.style.fontSize = "12px";
 		orderLabel.style.color = "#64748b";
 		
@@ -135,6 +134,9 @@ var varExplorer = (function () {
 		  outline:none;
 		`;
 		
+		
+		sortSelect.title = "Sort variants";
+		
 		sortSelect.innerHTML = `
 		  <option value="frequency-desc">frequency ↓</option>
 		  <option value="frequency-asc">frequency ↑</option>
@@ -149,16 +151,36 @@ var varExplorer = (function () {
 		// ---- Expand All Toggle (Toolbar) ----
 		let expandBtn = document.createElement("button");
 		expandBtn.id = "expandall-btn";
-		expandBtn.innerText = "Expand labels";
+		expandBtn.innerHTML = "↔";
+
 		expandBtn.style.cssText = `
-		  font-size:12px;
-		  padding:3px 8px;
+		  width:26px;
+		  height:22px;
+		  display:flex;
+		  align-items:center;
+		  justify-content:center;
+		
+		  font-size:15px;     
+		  font-weight:600;
+		  
 		  border-radius:6px;
 		  border:1px solid rgba(15,23,42,0.12);
 		  background:#f8fafc;
 		  color:#0f172a;
+	
 		  cursor:pointer;
+		  line-height:1;
+		  padding:0;
 		`;
+		
+		// subtle hover effect
+		expandBtn.onmouseenter = () => {
+		  expandBtn.style.background = "#e2e8f0";
+		};
+		expandBtn.onmouseleave = () => {
+		  expandBtn.style.background = "#f8fafc";
+		};
+		expandBtn.title = "Expand / collapse labels";
 		
 		expandBtn.onclick = function () {
 		  toggleExpandAll(expandBtn);
@@ -337,9 +359,7 @@ var varExplorer = (function () {
 	  let btn = document.getElementById("expandall-btn");
 	  if (!btn) return;
 	
-	  // ✅ Nothing rendered yet → always collapsed state
 	  if (_renderIndex === 0) {
-	    btn.innerText = "Expand labels";
 	    return;
 	  }
 	
@@ -354,7 +374,6 @@ var varExplorer = (function () {
 	    }
 	  }
 	
-	  btn.innerText = allExpanded ? "Collapse labels" : "Expand labels";
 	}
     
 
@@ -692,9 +711,6 @@ var varExplorer = (function () {
 	    for (let i = 0; i < visibleCount; i++) {
 	        _expandedRows.set(i, shouldExpand);
 	    }
-	
-	    // Update button label
-	    button.innerText = shouldExpand ? "Collapse labels" : "Expand labels";
 	
 	    // Re-render EXACTLY the same amount that was visible
 	    const container = document.getElementById("variantcontainer");
