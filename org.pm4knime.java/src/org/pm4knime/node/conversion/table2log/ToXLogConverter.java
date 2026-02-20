@@ -229,16 +229,8 @@ public class ToXLogConverter {
 	}
 	
 	private void assignAttributeWithDataCell(XAttributable currentObj, DataCell otherData, String attrName) {
-		// check if the attrName has the prefix of the event attributes, or not.
-		// should we retrieve it back to the exact event log?? I think yes. We shouldn't change any information
-		// to split here. TO avoid the additional prefix
-		if(attrName.startsWith(XLogSpecUtil.EVENT_ATTRIBUTE_PREFIX))
-			attrName = attrName.split(XLogSpecUtil.EVENT_ATTRIBUTE_PREFIX)[1];
-		else if(attrName.startsWith(XLogSpecUtil.TRACE_ATTRIBUTE_PREFIX))
-			attrName = attrName.split(XLogSpecUtil.TRACE_ATTRIBUTE_PREFIX)[1];
-		 
-		// add attributes to the log, we need to know the type of it.
-		
+
+	
 		if(otherData.getType().equals(IntCell.TYPE)){
 			IntCell iCell = (IntCell) otherData;
 			// here we set extension as null, but later we should improve it
