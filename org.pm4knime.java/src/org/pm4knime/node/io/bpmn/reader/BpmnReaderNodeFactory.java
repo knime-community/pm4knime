@@ -20,7 +20,9 @@ public class BpmnReaderNodeFactory extends WebUINodeFactory<BpmnReaderNodeModel>
 			.fullDescription("This node imports a BPMN model from a BPMN file. BPMN, or Business Process Model and Notation, encompasses several key elements that collectively define and illustrate a business process.")
 			.modelSettingsClass(ReaderNodeSettings.class)
 			.addOutputPort("BPMN", BpmnPortObject.TYPE, "a BPMN model")
-			.nodeType(NodeType.Source).build();
+			.nodeType(NodeType.Source)
+			.sinceVersion(3, 0, 0)
+			.build();
 
 	public BpmnReaderNodeFactory() {
 		super(CONFIG);

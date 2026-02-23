@@ -5,9 +5,6 @@ import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetGraph;
 import org.processmining.models.graphbased.directed.petrinet.ResetInhibitorNet;
 import org.processmining.models.graphbased.directed.petrinet.ResetNet;
-import org.processmining.plugins.astar.petrinet.AbstractPetrinetReplayer;
-import org.processmining.plugins.astar.petrinet.impl.PNaiveDelegate;
-import org.processmining.plugins.astar.petrinet.impl.PNaiveTail;
 
 
 public class PetrinetReplayerWithoutILPTable extends AbstractPetrinetReplayerTable<PNaiveTailTable, PNaiveDelegateTable>   {

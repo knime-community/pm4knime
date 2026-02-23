@@ -19,10 +19,10 @@ import org.pm4knime.portobject.XLogPortObjectSpec;
  *
  */
 public class XLogSpecUtil {
-	public static final String TRACE_ATTRIBUTE_PREFIX = "#Trace Attribute#";
-	public static final String EVENT_ATTRIBUTE_PREFIX = "#Event Attribute#";
+	public static final String TRACE_ATTRIBUTE_PREFIX = "case:";
+	public static final String EVENT_ATTRIBUTE_PREFIX = "";
 	public static final String CLASSIFIER_PREFIX = ""; // "#Classifier#";
-	public final static String CFG_KEY_CLASSIFIER_SEPARATOR = "###";
+	public final static String CFG_KEY_CLASSIFIER_SEPARATOR = "";
 	
 	public static final String CFG_KEY_TRACE_ATTRSET = "Trace attribute set";
 	public static final String CFG_KEY_EVENT_ATTRSET = "Event attribute set";

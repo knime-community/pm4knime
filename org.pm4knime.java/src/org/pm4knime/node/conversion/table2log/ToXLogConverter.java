@@ -85,6 +85,7 @@ public class ToXLogConverter {
 		
 		List<String> eventList = new ArrayList<>();
 		for (String col : all_columns) {
+			exec.checkCanceled();
 		    if (!traceSet.contains(col)) {
 		        eventList.add(col);
 		    }
@@ -159,6 +160,7 @@ public class ToXLogConverter {
 			
 			// get trace attributes 
 			for(int tIdx = 0; tIdx< traceColIndices.length ; tIdx++) {
+				exec.checkCanceled();
 				if(traceColVisited[tIdx])
 					continue; 
 				if(traceAttrMap.containsKey(traceList.get(tIdx))) {
@@ -209,6 +211,7 @@ public class ToXLogConverter {
 			// after this, we process other attributes, like resource, costs;; At this point, we need to differ their types 
 			// and add attributes to the currentEventClass...
 			for(int eIdx =0; eIdx< eventColIndices.length; eIdx++) {
+				exec.checkCanceled();
 				if(eventColVisited[eIdx])
 					continue;
 
@@ -226,16 +229,8 @@ public class ToXLogConverter {
 	}
 	
 	private void assignAttributeWithDataCell(XAttributable currentObj, DataCell otherData, String attrName) {
-		// check if the attrName has the prefix of the event attributes, or not.
-		// should we retrieve it back to the exact event log?? I think yes. We shouldn't change any information
-		// to split here. TO avoid the additional prefix
-		if(attrName.startsWith(XLogSpecUtil.EVENT_ATTRIBUTE_PREFIX))
-			attrName = attrName.split(XLogSpecUtil.EVENT_ATTRIBUTE_PREFIX)[1];
-		else if(attrName.startsWith(XLogSpecUtil.TRACE_ATTRIBUTE_PREFIX))
-			attrName = attrName.split(XLogSpecUtil.TRACE_ATTRIBUTE_PREFIX)[1];
-		 
-		// add attributes to the log, we need to know the type of it.
-		
+
+	
 		if(otherData.getType().equals(IntCell.TYPE)){
 			IntCell iCell = (IntCell) otherData;
 			// here we set extension as null, but later we should improve it

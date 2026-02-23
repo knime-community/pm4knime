@@ -19,6 +19,7 @@ public class MXMLWriterNodeFactory extends WebUINodeFactory<MXMLWriterNodeModel>
         .modelSettingsClass(MXMLWriterNodeSettings.class) //
         .addInputPort("Event Log", XLogPortObject.TYPE, "an event log")
         .nodeType(NodeType.Sink)
+        .sinceVersion(2, 0, 0)
 		.build();
 
     public MXMLWriterNodeFactory() {

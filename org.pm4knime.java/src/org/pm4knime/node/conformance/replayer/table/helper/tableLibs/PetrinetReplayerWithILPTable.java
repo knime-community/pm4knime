@@ -6,10 +6,7 @@ import org.processmining.models.graphbased.directed.petrinet.PetrinetGraph;
 import org.processmining.models.graphbased.directed.petrinet.ResetInhibitorNet;
 import org.processmining.models.graphbased.directed.petrinet.ResetNet;
 import org.processmining.models.semantics.petrinet.Marking;
-import org.processmining.plugins.astar.petrinet.impl.PILPDelegate;
-import org.processmining.plugins.astar.petrinet.impl.PILPTail;
 import org.processmining.plugins.petrinet.replayer.algorithms.IPNReplayParameter;
-import org.processmining.plugins.petrinet.replayer.algorithms.costbasedcomplete.CostBasedCompleteParam;
 
 public class PetrinetReplayerWithILPTable extends AbstractPetrinetReplayerTable<PILPTailTable, PILPDelegateTable>  {
 	private final boolean useFastLowerBound;

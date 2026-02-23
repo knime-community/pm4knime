@@ -20,6 +20,7 @@ public final class MergeTableNodeFactory extends WebUINodeFactory<MergeTableNode
 			.addInputPort("Table", BufferedDataTable.TYPE ,"The second event table to be merged.")//
 			.addOutputPort("Table", BufferedDataTable.TYPE, "The merged event table.")//
 			.nodeType(NodeType.Manipulator)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 

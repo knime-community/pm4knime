@@ -25,6 +25,7 @@ public class JSGraphVizDFGNodeFactory extends WebUINodeFactory<JSGraphVizAbstrac
 			.addInputPort("Directly-Follows Graph", DfgMsdPortObject.TYPE ,"a directly follows graph")//
 			.addOutputPort("Image", ImagePortObject.TYPE, "an SVG image")//
 			.nodeType(NodeType.Visualizer)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 	public JSGraphVizDFGNodeFactory() {
