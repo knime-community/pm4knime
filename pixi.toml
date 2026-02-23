@@ -30,3 +30,6 @@ debug = {features = ["debug"]}
 [pypi-dependencies]
 powl = "*"
 pm4py = "*"
+
+[pypi-options]
+no-build = true
