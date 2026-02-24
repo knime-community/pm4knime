@@ -80,10 +80,6 @@ public class PerformanceCheckerNodeView extends NodeView<PerformanceCheckerNodeM
  			counter = new PerfCounter();
          String timeAttr = m_parameter.getMTimeStamp().getStringValue();
          
-         if(timeAttr.contains(XLogSpecUtil.EVENT_ATTRIBUTE_PREFIX)) {
-         	timeAttr = timeAttr.split(XLogSpecUtil.EVENT_ATTRIBUTE_PREFIX)[1];
-         }
-         
          boolean withUnreliabelResult = m_parameter.isMWithUnreliableResult().getBooleanValue();
          try {
  			ManifestPerfPanel<ManifestEvClassPattern, PerfCounter> projectView = new ManifestPerfPanel<ManifestEvClassPattern, PerfCounter>(

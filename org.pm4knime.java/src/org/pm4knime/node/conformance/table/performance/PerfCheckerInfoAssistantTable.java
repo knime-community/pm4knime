@@ -81,9 +81,7 @@ public class PerfCheckerInfoAssistantTable {
 				
 			
 		}*/
-		if(timeAttr.contains(XLogSpecUtil.EVENT_ATTRIBUTE_PREFIX)) {
-	        	timeAttr = timeAttr.split(XLogSpecUtil.EVENT_ATTRIBUTE_PREFIX)[1];
-	        }
+
 		infoProvider.init( mResult, timeAttr, String.class, caseFilter);
 		
 		// format 
