@@ -99,7 +99,7 @@ public class RepResultPortObjectTable implements PortObject {
 		return tableLog;
 	}
 
-	public void setLog(DataTable tableLog, String classifier, String traceClassifier, String timeClassifier, ExecutionContext exec) {
+	public void setLog(DataTable tableLog, String classifier, String traceClassifier, String timeClassifier, ExecutionMonitor exec) {
 		// TODO Auto-generated method stub
 		TableEventLog logTEL = null;
 		try {
@@ -440,7 +440,7 @@ public class RepResultPortObjectTable implements PortObject {
 
 			// use this alignment object, we need to reload it here
 			repResultPO.setRepResult(new PNRepResultImpl(col));
-			repResultPO.setLog(log,classifier, traceClassifier, timeClassifier, (ExecutionContext)exec);
+			repResultPO.setLog(log,classifier, traceClassifier, timeClassifier, exec);
 			repResultPO.setNet(anet);
 			repResultPO.setDefaultMoveCosts(default_move_costs);
 			repResultPO.setMoveCostMaps(move_cost_maps);

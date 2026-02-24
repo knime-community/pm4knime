@@ -12,6 +12,7 @@ import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
+import org.knime.core.node.ExecutionMonitor;
 import org.processmining.framework.plugin.PluginContext;
 
 import gnu.trove.map.TObjectIntMap;
@@ -45,7 +46,7 @@ public class TableEventLog implements java.io.Serializable {
 	 * @throws Exception
 	 */
 	public TableEventLog(DataTable log, String classifier, String traceClassifier, String timestampClassifier,
-			ExecutionContext exec) throws Exception {
+			ExecutionMonitor exec) throws Exception {
 		this.classifier = classifier;
 		this.traceClassifier = traceClassifier;
 		this.timeClassifier = timestampClassifier;
@@ -95,7 +96,7 @@ public class TableEventLog implements java.io.Serializable {
 		return traceName;
 	}
 
-	private List<String> createActivityList(ExecutionContext exec) throws CanceledExecutionException {
+	private List<String> createActivityList(ExecutionMonitor exec) throws CanceledExecutionException {
 		List<String> activitiesList = new ArrayList<>();
 
 		for (Integer traceIndex : traces.keySet()) {
@@ -141,7 +142,7 @@ public class TableEventLog implements java.io.Serializable {
 		return row.getCell(0).toString() + ";" + cell.toString();
 	}
 
-	private Map<Integer, String> traceIdToName(ExecutionContext exec) throws Exception {
+	private Map<Integer, String> traceIdToName(ExecutionMonitor exec) throws Exception {
 		/**
 		 * We use id to counter so we can have flexible types for trace identification
 		 */
@@ -165,7 +166,7 @@ public class TableEventLog implements java.io.Serializable {
 		return traces;
 	}
 
-	private void tableLogToTraces(ExecutionContext exec) throws Exception {
+	private void tableLogToTraces(ExecutionMonitor exec) throws Exception {
 		/**
 		 * We use id to counter so we can have flexible types for trace identification
 		 */
@@ -204,7 +205,7 @@ public class TableEventLog implements java.io.Serializable {
 
 	}
 
-	private Map<Integer, List<String>> tableLogToMapWholeEventRow(ExecutionContext exec)
+	private Map<Integer, List<String>> tableLogToMapWholeEventRow(ExecutionMonitor exec)
 			throws CanceledExecutionException {
 		/**
 		 * We use id to counter so we can have flexible types for trace identification
@@ -295,11 +296,11 @@ public class TableEventLog implements java.io.Serializable {
 		return this.timestampTraces;
 	}
 
-	public void checkCanceled(final ExecutionContext exec) throws CanceledExecutionException {
+	public void checkCanceled(final ExecutionMonitor exec) throws CanceledExecutionException {
 		checkCanceled(null, exec);
 	}
 
-	public void checkCanceled(PluginContext pluginContext, final ExecutionContext exec)
+	public void checkCanceled(PluginContext pluginContext, final ExecutionMonitor exec)
 			throws CanceledExecutionException {
 		try {
 			exec.checkCanceled();
