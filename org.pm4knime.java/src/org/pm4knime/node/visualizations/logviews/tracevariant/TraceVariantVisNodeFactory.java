@@ -19,6 +19,7 @@ public class TraceVariantVisNodeFactory extends WebUINodeFactory<TraceVariantVis
 			.modelSettingsClass(TraceVariantVisNodeSettings.class)//
 			.addInputPort("Table", BufferedDataTable.TYPE ,"an event table")//
 			.addOutputPort("Table", BufferedDataTable.TYPE ,"trace variant table")//
+			.addOutputPort("Table", BufferedDataTable.TYPE ,"log table with variant information")//
 			.nodeType(NodeType.Visualizer)
 			.sinceVersion(2, 0, 0)
 			.build();
