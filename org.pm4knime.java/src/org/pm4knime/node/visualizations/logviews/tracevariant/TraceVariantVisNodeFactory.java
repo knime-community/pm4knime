@@ -1,43 +1,56 @@
 package org.pm4knime.node.visualizations.logviews.tracevariant;
 
-import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.port.image.ImagePortObject;
-import org.knime.core.node.wizard.WizardNodeFactoryExtension;
-import org.knime.core.webui.node.impl.WebUINodeConfiguration;
-import org.knime.core.webui.node.impl.WebUINodeFactory;
+import org.knime.node.DefaultNode;
+import org.knime.node.DefaultNodeFactory;
 
+public class TraceVariantVisNodeFactory extends DefaultNodeFactory {
 
-public class TraceVariantVisNodeFactory extends WebUINodeFactory<TraceVariantVisNodeModel> implements WizardNodeFactoryExtension<TraceVariantVisNodeModel, TraceVariantVisViewRepresentation, TraceVariantVisViewValue> {
-	
-	TraceVariantVisNodeModel node;
+    public TraceVariantVisNodeFactory() {
+        super(
 
-	public static final WebUINodeConfiguration CONFIG = WebUINodeConfiguration.builder()
-			.name("Trace Variant Explorer")
-			.icon("trace.png")
-			.shortDescription("Trace Variant Explorer")
-			.fullDescription("This node implements the trace variant explorer. The trace variant explorer represents an event log as a multi-set of unique activity sequences (called trace variants).") 
-			.modelSettingsClass(TraceVariantVisNodeSettings.class)//
-			.addInputPort("Table", BufferedDataTable.TYPE ,"an event table")//
-			.addOutputPort("Table", BufferedDataTable.TYPE ,"trace variant table")//
-			.addOutputPort("Table", BufferedDataTable.TYPE ,"log table with variant information")//
-			.nodeType(NodeType.Visualizer)
-			.sinceVersion(2, 0, 0)
-			.build();
+            DefaultNode.create()
 
+                // --------------------------------------------------
+                // REQUIRED PROPERTIES
+                // --------------------------------------------------
+                .name("Trace Variant Explorer")
+                .icon("trace.png")
+                .shortDescription("Trace Variant Explorer")
+                .fullDescription("This node implements the trace variant explorer. "
+                        + "The trace variant explorer represents an event log as a multi-set "
+                        + "of unique activity sequences (called trace variants).")
 
-	public TraceVariantVisNodeFactory() {
-		super(CONFIG);
-	}
+                .sinceVersion(2, 0, 0)
 
+                .ports(p -> p
+                    .addInputTable("Event Table","an event table")//
+        			.addOutputTable("Variant Summary Table", "a trace variant table")//
+        			.addOutputTable("Event Table With Variant IDs", "the input event table extended with an additional variant ID column")//
+                )
 
-	protected TraceVariantVisNodeFactory(final WebUINodeConfiguration configuration) {
-		super(configuration);
-	}
+                .model(m -> m
+                    .parametersClass(TraceVariantVisNodeSettings.class)
+                    .configure(TraceVariantModel::configure)
+                    .execute(TraceVariantModel::execute)
+                )
 
+                // --------------------------------------------------
+                // OPTIONAL
+                // --------------------------------------------------
+                .addView(v -> v
+                	.withoutParameters()
+            	    .description("Trace Variant Explorer")
+            	    .page(p -> p
+            	        .fromFile()
+        	            .bundleClass(TraceVariantVisNodeFactory.class)
+        	            .basePath("web")
+        	            .relativeFilePath("tracevariant.html")
+            	    )
+            	    .initialData(TraceVariantView::createInitialData)
+            	)
 
-	@Override
-	public TraceVariantVisNodeModel createNodeModel() {
-		node = new TraceVariantVisNodeModel(TraceVariantVisNodeSettings.class);
-		return node;
-	}
+                .nodeType(NodeType.Visualizer)
+        );
+    }
+    
 }
