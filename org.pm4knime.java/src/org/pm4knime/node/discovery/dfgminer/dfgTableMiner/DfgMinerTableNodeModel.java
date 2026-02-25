@@ -30,9 +30,12 @@ public class DfgMinerTableNodeModel extends DefaultTableMinerNodeModel<DefaultTa
 
 	@Override
 	protected AbstractJSONPortObject mine(BufferedDataTable log, final ExecutionContext exec) throws Exception {
-		logger.info("Begin:  DFM Miner");			
-		BufferedTableIMLog imLog = new BufferedTableIMLog(logPO, m_settings.e_classifier, m_settings.t_classifier);	
+		logger.info("Begin:  DFM Miner");	
+		exec.checkCanceled();
+		BufferedTableIMLog imLog = new BufferedTableIMLog(logPO, m_settings.e_classifier, m_settings.t_classifier, exec);	
+		exec.checkCanceled();
 		DfgMsd dfgmsd = Log2DfgMsd.convert(imLog);
+		exec.checkCanceled();
 		logger.info("End:  DFM Miner");
 		DfgMsdPortObject dfgMsdObj = new DfgMsdPortObject(dfgmsd);
 		return dfgMsdObj;

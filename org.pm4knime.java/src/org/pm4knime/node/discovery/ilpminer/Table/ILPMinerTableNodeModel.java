@@ -110,7 +110,7 @@ public class ILPMinerTableNodeModel extends DefaultTableMinerNodeModel<ILPMinerT
 		// here put some values from m_parameter to param
 		updateParameter(param);
       
-    	Object[] result = TableHybridILPMinerPlugin.discoverWithArtificialStartEnd(context, log, artifLog, param);
+    	Object[] result = TableHybridILPMinerPlugin.discoverWithArtificialStartEnd(context, log, artifLog, param, exec);
         
     	// create the accepting Petri net and PortObject
     	AcceptingPetriNet anet = new AcceptingPetriNetImpl((Petrinet) result[0], (Marking) result[1],  (Marking) result[2]);

@@ -19,6 +19,7 @@ public final class FilterByLengthTableNodeFactory extends WebUINodeFactory<Filte
 			.addInputPort("Table", BufferedDataTable.TYPE ,"The event table to be filtered.")//
 			.addOutputPort("Table", BufferedDataTable.TYPE, "The filtered event table.")//
 			.nodeType(NodeType.Manipulator)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 

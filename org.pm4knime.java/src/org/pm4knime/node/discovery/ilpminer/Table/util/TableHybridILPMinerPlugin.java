@@ -10,6 +10,8 @@ import java.util.concurrent.Executors;
 
 import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.model.XTrace;
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionContext;
 import org.pm4knime.util.defaultnode.TraceVariant;
 import org.pm4knime.util.defaultnode.TraceVariantRepresentation;
 import org.processmining.algorithms.BerthelotAlgorithm;
@@ -42,7 +44,7 @@ public class TableHybridILPMinerPlugin {
 	
 	
 	public static Object[] applyExpress(PluginContext context, TraceVariantRepresentation log,
-			TableHybridILPMinerParametersImpl parameters) {
+			TableHybridILPMinerParametersImpl parameters, final ExecutionContext exec) throws CanceledExecutionException {
 		context.getProgress().setMinimum(0);
 		if (parameters == null) {
 			parameters = new TableHybridILPMinerParametersImpl(context, log);
@@ -70,7 +72,7 @@ public class TableHybridILPMinerPlugin {
 		context.log("Discover Causal Graph");
 		SimpleCausalGraph scag = miner.mineCausalGraph();
 		context.getProgress().inc();
-		return applyFlexHeur(context, log, new SimpleCausalGraphImpl(scag.getSetActivities(), scag.getCausalRelations()), parameters);
+		return applyFlexHeur(context, log, new SimpleCausalGraphImpl(scag.getSetActivities(), scag.getCausalRelations()), parameters, exec);
 	}
 	
 	
@@ -98,24 +100,24 @@ public class TableHybridILPMinerPlugin {
 
 
 	public static Object[] applyFlexHeur(PluginContext context, TraceVariantRepresentation log, XEventClassifierAwareSimpleCausalGraph cag,
-			TableHybridILPMinerParametersImpl params) {
+			TableHybridILPMinerParametersImpl params, final ExecutionContext exec) throws CanceledExecutionException {
 		params.getDiscoveryStrategy().setDiscoveryStrategyType(DiscoveryStrategyType.CAUSAL_FLEX_HEUR);
 		params.getDiscoveryStrategy().setSimpleCag(cag);
 		final String artiStart = "ARTIFICIAL_START";
 		final String artiEnd = "ARTIFICIAL_END";
 		TraceVariantRepresentation artificial = TraceVariantRepresentation.addArtificialStartAndEnd(log.getNumberOfTraces(), log.getActivities(), log.getVariants(), artiStart, artiEnd);
 		params.setLog(artificial);
-		return discoverWithArtificialStartEnd(context, log, artificial, params);
+		return discoverWithArtificialStartEnd(context, log, artificial, params, exec);
 	}
 
 	public static Object[] discover(LPMiner miner, final TraceVariantRepresentation inputLog,
 			final TableHybridILPMinerParametersImpl parameters, final String artificStartLabel,
-			final String ArtificEndLabel, final boolean removeRedundant) {
+			final String ArtificEndLabel, final boolean removeRedundant, final ExecutionContext exec) throws CanceledExecutionException {
 		miner.run();
 		Pair<Petrinet, Marking> netAndMarking = miner.synthesizeNet();
 		Object[] result;
 		result = processPetriNet(netAndMarking.getFirst(), artificStartLabel, ArtificEndLabel, parameters.isFindSink(),
-				removeRedundant);
+				removeRedundant, exec);
 		if (!parameters.getLPConstraintTypes().contains(LPConstraintType.EMPTY_AFTER_COMPLETION)) {
 			result[2] = null;
 		}
@@ -123,27 +125,27 @@ public class TableHybridILPMinerPlugin {
 	}
 
 	public static Object[] discoverWithArtificialStartEnd(final PluginContext context, final TraceVariantRepresentation originalLog,
-			final TraceVariantRepresentation artificialLog, final TableHybridILPMinerParametersImpl parameters) {
+			final TraceVariantRepresentation artificialLog, final TableHybridILPMinerParametersImpl parameters, final ExecutionContext exec) throws CanceledExecutionException {
 		if (parameters.getDiscoveryStrategy().getDiscoveryStrategyType().equals(DiscoveryStrategyType.CAUSAL_FLEX_HEUR)
 				&& parameters.getDiscoveryStrategy().getSimpleCag() == null) {
-			return applyExpress(context, originalLog, parameters);
+			return applyExpress(context, originalLog, parameters, exec);
 		}
 		ArrayList<String> firstTrace = artificialLog.variants.get(0).getActivities();
 		String artificStartLabel = firstTrace.get(0);
 		String artificEndLabel = firstTrace.get(firstTrace.size() - 1);
-		return discoverWithArtificialStartEnd(context, artificialLog, parameters, artificStartLabel, artificEndLabel);
+		return discoverWithArtificialStartEnd(context, artificialLog, parameters, artificStartLabel, artificEndLabel, exec);
 	}
 
 	public static Object[] discoverWithArtificialStartEnd(final PluginContext context, final TraceVariantRepresentation log,
 			final TableHybridILPMinerParametersImpl parameters, final String artificStartLabel,
-			final String artificEndLabel) {
+			final String artificEndLabel, final ExecutionContext exec) throws CanceledExecutionException {
 		context.log("Establishing connection to selected LP-Engine");
 		// establish some engineType connection.
 		LPEngineFactory.createLPEngine(parameters.getEngine());
 		context.log("Connected to Engine");
 		LPMiner miner = TableLPMinerFactory.createLPMiner(parameters, context);
 		Object[] result = discover(miner, log, parameters, artificStartLabel, artificEndLabel,
-				parameters.isApplyStructuralRedundantPlaceRemoval());
+				parameters.isApplyStructuralRedundantPlaceRemoval(), exec);
 		Connection iMarking = new InitialMarkingConnection((Petrinet) result[0], (Marking) result[1]);
 		context.getConnectionManager().addConnection(iMarking);
 		if (parameters.getLPConstraintTypes().contains(LPConstraintType.EMPTY_AFTER_COMPLETION)) {
@@ -154,12 +156,13 @@ public class TableHybridILPMinerPlugin {
 	}
 
 	private static Object[] processPetriNet(Petrinet net, final String startName, final String endName,
-			boolean findSink, final boolean removeRedundant) {
+			boolean findSink, final boolean removeRedundant, final ExecutionContext exec) throws CanceledExecutionException {
 		Place ini = null, fin = null, unconnected = null;
 		Transition start = null, end = null;
 		Iterator<Transition> trit = net.getTransitions().iterator();
 		Set<Transition> remove = new HashSet<>();
 		while (trit.hasNext()) {
+			exec.checkCanceled();
 			Transition t = trit.next();
 			if (t.getLabel().equals(startName)) {
 				t.setInvisible(true);

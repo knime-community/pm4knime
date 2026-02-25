@@ -172,6 +172,8 @@ function createPaper(nodes, edges) {
 		defaultConnectionPoint: { name: "boundary" },
 		model: graph,
 	});
+	
+	paper.freeze();
 
 	const zoom = (zoomLevel) => {
 		paper.scale(zoomLevel);
@@ -187,6 +189,8 @@ function createPaper(nodes, edges) {
 	var elements = {};
 
 	// Add nodes
+	let nodeElements = [];
+	
 	nodes.forEach(function(node) {
 
 		if (node.type === "activity")
@@ -439,14 +443,15 @@ function createPaper(nodes, edges) {
 			});
 		}
 
-		graph.addCell(element);
+		nodeElements.push(element);
 
 		elements[node.id] = element;
 
 	});
 
+	let linkElements = [];
 	edges.forEach(function(edge) {
-
+		
 		var linkAttrs = {
 			".connection": { stroke: "grey", "stroke-width": 3 },
 			".marker-target": { fill: "grey", stroke: "grey", "stroke-width": 2 }
@@ -503,14 +508,18 @@ function createPaper(nodes, edges) {
 			link.attr('.marker-target', { fill: 'orange', stroke: 'orange' });
 		}
 
-		graph.addCell(link);
+		linkElements.push(link); 
 	});
-
+	
+	graph.addCells(nodeElements);
+	graph.addCells(linkElements);  
 	applyAutoLayout(nodes, edges, elements);
+	
+	paper.unfreeze();
 
 	adjustPaperSize(graph, paper);
 
-	initialGraphState = JSON.parse(JSON.stringify(graph.toJSON()));
+	initialGraphState = graph.toJSON();
 	let bbox = paper.getContentBBox();
 	let graphWidth = bbox.width;
 	let graphHeight = bbox.height;
@@ -564,33 +573,40 @@ function createPaper(nodes, edges) {
 
 			var graph = paper.model;
 			graph.clear();
-			graph.fromJSON(initialGraphState); // Restore the graph from the initial saved state
+			graph.fromJSON(joint.util.cloneDeep(initialGraphState)); // Restore the graph from the initial saved state
 
 			zoomLevel = 1;
 			zoom(zoomLevel);
 		});
 
-		paper.el.addEventListener("wheel", (event) => {
-			event.preventDefault(); // Prevent scrolling
-			const delta = event.deltaY;
-			// Determine zoom direction
-			if (delta > 0) {
-				// Zoom out
-				zoomLevel = zoomLevel - 0.2;
-			} else if (delta < 0) {
-				// Zoom in
-				zoomLevel = zoomLevel + 0.2;
-			}
-			zoom(zoomLevel);
-		});
+		let wheelTimer = null;
 
-		paper.on("element:pointerup link:pointerup", (cellView) => {
-			paper.fitToContent({
-				useModelGeometry: true,
-				padding: padding_inside_paper,
-				allowNewOrigin: "any",
-			});
+		paper.el.addEventListener("wheel", (event) => {
+		    event.preventDefault();
+		    const delta = event.deltaY;
+		
+		    zoomLevel += (delta > 0 ? -0.2 : 0.2);
+		    zoomLevel = Math.max(0.2, Math.min(3, zoomLevel));
+		
+		    // Fast: scale only
+		    zoom(zoomLevel);
+		
+		    // Optional: do a single fit after wheel stops
+		    clearTimeout(wheelTimer);
+		    wheelTimer = setTimeout(() => {
+		        // fit(); // enable only if you really want auto-reframe
+		    }, 120);
 		});
+		
+		paper.on("element:pointerup link:pointerup", (cellView) => {
+		    paper.fitToContent({
+		        useModelGeometry: true,
+		        padding: padding_inside_paper,
+		        allowNewOrigin: "any",
+		    });
+		});
+		
+
 
 		document.getElementById("download-svg").addEventListener("click", async () => {
 
@@ -651,10 +667,11 @@ function createPaper(nodes, edges) {
 			});
 		});
 
-		if (process_tree_flag === 1)
-			dagre.layout(g, { disableOrder: true });
-		else
-			dagre.layout(g);
+		if (process_tree_flag === 1) {
+		    dagre.layout(g, { disableOrder: true });
+		} else {
+		    dagre.layout(g);
+		}
 
 		g.nodes().forEach(function(v) {
 			let node = g.node(v);
@@ -707,13 +724,15 @@ function createSVG(paper) {
 	const svgElement = paper.svg.cloneNode(true);
 	svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 	const bbox = paper.getContentBBox();
-	const width_with_padding = bbox.width + 2*padding_inside_paper;
-	const height_with_padding = bbox.width + 2*padding_inside_paper;
+	const padding = 30;  
+	
+	const width_with_padding = bbox.width + 2*padding;
+	const height_with_padding = bbox.height + 2*padding;
 
 	svgElement.setAttribute("width", width_with_padding);
 	svgElement.setAttribute("height", height_with_padding);
-	svgElement.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${width_with_padding} ${height_with_padding}`);
-
+	svgElement.setAttribute("viewBox", `${bbox.x - padding} ${bbox.y - padding} ${width_with_padding} ${height_with_padding}`);
+	
 	// Create a style element for the SVG
 	const cssStyle = document.createElement('style');
 	cssStyle.setAttribute('type', 'text/css');

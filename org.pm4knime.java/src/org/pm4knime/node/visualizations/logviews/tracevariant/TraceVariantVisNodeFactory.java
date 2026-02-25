@@ -18,8 +18,9 @@ public class TraceVariantVisNodeFactory extends WebUINodeFactory<TraceVariantVis
 			.fullDescription("This node implements the trace variant explorer. The trace variant explorer represents an event log as a multi-set of unique activity sequences (called trace variants).") 
 			.modelSettingsClass(TraceVariantVisNodeSettings.class)//
 			.addInputPort("Table", BufferedDataTable.TYPE ,"an event table")//
-			.addOutputPort("Image", ImagePortObject.TYPE, "an SVG image")//
+			.addOutputPort("Table", BufferedDataTable.TYPE ,"trace variant table")//
 			.nodeType(NodeType.Visualizer)
+			.sinceVersion(2, 0, 0)
 			.build();
 
 

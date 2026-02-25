@@ -7,14 +7,18 @@ import java.util.List;
 import java.util.Set;
 
 import org.deckfour.xes.model.XLog;
+import org.deckfour.xes.model.XTrace;
 import org.deckfour.xes.model.impl.XAttributeBooleanImpl;
 import org.deckfour.xes.model.impl.XAttributeContinuousImpl;
 import org.deckfour.xes.model.impl.XAttributeDiscreteImpl;
 import org.deckfour.xes.model.impl.XAttributeLiteralImpl;
 import org.deckfour.xes.model.impl.XAttributeTimestampImpl;
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
+import org.knime.core.data.MissingCell;
 import org.knime.core.data.def.BooleanCell;
+import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.StringCell;
@@ -85,7 +89,7 @@ public class XLog2TableConverterNodeModel extends NodeModel {
 
     public XLog2TableConverterNodeModel(Class<EmptyNodeSettings> modelSettingsClass) {
 		// TODO Auto-generated constructor stub
-    	super(new PortType[]{XLogPortObject.TYPE}, new PortType[]{BufferedDataTable.TYPE});
+    	super(new PortType[]{XLogPortObject.TYPE}, new PortType[]{BufferedDataTable.TYPE, BufferedDataTable.TYPE});
     	//super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{XLogPortObject.TYPE});
     	m_settingsClass = modelSettingsClass;
     }
@@ -98,25 +102,39 @@ public class XLog2TableConverterNodeModel extends NodeModel {
             final ExecutionContext exec) throws Exception {
     	logger.info("Start : Convert Event log to DataTable" );
     	XLogPortObject logPortObject = null ;
-    	for(PortObject obj: inData)
+    	for(PortObject obj: inData) {
+    		exec.checkCanceled();
         	if(obj instanceof XLogPortObject) {
         		logPortObject = (XLogPortObject)obj;
         		break;
         	}
+    	}
         
     	XLog log = logPortObject.getLog();
+    	DataTableSpec eventSpec = createEventSpec();
+    	DataTableSpec caseSpec  = createCaseSpec();
+
+    	BufferedDataContainer eventBuf =
+    	        exec.createDataContainer(eventSpec);
+
+    	BufferedDataContainer caseBuf =
+    	        exec.createDataContainer(caseSpec);    	
+
     	
-    	DataTableSpec outSpec = createSpec();
+    	FromXLogConverter.convert(log, eventBuf, caseBuf, exec);
+
     	
-    	BufferedDataContainer bufCon = exec.createDataContainer(outSpec);
-    	FromXLogConverter.convert(log, bufCon, exec);
-    	
-    	bufCon.close();
+    	eventBuf.close();
+    	caseBuf.close();
     	logger.info("End : Convert Event log to DataTable" );
-        return new BufferedDataTable[]{bufCon.getTable()};
+    	
+    	return new BufferedDataTable[]{
+    	        eventBuf.getTable(),
+    	        caseBuf.getTable()
+    	};
     }
 
-    private DataTableSpec createSpec() {
+    private DataTableSpec createEventSpec() {
     	
     	List<String> attrNames = new ArrayList();
 		List<DataType> attrTypes = new ArrayList();
@@ -150,6 +168,32 @@ public class XLog2TableConverterNodeModel extends NodeModel {
 				attrNames.toArray(new String[0]), attrTypes.toArray(new DataType[0]));
 		
     	return outSpec;
+    }
+    
+    private DataTableSpec createCaseSpec() {
+
+        List<String> attrNames = new ArrayList<>();
+        List<DataType> attrTypes = new ArrayList<>();
+
+        Set<String> specTraceColumns = m_inSpec.getGTraceAttrMap().keySet();
+
+        for (String attrKey : specTraceColumns) {
+
+            attrNames.add(attrKey);
+
+            String attrType = m_inSpec
+                    .getGTraceAttrMap()
+                    .get(attrKey)
+                    .getSimpleName();
+
+            attrTypes.add(findDataType(attrType));
+        }
+
+        return new DataTableSpec(
+            "Case Table",
+            attrNames.toArray(new String[0]),
+            attrTypes.toArray(new DataType[0])
+        );
     }
     
     
@@ -203,26 +247,12 @@ public class XLog2TableConverterNodeModel extends NodeModel {
 //    	}
    	
 
-    	m_inSpec = spec;
+    	m_inSpec = spec;   	
     	
-    	try {
-    		if(m_traceAttrSet.getIncludeList().isEmpty()) {
-            	Set<String> specTraceColumns = m_inSpec.getGTraceAttrMap().keySet();
-            	m_traceAttrSet.setIncludeList(specTraceColumns);
-            	m_traceAttrSet.setExcludeList(new String[0]);
-        	}
-        	
-        	if(m_eventAttrSet.getIncludeList().isEmpty()) {
-            	Set<String> specEventColumns = m_inSpec.getGEventAttrMap().keySet();
-            	m_eventAttrSet.setIncludeList(specEventColumns);
-            	m_eventAttrSet.setExcludeList(new String[0]);
-        	}
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    	}
-    	
-    	
-        return new PortObjectSpec[]{null};
+    	return new PortObjectSpec[]{
+    	        null,
+    	        null
+    	    };
     }
 
     /**

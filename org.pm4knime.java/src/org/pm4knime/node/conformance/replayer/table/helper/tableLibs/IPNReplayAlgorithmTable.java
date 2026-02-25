@@ -1,9 +1,8 @@
 package org.pm4knime.node.conformance.replayer.table.helper.tableLibs;
 
-import org.deckfour.xes.model.XLog;
+import org.knime.core.node.ExecutionContext;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetGraph;
-import org.processmining.plugins.connectionfactories.logpetrinet.TransEvClassMapping;
 import org.processmining.plugins.petrinet.replayer.algorithms.IPNReplayParamProvider;
 import org.processmining.plugins.petrinet.replayer.algorithms.IPNReplayParameter;
 import org.processmining.plugins.petrinet.replayresult.PNRepResult;
@@ -15,13 +14,14 @@ public interface IPNReplayAlgorithmTable {
 	 * Replay log assuming GUI exist (progress bars, etc)
 	 * 
 	 * @param context
+	 * @param exec 
 	 * @param net
 	 * @param log
 	 * @param mapping
 	 * @param parameter
 	 * @return
 	 */
-	public PNRepResult replayLog(PluginContext context, PetrinetGraph net, TableEventLog log, TransEvClassMappingTable mapping,
+	public PNRepResult replayLog(PluginContext context, ExecutionContext exec, PetrinetGraph net, TableEventLog log, TransEvClassMappingTable mapping,
 			IPNReplayParameter parameter) throws AStarException;
 
 	/**

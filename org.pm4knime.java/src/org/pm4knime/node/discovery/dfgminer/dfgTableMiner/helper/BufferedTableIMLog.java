@@ -10,6 +10,8 @@ import java.util.Set;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.processmining.framework.util.ArrayUtils;
 import org.processmining.plugins.InductiveMiner.mining.logs.XLifeCycleClassifier.Transition;
@@ -40,14 +42,14 @@ public class BufferedTableIMLog implements IMLog {
 	private int indexOfTraceClassifierTable = 0;
 	private int indexOfEventClassifierTable = 0;
 
-	public BufferedTableIMLog(BufferedDataTable log, String aClassifier, String tClassifier) throws InvalidSettingsException {
+	public BufferedTableIMLog(BufferedDataTable log, String aClassifier, String tClassifier, ExecutionContext exec) throws InvalidSettingsException, CanceledExecutionException {
 		this.log = log;
 		String activityColumn = aClassifier;
 		indexOfEventClassifierTable = getClassifierIndexFromColumn(aClassifier);
 		indexOfTraceClassifierTable = getClassifierIndexFromColumn(tClassifier);
 		this.activities = log.getDataTableSpec().getColumnSpec(activityColumn).getDomain().getValues();
 		createActivity2Index();
-		transformTableIntoEvents();
+		transformTableIntoEvents(exec);
 		this.activtiesString = this.activitiesList.stream().map(s -> s.toString()).toArray(String[]::new);
 	}
 
@@ -68,15 +70,18 @@ public class BufferedTableIMLog implements IMLog {
 	/**
 	 * Transform the log table into the event data format so we can use the old
 	 * implementation
+	 * @param exec 
 	 * 
 	 * @param log
+	 * @throws CanceledExecutionException 
 	 */
-	private void transformTableIntoEvents() {
+	private void transformTableIntoEvents(ExecutionContext exec) throws CanceledExecutionException {
 		int traceSize = getTraceSize();
 		events = new long[traceSize][];
 		Map<Integer, List<String>> traces = createTraceMap();
 
 		for (Integer traceIndex : traces.keySet()) {
+			exec.checkCanceled();
 			List<String> trace = traces.get(traceIndex);
 			events[traceIndex] = new long[trace.size()];
 			for (int eventIndex = 0; eventIndex < trace.size(); eventIndex++) {

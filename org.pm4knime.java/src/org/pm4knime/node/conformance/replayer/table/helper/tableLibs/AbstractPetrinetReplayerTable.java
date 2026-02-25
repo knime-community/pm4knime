@@ -14,6 +14,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionContext;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.Progress;
 import org.processmining.models.graphbased.directed.opennet.OpenNet;
@@ -25,17 +27,9 @@ import org.processmining.models.graphbased.directed.petrinet.ResetNet;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.semantics.petrinet.Marking;
 import org.processmining.plugins.astar.petrinet.PartialOrderBuilder;
-import org.processmining.plugins.astar.petrinet.AbstractPetrinetReplayer.Representative;
-import org.processmining.plugins.astar.petrinet.AbstractPetrinetReplayer.Result;
-import org.processmining.plugins.astar.petrinet.impl.AbstractPDelegate;
-import org.processmining.plugins.astar.petrinet.impl.AbstractPILPDelegate;
 
-import org.processmining.plugins.connectionfactories.logpetrinet.TransEvClassMapping;
-import org.processmining.plugins.petrinet.replayer.algorithms.IPNPartialOrderAwareReplayAlgorithm;
 import org.processmining.plugins.petrinet.replayer.algorithms.IPNReplayParamProvider;
 import org.processmining.plugins.petrinet.replayer.algorithms.IPNReplayParameter;
-import org.processmining.plugins.petrinet.replayer.algorithms.costbasedcomplete.CostBasedCompleteParam;
-import org.processmining.plugins.petrinet.replayer.algorithms.costbasedcomplete.CostBasedCompleteParamProvider;
 import org.processmining.plugins.petrinet.replayresult.PNRepResult;
 import org.processmining.plugins.petrinet.replayresult.PNRepResultImpl;
 import org.processmining.plugins.petrinet.replayresult.StepTypes;
@@ -59,9 +53,9 @@ import nl.tue.astar.AStarThread.Canceller;
 import nl.tue.astar.impl.memefficient.MemoryEfficientAStarAlgorithm;
 import nl.tue.astar.util.LinearTrace;
 
-public abstract class AbstractPetrinetReplayerTable <T extends Tail, D extends AbstractPDelegateTable<T>> implements
-IPNPartialOrderAwareReplayAlgorithmTable {
-	
+public abstract class AbstractPetrinetReplayerTable<T extends Tail, D extends AbstractPDelegateTable<T>>
+		implements IPNPartialOrderAwareReplayAlgorithmTable {
+
 	private PartialOrderBuilder poBuilder = PartialOrderBuilder.DEFAULT;
 
 	public static class Representative {
@@ -109,11 +103,12 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 	/**
 	 * Return true if all replay inputs are correct
 	 */
-	public boolean isAllReqSatisfied(PluginContext context, PetrinetGraph net, TableEventLog log, TransEvClassMappingTable mapping,
-			IPNReplayParameter parameter) {
+	public boolean isAllReqSatisfied(PluginContext context, PetrinetGraph net, TableEventLog log,
+			TransEvClassMappingTable mapping, IPNReplayParameter parameter) {
 		if ((net instanceof ResetInhibitorNet) || (net instanceof InhibitorNet) || (net instanceof ResetNet)
 				|| (net instanceof Petrinet) || (net instanceof OpenNet)) {
-			// check number of transitions, places, and event classes, should be less than Short.MAX_VALUE
+			// check number of transitions, places, and event classes, should be less than
+			// Short.MAX_VALUE
 			if ((net.getTransitions().size() < Short.MAX_VALUE) && (net.getPlaces().size() < Short.MAX_VALUE)) {
 				// check the number of event classes, should be less than Short.MAX_VALUE
 				int eventClassSize = log.getActivties().length;
@@ -133,7 +128,8 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 			TransEvClassMappingTable mapping) {
 		if ((net instanceof ResetInhibitorNet) || (net instanceof InhibitorNet) || (net instanceof ResetNet)
 				|| (net instanceof Petrinet) || (net instanceof OpenNet)) {
-			// check number of transitions, places, and event classes, should be less than Short.MAX_VALUE
+			// check number of transitions, places, and event classes, should be less than
+			// Short.MAX_VALUE
 			if ((net.getTransitions().size() < Short.MAX_VALUE) && (net.getPlaces().size() < Short.MAX_VALUE)) {
 				// check the number of event classes, should be less than Short.MAX_VALUE
 				return (log.getActivties().length < Short.MAX_VALUE);
@@ -143,12 +139,12 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 	}
 
 	/**
-	 * Return true if all replay inputs are correct: parameter type is correct
-	 * and non empty (no null); all transitions are mapped to cost; all event
-	 * classes (including dummy event class, i.e. an event class that does not
-	 * exist in log, any transitions that are NOT silent and not mapped to any
-	 * event class in the log is mapped to it) are mapped to cost; all costs
-	 * should be non negative; numStates is non negative
+	 * Return true if all replay inputs are correct: parameter type is correct and
+	 * non empty (no null); all transitions are mapped to cost; all event classes
+	 * (including dummy event class, i.e. an event class that does not exist in log,
+	 * any transitions that are NOT silent and not mapped to any event class in the
+	 * log is mapped to it) are mapped to cost; all costs should be non negative;
+	 * numStates is non negative
 	 */
 	public boolean isParameterReqCorrect(PetrinetGraph net, TableEventLog log, TransEvClassMappingTable mapping,
 			IPNReplayParameter parameter) {
@@ -165,12 +161,12 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 					List<String> eventClassList = new ArrayList<String>(Arrays.asList(eventClassesName));
 					if (evClassWithCost.containsAll(eventClassList)) {
 						// dummy event class has to be mapped to cost
-						//if (mapping.getDummyEventClass() != null) {
-						//	if (!evClassWithCost.contains(mapping.getDummyEventClass())) {
-						//		return false;
-						//	}
-						//	;
-						//}
+						// if (mapping.getDummyEventClass() != null) {
+						// if (!evClassWithCost.contains(mapping.getDummyEventClass())) {
+						// return false;
+						// }
+						// ;
+						// }
 
 						// all cost should be non negative
 						for (Integer costVal : param.getMapEvClass2Cost().values()) {
@@ -215,12 +211,12 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 		/*
 		 * TODO: UI CHANGING
 		 */
-		return  null;
+		return null;
 	}
 
-	protected SyncReplayResult recordToResult(AbstractPDelegateTable<?> d, List<String> trace, Trace filteredTrace, PRecordTable r,
-			int traceIndex, int stateCount, boolean isReliable, long milliseconds, int queuedStates, int traversedArcs,
-			int minCostMoveModel, TIntList unUsedIndices, TIntIntMap trace2orgTrace) {
+	protected SyncReplayResult recordToResult(AbstractPDelegateTable<?> d, List<String> trace, Trace filteredTrace,
+			PRecordTable r, int traceIndex, int stateCount, boolean isReliable, long milliseconds, int queuedStates,
+			int traversedArcs, int minCostMoveModel, TIntList unUsedIndices, TIntIntMap trace2orgTrace) {
 		List<PRecordTable> history = PRecordTable.getHistory(r);
 		double mmCost = 0; // total cost of move on model
 		double mlCost = 0; // total cost of move on log
@@ -250,9 +246,10 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 			} else {
 				// a move occurred in the log. Check if class aligns with class in trace
 
-				// check rec.getMovedEvent. If this is larger than unUsedIndices, then include all unUsedIndices
+				// check rec.getMovedEvent. If this is larger than unUsedIndices, then include
+				// all unUsedIndices
 				// upto rec.getMovedEvent as LogMoves right now.
-				//Todo: might be drastic change******check
+				// Todo: might be drastic change******check
 				while (trace2orgTrace.get(rec.getMovedEvent()) > firstUnUsed) {
 					String clsInTrace = trace.get(firstUnUsed); // this an unused event
 
@@ -266,31 +263,34 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 
 				short a = (short) filteredTrace.get(rec.getMovedEvent()); // a is the event obtained from the replay
 				eventInTrace++;
-				//				XEventClass clsInTrace = d.getClassOf(trace.get(eventInTrace)); // this is the current event
-				//				while (d.getIndexOf(clsInTrace) != a) {
-				//					// The next event in the trace is not of the same class as the next event in the A-star result.
-				//					// This is caused by the class in the trace not being mapped to any transition.
-				//					// move log only
+				// XEventClass clsInTrace = d.getClassOf(trace.get(eventInTrace)); // this is
+				// the current event
+				// while (d.getIndexOf(clsInTrace) != a) {
+				// // The next event in the trace is not of the same class as the next event in
+				// the A-star result.
+				// // This is caused by the class in the trace not being mapped to any
+				// transition.
+				// // move log only
 				//
-				//					// TODO: This is bullshit for partially ordered traces!
-				//					stepTypes.add(StepTypes.L);
-				//					nodeInstance.add(clsInTrace);
-				//					mlCost += mapEvClass2Cost.get(clsInTrace);
-				//					eventInTrace++;
-				//					clsInTrace = d.getClassOf(trace.get(eventInTrace));
-				//				}
+				// // TODO: This is bullshit for partially ordered traces!
+				// stepTypes.add(StepTypes.L);
+				// nodeInstance.add(clsInTrace);
+				// mlCost += mapEvClass2Cost.get(clsInTrace);
+				// eventInTrace++;
+				// clsInTrace = d.getClassOf(trace.get(eventInTrace));
+				// }
 				if (rec.getModelMove() == AStarThread.NOMOVE) {
 					// move log only
 					stepTypes.add(StepTypes.L);
 					nodeInstance.add(d.getEventClass(a));
 					mlCost += (d.getCostForMoveLog(a) - 1.0) / d.getDelta();
-					//					mlUpper += (d.getCostForMoveLog(a) - 1.0) / d.getDelta();
+					// mlUpper += (d.getCostForMoveLog(a) - 1.0) / d.getDelta();
 				} else {
 					// sync move
 					stepTypes.add(StepTypes.LMGOOD);
 					nodeInstance.add(d.getTransition((short) rec.getModelMove()));
 					mSyncCost += (d.getCostForMoveSync((short) rec.getModelMove()) - 1.0) / d.getDelta();
-					//					mlUpper += (d.getCostForMoveLog(a) - 1.0) / d.getDelta();
+					// mlUpper += (d.getCostForMoveLog(a) - 1.0) / d.getDelta();
 					mmUpper += (d.getCostForMoveModel((short) rec.getModelMove()) - 1.0) / d.getDelta();
 				}
 			}
@@ -299,7 +299,7 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 
 		// add the rest of the trace
 		eventInTrace++;
-		//		while (eventInTrace < trace.size()) {
+		// while (eventInTrace < trace.size()) {
 		while (firstUnUsed < trace.size()) {
 			// move log only
 			String a = trace.get(firstUnUsed);
@@ -307,12 +307,13 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 			stepTypes.add(StepTypes.L);
 			nodeInstance.add(a);
 			mlCost += mapEvClass2Cost.get(a);
-			//			mlUpper += mapEvClass2Cost.get(a);
+			// mlUpper += mapEvClass2Cost.get(a);
 			firstUnUsed = it.hasNext() ? it.next() : Integer.MAX_VALUE;
 
 		}
 
-		// calculate mlUpper (because in cases where we have synchronous move in manifest, more than one events are aggregated
+		// calculate mlUpper (because in cases where we have synchronous move in
+		// manifest, more than one events are aggregated
 		// in one movement
 		for (String evt : trace) {
 			mlUpper += mapEvClass2Cost.get(evt);
@@ -363,9 +364,11 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 	 * @param mapEvClass2Trans
 	 * @param listMoveOnLog
 	 * @return
+	 * @throws CanceledExecutionException
 	 */
-	protected LinearTrace getLinearTrace(TableEventLog log, int trace, AbstractPDelegateTable<?> delegate, TIntList unUsedIndices,
-			TIntIntMap trace2orgTrace) {
+	protected LinearTrace getLinearTrace(TableEventLog log, int trace, AbstractPDelegateTable<?> delegate,
+			TIntList unUsedIndices, TIntIntMap trace2orgTrace, ExecutionContext exec)
+			throws CanceledExecutionException {
 		List<String> traces = log.getTraces().get(trace);
 		int s = traces.size();
 		String name = log.getTraceName(trace);
@@ -374,6 +377,7 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 		}
 		TIntList activities = new TIntArrayList(s);
 		for (int i = 0; i < s; i++) {
+			exec.checkCanceled();
 			int act = delegate.getActivityOf(trace, i);
 			if (act != AStarThread.NOMOVE) {
 				trace2orgTrace.put(activities.size(), i);
@@ -399,10 +403,12 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 				+ "activities can be assigned uniquely for each move on model/log. </html>";
 	}
 
-	public PNRepResult replayLog(final PluginContext context, PetrinetGraph net, final TableEventLog log,
-			TransEvClassMappingTable mapping, final IPNReplayParameter parameters) throws AStarException {
+	public PNRepResult replayLog(final PluginContext context, final ExecutionContext exec, PetrinetGraph net,
+			final TableEventLog log, TransEvClassMappingTable mapping, final IPNReplayParameter parameters)
+			throws AStarException {
 		importParameters((CostBasedCompleteParamTable) parameters);
 		classifier = mapping.getEventClassifier();
+
 
 		if (parameters.isGUIMode()) {
 			if (maxNumOfStates != Integer.MAX_VALUE) {
@@ -412,14 +418,14 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 			}
 		}
 
-	
 		final String[] classes = log.getActivties();
 
 		final int delta = 1000;
 		final int threads = parameters.getNumThreads();
 		final D localDelegate = getDelegate(net, log, classes, mapping, delta, threads);
 
-		final MemoryEfficientAStarAlgorithm<PHeadTable, T> aStar = new MemoryEfficientAStarAlgorithm<PHeadTable, T>(localDelegate);
+		final MemoryEfficientAStarAlgorithm<PHeadTable, T> aStar = new MemoryEfficientAStarAlgorithm<PHeadTable, T>(
+				localDelegate);
 
 		ExecutorService pool = Executors.newFixedThreadPool(threads);
 
@@ -440,27 +446,25 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 			// calculate first cost of empty trace
 
 			// CPU EFFICIENT:
-			//TObjectIntMap<PHead> head2int = new TObjectIntHashMap<PHead>(256 * 1024);
-			//List<State<PHead, T>> stateList = new ArrayList<State<PHead, T>>(256 * 1024);
+			// TObjectIntMap<PHead> head2int = new TObjectIntHashMap<PHead>(256 * 1024);
+			// List<State<PHead, T>> stateList = new ArrayList<State<PHead, T>>(256 * 1024);
 
-			int minCostMoveModel = getMinBoundMoveModel(parameters, delta, aStar, localDelegate);
-			//int minCostMoveModel = 0; // AA: temporarily
-
-			final Canceller canceller = parameters.getCanceller() == null ? new Canceller() {
+			final Canceller canceller = new Canceller() {
 				public boolean isCancelled() {
-					if (context != null) {
-						return context.getProgress().isCancelled();
+					try {
+						exec.checkCanceled();
+						return false;
+					} catch (CanceledExecutionException e) {
+						return true;
 					}
-					return false;
 				}
-			} : parameters.getCanceller();
+			};
+
+			int minCostMoveModel = getMinBoundMoveModel(parameters, exec, canceller, delta, aStar, localDelegate);
+			// int minCostMoveModel = 0; // AA: temporarily
 
 			for (int i = 0; i < log.getTraces().size(); i++) {
-				if (parameters.getCanceller() != null) {
-					if (parameters.getCanceller().isCancelled()) {
-						break;
-					}
-				}
+				exec.checkCanceled();
 
 				PHeadTable initial = constructHead(localDelegate, initMarking, log.getTraces().get(i));
 
@@ -469,12 +473,11 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 				/**
 				 * Todo partial order
 				 */
-				final Trace trace = getLinearTrace(log, i, localDelegate, unUsedIndices,
-						trace2orgTrace);
+				final Trace trace = getLinearTrace(log, i, localDelegate, unUsedIndices, trace2orgTrace, exec);
 				int first = traces.get(trace);
 				if (first >= 0) {
 					doneMap.put(i, new Representative(first, unUsedIndices, trace2orgTrace));
-					//System.out.println(i + "/" + log.size() + "-is the same as " + first);
+					// System.out.println(i + "/" + log.size() + "-is the same as " + first);
 					continue;
 				} else {
 					traces.put(trace, i);
@@ -489,35 +492,40 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 				thread.setASynchronousMoveSorting(parameters.getAsynchronousMoveSort());
 				thread.setQueueingModel(parameters.getQueueingModel());
 				thread.setEpsilon(parameters.getEpsilon());
-				// set the expected alignment length to the overrun times the length of the trace
+				// set the expected alignment length to the overrun times the length of the
+				// trace
 				// rounded up.
 				thread.setExpectedLength((int) (trace.getSize() * parameters.getExpectedAlignmentOverrun() + 0.5));
 
 				// CPU EFFICIENT:
-				//thread = new FastAStarThread<PHead, T>(delegate, head2int, stateList, initial, trace, maxNumOfStates);
+				// thread = new FastAStarThread<PHead, T>(delegate, head2int, stateList,
+				// initial, trace, maxNumOfStates);
 
 				// To output dot files for each graph, use:
-				//------------------
-				//				String traceID = XConceptExtension.instance().extractName(log.get(i));
-				//				if (traceID == null || traceID.isEmpty()) {
-				//					traceID = "" + i;
-				//				}
-				//				final String dotFileName = "D:/temp/alignment/prAm6/trace_" + traceID + "_graph";
-				//				final java.io.File dotFile = new java.io.File(dotFileName);
-				//				final DotGraphAStarObserver graphObserver = new DotGraphAStarObserver(dotFile);//, aStar.getStore());
-				//				thread.addObserver(graphObserver);
+				// ------------------
+				// String traceID = XConceptExtension.instance().extractName(log.get(i));
+				// if (traceID == null || traceID.isEmpty()) {
+				// traceID = "" + i;
+				// }
+				// final String dotFileName = "D:/temp/alignment/prAm6/trace_" + traceID +
+				// "_graph";
+				// final java.io.File dotFile = new java.io.File(dotFileName);
+				// final DotGraphAStarObserver graphObserver = new
+				// DotGraphAStarObserver(dotFile);//, aStar.getStore());
+				// thread.addObserver(graphObserver);
 				//
-				//				final String spFileName = "D:/temp/alignment/prAm6/trace_" + traceID + "_sptree";
-				//				final java.io.File spFile = new java.io.File(spFileName);
-				//				final AStarObserver treeObserver = new DotSpanningTreeObserver(spFile);
-				//				thread.addObserver(treeObserver);
+				// final String spFileName = "D:/temp/alignment/prAm6/trace_" + traceID +
+				// "_sptree";
+				// final java.io.File spFile = new java.io.File(spFileName);
+				// final AStarObserver treeObserver = new DotSpanningTreeObserver(spFile);
+				// thread.addObserver(treeObserver);
 
-				//------------------
+				// ------------------
 				// To use a fast implementation rather than a memory-efficient,use:
-				//				TObjectIntMap<PHead> head2int = new TObjectIntHashMap<PHead>(10000);
-				//				List<State<PHead, T>> stateList = new ArrayList<State<PHead, T>>(10000);
-				//				thread = new FastAStarThread<PHead, T>(delegate,
-				//						head2int, stateList, initial, trace, "trace" + i, maxNumOfStates);
+				// TObjectIntMap<PHead> head2int = new TObjectIntHashMap<PHead>(10000);
+				// List<State<PHead, T>> stateList = new ArrayList<State<PHead, T>>(10000);
+				// thread = new FastAStarThread<PHead, T>(delegate,
+				// head2int, stateList, initial, trace, "trace" + i, maxNumOfStates);
 
 				final int j = i;
 				result.add(pool.submit(new Callable<Result>() {
@@ -532,24 +540,26 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 						// long start = System.nanoTime();
 						long start = System.currentTimeMillis();
 						result.record = (PRecordTable) thread.getOptimalRecord(canceller);
-						//long end = System.nanoTime();
+						// long end = System.nanoTime();
 						long end = System.currentTimeMillis();
 						result.reliable = thread.wasReliable();
 
-						//uncomment to have all classes of optimal alignments
-						//while (thread.wasReliable()) {
-						//thread.getOptimalRecord(c, result.record.getTotalCost());
-						//}
+						// uncomment to have all classes of optimal alignments
+						// while (thread.wasReliable()) {
+						// thread.getOptimalRecord(c, result.record.getTotalCost());
+						// }
 
 						if (context != null) {
 							synchronized (context) {
 								if (parameters.isGUIMode() && (j % 100 == 0)) {
-									//									context.log(j + "/" + log.size() + " queueing " + thread.getQueuedStateCount()
-									//											+ " states, visiting " + thread.getVisitedStateCount() + " states took "
-									//											+ (end - start) / 1000000000.0 + " seconds.");
-									context.log(j + "/" + log.getTraces().size() + " queueing " + thread.getQueuedStateCount()
-											+ " states, visiting " + thread.getVisitedStateCount() + " states took "
-											+ (end - start) + " seconds.");
+									// context.log(j + "/" + log.size() + " queueing " +
+									// thread.getQueuedStateCount()
+									// + " states, visiting " + thread.getVisitedStateCount() + " states took "
+									// + (end - start) / 1000000000.0 + " seconds.");
+									context.log(j + "/" + log.getTraces().size() + " queueing "
+											+ thread.getQueuedStateCount() + " states, visiting "
+											+ thread.getVisitedStateCount() + " states took " + (end - start)
+											+ " seconds.");
 								}
 
 							}
@@ -564,43 +574,48 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 						result.traversedArcs = thread.getTraversedArcCount();
 
 						// uncomment the following two lines if state space graph is printed
-						//						graphObserver.close();
-						//						java.io.File f = new java.io.File(dotFileName + " "
-						//								+ (result.record.getCostSoFar() - result.record.getBacktraceSize() - 1) + ".dot");
-						//						if (f.exists()) {
-						//							dotFile.delete();
-						//						} else {
-						//							if (AlignmentTest.iteration == 0) {
-						//								dotFile.renameTo(f);
-						//							} else {
-						//								dotFile.renameTo(new java.io.File(dotFileName + " " + AlignmentTest.iteration + " "
-						//										+ (result.record.getCostSoFar() - result.record.getBacktraceSize() - 1)
-						//										+ " COPY.dot"));
-						//							}
+						// graphObserver.close();
+						// java.io.File f = new java.io.File(dotFileName + " "
+						// + (result.record.getCostSoFar() - result.record.getBacktraceSize() - 1) +
+						// ".dot");
+						// if (f.exists()) {
+						// dotFile.delete();
+						// } else {
+						// if (AlignmentTest.iteration == 0) {
+						// dotFile.renameTo(f);
+						// } else {
+						// dotFile.renameTo(new java.io.File(dotFileName + " " + AlignmentTest.iteration
+						// + " "
+						// + (result.record.getCostSoFar() - result.record.getBacktraceSize() - 1)
+						// + " COPY.dot"));
+						// }
 						//
-						//						}
+						// }
 						//
-						//						treeObserver.close();
-						//						f = new java.io.File(spFileName + " "
-						//								+ (result.record.getCostSoFar() - result.record.getBacktraceSize() - 1) + ".dot");
-						//						if (f.exists()) {
-						//							spFile.delete();
-						//						} else {
-						//							if (AlignmentTest.iteration == 0) {
-						//								spFile.renameTo(f);
-						//							} else {
-						//								spFile.renameTo(new java.io.File(spFileName + " " + AlignmentTest.iteration + " "
-						//										+ (result.record.getCostSoFar() - result.record.getBacktraceSize() - 1)
-						//										+ " COPY.dot"));
-						//							}
+						// treeObserver.close();
+						// f = new java.io.File(spFileName + " "
+						// + (result.record.getCostSoFar() - result.record.getBacktraceSize() - 1) +
+						// ".dot");
+						// if (f.exists()) {
+						// spFile.delete();
+						// } else {
+						// if (AlignmentTest.iteration == 0) {
+						// spFile.renameTo(f);
+						// } else {
+						// spFile.renameTo(new java.io.File(spFileName + " " + AlignmentTest.iteration +
+						// " "
+						// + (result.record.getCostSoFar() - result.record.getBacktraceSize() - 1)
+						// + " COPY.dot"));
+						// }
 						//
-						//						}
+						// }
 						return result;
 
 					}
 				}));
 
 			}
+			
 			if (context != null) {
 				context.getProgress().inc();
 			}
@@ -611,11 +626,12 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 				} catch (InterruptedException e) {
 				}
 			}
-
+						
 			long maxStateCount = 0;
 			long time = 0;
-			//			long ui = System.currentTimeMillis();
+			// long ui = System.currentTimeMillis();
 			for (Future<Result> f : result) {
+				exec.checkCanceled();
 				Result r = null;
 				try {
 					while (r == null) {
@@ -626,7 +642,8 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 					}
 					List<String> trace = log.getTraces().get(r.trace);
 					int states = addReplayResults((context == null ? null : context.getProgress()), localDelegate,
-							trace, r, r.unUsedIndices, r.trace2orgTrace, doneMap, log, col, r.trace, minCostMoveModel);//, null);
+							trace, r, r.unUsedIndices, r.trace2orgTrace, doneMap, log, col, r.trace, minCostMoveModel);// ,
+																														// null);
 					maxStateCount = Math.max(maxStateCount, states);
 					time += r.milliseconds;
 				} catch (ExecutionException e) {
@@ -643,32 +660,35 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 				context.log("In total " + visitedStates + " unique states were visited.");
 				context.log("In total " + traversedArcs + " arcs were traversed.");
 				context.log("In total " + queuedStates + " states were queued.");
-				//				context.log("In total " + aStar.getStatespace().size()
-				//						+ " marking-parikhvector pairs were stored in the statespace.");
-				//				context.log("In total " + aStar.getStatespace().getMemory() / (1024.0 * 1024.0)
-				//						+ " MB were needed for the statespace.");
-				context.log("At most " + maxStateCount / (1024.0 * 1024.0)
-						+ " MB was needed for a trace (overestimate).");
+				// context.log("In total " + aStar.getStatespace().size()
+				// + " marking-parikhvector pairs were stored in the statespace.");
+				// context.log("In total " + aStar.getStatespace().getMemory() / (1024.0 *
+				// 1024.0)
+				// + " MB were needed for the statespace.");
+				context.log(
+						"At most " + maxStateCount / (1024.0 * 1024.0) + " MB was needed for a trace (overestimate).");
 				context.log("States / second:  " + visitedStates / (time / 1000.0));
 				context.log("Traversed arcs / second:  " + traversedArcs / (time / 1000.0));
 				context.log("Queued states / second:  " + queuedStates / (time / 1000.0));
-				//				context.log("Storage / second: " + aStar.getStatespace().size() / ((ui - start) / 1000.0));
-				//				context.log("EQUAL calls:" + PHeadCompressor.EQUALCALLS);
-				//				context.log("EQUAL hash: " + PHeadCompressor.EQUALHASH);
-				//				context.log("UNEQUAL:    " + PHeadCompressor.NONEQUAL);
+				// context.log("Storage / second: " + aStar.getStatespace().size() / ((ui -
+				// start) / 1000.0));
+				// context.log("EQUAL calls:" + PHeadCompressor.EQUALCALLS);
+				// context.log("EQUAL hash: " + PHeadCompressor.EQUALHASH);
+				// context.log("UNEQUAL: " + PHeadCompressor.NONEQUAL);
 			}
 			synchronized (col) {
-				//				if (outputStream != null) {
-				//					outputStream.close();
-				//				}
+				// if (outputStream != null) {
+				// outputStream.close();
+				// }
 				return new PNRepResultImpl(col);
 			}
+			
 
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
 		} finally {
-	
+
 			if (localDelegate instanceof AbstractPILPDelegateTable) {
 				((AbstractPILPDelegateTable<?>) localDelegate).deleteLPs();
 			}
@@ -693,12 +713,13 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 	 * @param delegateD
 	 * @return
 	 */
-	protected int getMinBoundMoveModel(IPNReplayParameter parameters, final int delta,
-			final MemoryEfficientAStarAlgorithm<PHeadTable, T> aStar, D delegateD) throws AStarException {
-		// create a log 
+	protected int getMinBoundMoveModel(IPNReplayParameter parameters, ExecutionContext exec, Canceller canceller,
+			final int delta, final MemoryEfficientAStarAlgorithm<PHeadTable, T> aStar, D delegateD)
+			throws AStarException {
+		// create a log
 		List<String> emptyTrace = new ArrayList<String>();
 
-		//final D delegateD = getDelegate(net, log, classes, mapping, delta, threads);
+		// final D delegateD = getDelegate(net, log, classes, mapping, delta, threads);
 		PHeadTable initialD = constructHead(delegateD, initMarking, emptyTrace);
 
 		final AStarThread<PHeadTable, T> threadD = new AStarThread.MemoryEfficient<PHeadTable, T>(aStar, initialD,
@@ -708,21 +729,12 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 		threadD.setASynchronousMoveSorting(parameters.getAsynchronousMoveSort());
 		threadD.setQueueingModel(parameters.getQueueingModel());
 		threadD.setEpsilon(parameters.getEpsilon());
-		// set the expected alignment length to the overrun times the length of the trace
+		// set the expected alignment length to the overrun times the length of the
+		// trace
 		// rounded up.
 		threadD.setExpectedLength(10);
 
-		Canceller canceller = parameters.getCanceller();
 		try {
-			if (canceller == null) {
-				canceller = new Canceller() {
-
-					@Override
-					public boolean isCancelled() {
-						return false;
-					}
-				};
-			}
 			PRecordTable recordD = (PRecordTable) threadD.getOptimalRecord(canceller);
 			if (recordD == null) {
 				return 0;
@@ -731,7 +743,7 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 			assert (recordD.getCostSoFar() - recordD.getBacktraceSize() - 1) % delta == 0;
 			int tempRes = (recordD.getCostSoFar() - recordD.getBacktraceSize() - 1) / delta;
 
-			//			AbstractPILPDelegate.calls = 0;
+			// AbstractPILPDelegate.calls = 0;
 			return tempRes;
 
 		} catch (AStarException e1) {
@@ -740,12 +752,13 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 		}
 	}
 
-	protected abstract D getDelegate(PetrinetGraph net, TableEventLog log, String[] classes, TransEvClassMappingTable mapping,
-			int delta, int threads);
+	protected abstract D getDelegate(PetrinetGraph net, TableEventLog log, String[] classes,
+			TransEvClassMappingTable mapping, int delta, int threads);
 
 	protected int addReplayResults(Progress progress, D delegate, List<String> trace, Result r, TIntList unUsedIndices,
-			TIntIntMap trace2orgTrace, TIntObjectMap<Representative> doneMap, TableEventLog log, List<SyncReplayResult> col,
-			int traceIndex, int minCostMoveModel) {//, Map<Integer, SyncReplayResult> mapRes) {
+			TIntIntMap trace2orgTrace, TIntObjectMap<Representative> doneMap, TableEventLog log,
+			List<SyncReplayResult> col, int traceIndex, int minCostMoveModel) {// , Map<Integer, SyncReplayResult>
+																				// mapRes) {
 
 		SyncReplayResult srr = recordToResult(delegate, trace, r.filteredTrace, r.record, traceIndex, r.states,
 				r.reliable, r.milliseconds, r.queuedStates, r.traversedArcs, minCostMoveModel, unUsedIndices,
@@ -755,12 +768,12 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 			progress.inc();
 		}
 
-		//BVD		if (mapRes == null) {
+		// BVD if (mapRes == null) {
 		HashMap<Integer, SyncReplayResult> mapRes = new HashMap<Integer, SyncReplayResult>(4);
-		//BVD		}
+		// BVD }
 		mapRes.put(traceIndex, srr);
 
-		//BVD		boolean done = false;
+		// BVD boolean done = false;
 		forLoop: for (int key : doneMap.keys()) {
 			Representative value = doneMap.get(key);
 			if (value != null && value.trace == r.trace) {
@@ -773,20 +786,22 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 				// try to find an XTrace that has the same event list as keyTrace.
 				for (Integer keyMapRes : mapRes.keySet()) {
 					if (compareEventClassList(delegate, log.getTraces().get(keyMapRes), keyTrace)) {
-						// Now add key to the synchronous replay result for the keyMapRes, to 
+						// Now add key to the synchronous replay result for the keyMapRes, to
 						// indicate that the synchronous replay result for keyTrace is identical to
 						// the synchronous replay result of keyMapRes.
 						mapRes.get(keyMapRes).addNewCase(key);
 						if (progress != null) {
 							progress.inc();
 						}
-						// remove key from the doneMap, by mapping it to null (cannot change the map because of forLoop.
-						//BVD						doneMap.put(key, null);
+						// remove key from the doneMap, by mapping it to null (cannot change the map
+						// because of forLoop.
+						// BVD doneMap.put(key, null);
 						continue forLoop;
 					}
 				}
-				//BVD				if (!done) {
-				// We were unable to find a log trace similar to keyTrace for which a replay result
+				// BVD if (!done) {
+				// We were unable to find a log trace similar to keyTrace for which a replay
+				// result
 				// is available.
 				srr = recordToResult(delegate, keyTrace, r.filteredTrace, r.record, key, r.states, r.reliable,
 						r.milliseconds, r.queuedStates, r.traversedArcs, minCostMoveModel, value.unUsedIndices,
@@ -796,13 +811,14 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 				if (progress != null) {
 					progress.inc();
 				}
-				//BVD					addReplayResults(delegate, keyTrace, r, value.unUsedIndices, value.trace2orgTrace, doneMap, log,
-				//BVD							col, key, minCostMoveModel, mapRes);
-				//BVD					done = true;
-				//BVD				}
+				// BVD addReplayResults(delegate, keyTrace, r, value.unUsedIndices,
+				// value.trace2orgTrace, doneMap, log,
+				// BVD col, key, minCostMoveModel, mapRes);
+				// BVD done = true;
+				// BVD }
 			}
 		}
-		//BVD		col.add(srr);
+		// BVD col.add(srr);
 
 		return r.states;
 	}
@@ -813,7 +829,7 @@ IPNPartialOrderAwareReplayAlgorithmTable {
 		}
 		Iterator<String> it = t2.iterator();
 		for (String e : t1) {
-			if (!e.equals(it.next())){
+			if (!e.equals(it.next())) {
 				return false;
 			}
 		}

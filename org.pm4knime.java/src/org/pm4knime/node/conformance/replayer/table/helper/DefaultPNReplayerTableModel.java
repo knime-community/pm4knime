@@ -100,13 +100,17 @@ public class DefaultPNReplayerTableModel extends DefaultNodeModel {
       	// extract one method here to allow logger record its current class info
     	// check cancellation of node
     	checkCanceled(exec);
-    	
     	BufferedDataTable logPO = (BufferedDataTable) inData[INPORT_LOG];
     	PetriNetPortObject netPO = (PetriNetPortObject) inData[INPORT_PETRINET];
+    	
+    	checkCanceled(exec);
     	String eventClassifier = m_modelSettings.e_classifier;
     	String traceClassifier = m_modelSettings.t_classifier;
     	String timeClassifier = m_modelSettings.time_classifier;
-    	TableEventLog log = new TableEventLog(logPO, eventClassifier, traceClassifier, timeClassifier); 
+
+    	TableEventLog log = new TableEventLog(logPO, eventClassifier, traceClassifier, timeClassifier, exec); 
+    	checkCanceled(exec);
+    	
     	AcceptingPetriNet anet = netPO.getANet();
     	
     	// here to change the operation on the classifier
@@ -123,7 +127,7 @@ public class DefaultPNReplayerTableModel extends DefaultNodeModel {
 //    		m_parameter.setMClassifierTrace(null);
     		// different parameters need different get parameter methods. We need to go back to replayer node
 //    		this.m_modelSettings.set_parameters_from_settings(m_parameter);
-    		PNManifestReplayerParameterTable manifestParameters = ParameterGenerator.getPerfParameter(log, anet, move_costs, move_cost_maps);
+    		PNManifestReplayerParameterTable manifestParameters = ParameterGenerator.getPerfParameter(log, anet, move_costs, move_cost_maps, exec);
     		
     		PNManifestFlattenerTable flattener = new PNManifestFlattenerTable(anet.getNet(), manifestParameters);
     		CostBasedCompleteManifestParamTable parameter = new CostBasedCompleteManifestParamTable(flattener.getMapEvClass2Cost(),
@@ -139,7 +143,7 @@ public class DefaultPNReplayerTableModel extends DefaultNodeModel {
     		// check cancellation of node before replaying the result
     		checkCanceled(pluginContext, exec);
     		PNLogReplayerTable replayer = new PNLogReplayerTable();
-    		repResult = replayer.replayLog(pluginContext, flattener.getNet(), log, flattener.getMap(),
+    		repResult = replayer.replayLog(pluginContext, exec, flattener.getNet(), log, flattener.getMap(),
     				replayAlgorithm, parameter);
     		
     	}else {
@@ -149,14 +153,13 @@ public class DefaultPNReplayerTableModel extends DefaultNodeModel {
 	    	}else if(strategyName.equals(ReplayerUtil.strategyList[1])) {
 	    		replayAlgorithm = new PetrinetReplayerWithoutILPTable();
 	    	}
-	    	
 	    	TransEvClassMappingTable mapping = PetriNetUtil.constructMapping(log, anet.getNet(), eventClassifier, evClassDummy);
 	    	IPNReplayParameter parameters =  ParameterGenerator.getConfParameter(log, anet, evClassDummy, move_costs, move_cost_maps);
 	    	PluginContext pluginContext = PM4KNIMEGlobalContext.instance()
 					.getFutureResultAwarePluginContext(PNLogReplayer.class);
 	    	// check cancellation of node before replaying the result
 	    	checkCanceled(pluginContext, exec);
-	    	repResult = replayAlgorithm.replayLog(pluginContext, anet.getNet(), log, mapping, parameters);
+	    	repResult = replayAlgorithm.replayLog(pluginContext, exec, anet.getNet(), log, mapping, parameters);
     	}
     	
     	// put the dummy event class and event classifier in the info table for reuse

@@ -20,6 +20,7 @@ import org.knime.core.data.container.DataContainer;
 import org.knime.core.data.util.NonClosableOutputStream;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
@@ -98,11 +99,11 @@ public class RepResultPortObjectTable implements PortObject {
 		return tableLog;
 	}
 
-	public void setLog(DataTable tableLog, String classifier, String traceClassifier, String timeClassifier) {
+	public void setLog(DataTable tableLog, String classifier, String traceClassifier, String timeClassifier, ExecutionMonitor exec) {
 		// TODO Auto-generated method stub
 		TableEventLog logTEL = null;
 		try {
-			logTEL = new TableEventLog(tableLog, classifier, traceClassifier, timeClassifier);
+			logTEL = new TableEventLog(tableLog, classifier, traceClassifier, timeClassifier, exec);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -439,7 +440,7 @@ public class RepResultPortObjectTable implements PortObject {
 
 			// use this alignment object, we need to reload it here
 			repResultPO.setRepResult(new PNRepResultImpl(col));
-			repResultPO.setLog(log,classifier, traceClassifier, timeClassifier);
+			repResultPO.setLog(log,classifier, traceClassifier, timeClassifier, exec);
 			repResultPO.setNet(anet);
 			repResultPO.setDefaultMoveCosts(default_move_costs);
 			repResultPO.setMoveCostMaps(move_cost_maps);
