@@ -18,7 +18,7 @@ public final class TraceVariantVisNodeSettings implements NodeParameters {
 		interface MainDropdownSection {
 		}
 
-		@Section(title = "Variant ID")
+		@Section(title = "Variant ID Column")
 		interface VariantIdSection {
 		}
 	}
@@ -38,7 +38,7 @@ public final class TraceVariantVisNodeSettings implements NodeParameters {
 	@ChoicesProvider(value = TimeColumnsProvider.class)
 	public String time_classifier;
 
-	@Widget(title = "Variant ID", description = "The name of the column that will be appended to the event log containing the variant ID for each trace.")
+	@Widget(title = "Column Name", description = "The name of the column that will be appended to the event log containing the variant ID for each trace.")
 	@Layout(DialogLayout.VariantIdSection.class)
 	public String variantIdColumnName = "Variant ID";
 
