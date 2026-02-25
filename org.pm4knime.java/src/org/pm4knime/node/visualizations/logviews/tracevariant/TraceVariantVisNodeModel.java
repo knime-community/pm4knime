@@ -73,10 +73,17 @@ public class TraceVariantVisNodeModel
 	protected PortObjectSpec[] configure(PortObjectSpec[] inSpecs) throws InvalidSettingsException {
 		if (!(inSpecs[0] instanceof DataTableSpec))
 			throw new InvalidSettingsException("Input is not a valid Table!");
-		if (m_settings.e_classifier == null || m_settings.t_classifier == null)
+		if (m_settings.e_classifier == null 
+				|| m_settings.t_classifier == null 
+		        || m_settings.time_classifier == null)
 			throw new InvalidSettingsException("Classifiers are not set!");
 
 		DataTableSpec inSpec = (DataTableSpec) inSpecs[0];
+		
+		if (m_settings.variantIdColumnName == null 
+		        || m_settings.variantIdColumnName.isBlank()) {
+		    throw new InvalidSettingsException("Variant ID column name is not set.");
+		}
 
 		if (inSpec.containsName(m_settings.variantIdColumnName)) {
 			if (m_settings.existingVariantIdColumnMode == ExistingOutputColumnHandlingMode.FAIL) {
