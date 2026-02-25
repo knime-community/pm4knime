@@ -13,6 +13,7 @@ import org.knime.js.core.node.AbstractSVGWizardNodeModel;
 import org.pm4knime.util.defaultnode.TraceVariantRepresentation;
 import org.pm4knime.util.defaultnode.TraceVariant;
 import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerNodeModel;
+import org.pm4knime.util.NodeSettingsUtils.ExistingOutputColumnHandlingMode;
 
 @SuppressWarnings("restriction")
 public class TraceVariantVisNodeModel
@@ -75,9 +76,18 @@ public class TraceVariantVisNodeModel
 		if (m_settings.e_classifier == null || m_settings.t_classifier == null)
 			throw new InvalidSettingsException("Classifiers are not set!");
 
-		return new PortObjectSpec[] { createVariantTableSpec(), createLogWithVariantSpec((DataTableSpec) inSpecs[0]) };
-	}
+		DataTableSpec inSpec = (DataTableSpec) inSpecs[0];
 
+		if (inSpec.containsName(m_settings.variantIdColumnName)) {
+			if (m_settings.existingVariantIdColumnMode == ExistingOutputColumnHandlingMode.FAIL) {
+				throw new InvalidSettingsException(
+						"Input table already contains a column named '" + m_settings.variantIdColumnName + "'. ");
+			}
+			setWarningMessage("Existing '" + m_settings.variantIdColumnName + "' column will be overwritten.");
+		}
+
+		return new PortObjectSpec[] { createVariantTableSpec(), createLogWithVariantSpec(inSpec) };
+	}
 
 	@Override
 	protected void performExecuteCreateView(PortObject[] inObjects, ExecutionContext exec) throws Exception {
@@ -106,7 +116,6 @@ public class TraceVariantVisNodeModel
 		traceToVariant = buildTraceToVariantMapping();
 	}
 
-	
 	private Map<String, String> buildTraceToVariantMapping() {
 		List<TraceVariant> variants = m_variants.getVariants();
 		Map<String, String> sequenceToVariantId = new HashMap<>(variants.size() * 2);
@@ -135,7 +144,6 @@ public class TraceVariantVisNodeModel
 		return result;
 	}
 
-
 	@Override
 	protected PortObject[] performExecuteCreatePortObjects(PortObject svgImageFromView, PortObject[] inObjects,
 			ExecutionContext exec) throws Exception {
@@ -143,7 +151,6 @@ public class TraceVariantVisNodeModel
 		return new PortObject[] { createVariantSummaryTable(exec), createLogWithVariantTable(exec) };
 	}
 
-	
 	private BufferedDataTable createVariantSummaryTable(ExecutionContext exec) {
 		BufferedDataContainer container = exec.createDataContainer(createVariantTableSpec());
 
@@ -153,8 +160,8 @@ public class TraceVariantVisNodeModel
 			String variantId = "Variant_" + (i + 1);
 			String seq = String.join(" → ", v.getActivities());
 
-			container.addRowToTable(new DefaultRow(RowKey.createRowKey((long) i), 
-					new StringCell(variantId), new IntCell(v.getFrequency()), new StringCell(seq)));
+			container.addRowToTable(new DefaultRow(RowKey.createRowKey((long) i), new StringCell(variantId),
+					new IntCell(v.getFrequency()), new StringCell(seq)));
 		}
 
 		container.close();
@@ -168,18 +175,23 @@ public class TraceVariantVisNodeModel
 						new DataColumnSpecCreator("Activity Sequence", StringCell.TYPE).createSpec() });
 	}
 
-
 	private BufferedDataTable createLogWithVariantTable(ExecutionContext exec) {
 		DataTableSpec newSpec = createLogWithVariantSpec(table.getDataTableSpec());
 		BufferedDataContainer container = exec.createDataContainer(newSpec);
 
-		final int traceColIdx = table.getDataTableSpec().findColumnIndex(m_settings.t_classifier);
+		final DataTableSpec originalSpec = table.getDataTableSpec();
+		final int traceColIdx = originalSpec.findColumnIndex(m_settings.t_classifier);
+		final int existingVarIdx = originalSpec.findColumnIndex(m_settings.variantIdColumnName);
 
 		for (DataRow row : table) {
 			String variantId = traceToVariant.getOrDefault(row.getCell(traceColIdx).toString(), "UNKNOWN");
 
 			List<DataCell> cells = new ArrayList<>(row.getNumCells() + 1);
-			row.forEach(cells::add);
+			for (int i = 0; i < row.getNumCells(); i++) {
+				if (i != existingVarIdx) {
+					cells.add(row.getCell(i));
+				}
+			}
 			cells.add(new StringCell(variantId));
 
 			container.addRowToTable(new DefaultRow(row.getKey(), cells));
@@ -190,13 +202,18 @@ public class TraceVariantVisNodeModel
 	}
 
 	private DataTableSpec createLogWithVariantSpec(DataTableSpec originalSpec) {
-		DataColumnSpec variantCol = new DataColumnSpecCreator("Variant ID", StringCell.TYPE).createSpec();
-		DataColumnSpec[] allCols = new DataColumnSpec[originalSpec.getNumColumns() + 1];
-		for (int i = 0; i < originalSpec.getNumColumns(); i++) {
-			allCols[i] = originalSpec.getColumnSpec(i);
+		DataColumnSpec variantCol = new DataColumnSpecCreator(m_settings.variantIdColumnName, StringCell.TYPE)
+				.createSpec();
+
+		List<DataColumnSpec> cols = new ArrayList<>(originalSpec.getNumColumns() + 1);
+		for (DataColumnSpec col : originalSpec) {
+			if (!col.getName().equals(m_settings.variantIdColumnName)) {
+				cols.add(col);
+			}
 		}
-		allCols[allCols.length - 1] = variantCol;
-		return new DataTableSpec("Event Log with Variant ID", allCols);
+		cols.add(variantCol);
+
+		return new DataTableSpec("Event Log with Variant ID", cols.toArray(new DataColumnSpec[0]));
 	}
 
 	@Override
@@ -212,7 +229,6 @@ public class TraceVariantVisNodeModel
 	@Override
 	protected void validateSettings(NodeSettingsRO settings) throws InvalidSettingsException {
 	}
-
 
 	@Override
 	public PortObject[] getInternalPortObjects() {
