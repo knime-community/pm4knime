@@ -43,8 +43,9 @@ public class TraceVariantVisNodeFactory extends DefaultNodeFactory {
             	    .page(p -> p
             	        .fromFile()
         	            .bundleClass(TraceVariantVisNodeFactory.class)
-        	            .basePath("web")
-        	            .relativeFilePath("tracevariant.html")
+        	            .basePath("js-src/dist")
+        	            .relativeFilePath("src/views/tracevariant/index.html")
+                        .addResourceDirectory("assets")
             	    )
             	    .initialData(TraceVariantView::createInitialData)
             	)
@@ -54,3 +55,5 @@ public class TraceVariantVisNodeFactory extends DefaultNodeFactory {
     }
     
 }
+
+
