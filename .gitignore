@@ -19,3 +19,7 @@ ivy-2.5.0.jar
 org.pm4knime.python/config.yml
 
 pixi.lock
+**/node_modules/
+**/js-src/**/dist/
+**/js-src/**/.vite/
+**/null*.jar
