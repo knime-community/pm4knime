@@ -1,27 +1,27 @@
 [workspace]
-channels = ["knime", "knime/label/nightly", "conda-forge"]
+channels = ["knime", "conda-forge"]
 platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 
 [tasks]
 
 [dependencies]
-python = "3.11.*"
+python = "3.*"
 knime-extension = "*"
-knime-python-base = "5.10.*"
-knime-python-versions = "5.10.*"
+knime-python-base = "5.*"
+knime-python-versions = "5.*"
 intervaltree = "*"
 pydotplus = "*"
 pip = "*"
 
 [feature.build.dependencies]
-python = "3.9.*"
-knime-extension-bundling = "5.10.*"
+python = "*"
+knime-extension-bundling = "5.*"
 
 [feature.debug.dependencies]
 debugpy = "*"
 
 [feature.build.tasks]
-build = { args = [{ "arg" = "dest", "default" = "./local-update-site" }], cmd = "build-python-extension . {{ dest }} --update-sites-version 5.10"}
+build = { args = [{ "arg" = "dest", "default" = "./local-update-site" }], cmd = "build-python-extension . {{ dest }} --update-sites-version latest"}
 
 
 [environments]
