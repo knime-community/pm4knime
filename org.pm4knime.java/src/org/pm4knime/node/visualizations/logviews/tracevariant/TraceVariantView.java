@@ -13,7 +13,7 @@ import org.knime.node.DefaultView;
 
 final class TraceVariantView {
 
-    private static final String DELIMITER = " → ";
+    private static final String DELIMITER = " \u2192 ";
 
     static DefaultView.DefaultInitialData<Map<String, Object>>
     createInitialData(DefaultView.RequireInitialData r) {
@@ -27,7 +27,7 @@ final class TraceVariantView {
             Map<String, Object> variantData = new HashMap<>(3);
 
             List<Map<String, Object>> variantsList =
-                    new ArrayList<>((int) summaryTable.size());
+                    new ArrayList<>((int)summaryTable.size());
 
             Set<String> allActivities = new LinkedHashSet<>();
 
@@ -36,7 +36,7 @@ final class TraceVariantView {
             for (var row : summaryTable) {
 
                 String variantId = row.getCell(0).toString();
-                int frequency = ((IntCell) row.getCell(1)).getIntValue();
+                int frequency = ((IntCell)row.getCell(1)).getIntValue();
                 String activitySequence = row.getCell(2).toString();
 
                 numberOfTraces += frequency;
@@ -56,17 +56,13 @@ final class TraceVariantView {
             variantData.put("numberOfTraces", numberOfTraces);
             variantData.put("variants", variantsList);
             variantData.put("activities",
-                    new ArrayList<>(allActivities)); // no extra HashSet
+                    new ArrayList<>(allActivities));
 
             root.put("variants", variantData);
 
             return root;
         });
     }
-
-    // ---------------------------------------------------------
-    // Fast non-regex split for fixed delimiter
-    // ---------------------------------------------------------
 
     private static List<String> splitFast(String input) {
 
