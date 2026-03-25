@@ -1,7 +1,18 @@
+import dagre from "dagre";
+import * as joint from "jointjs";
+import "jointjs/dist/joint.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import graphExportCss from "./graphExportCss.txt?raw";
+
+const normalizedGraphExportCss = graphExportCss.replace(/font-size:\s*22px;/g, "font-size: 14px;");
+
 export type GraphNode = {
   id: string;
   type?: string;
   label?: string;
+  position?: { x: number; y: number };
+  width?: number;
+  height?: number;
   initial?: boolean;
   final?: boolean;
   i_marking?: boolean;
@@ -12,6 +23,7 @@ export type GraphEdge = {
   source: string;
   target: string;
   type?: string;
+  label?: string;
   frequency?: number | string;
 };
 
@@ -20,381 +32,546 @@ export type GraphPayload = {
   links?: GraphEdge[];
 };
 
-type PositionedNode = {
-  node: GraphNode;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
+const PADDING_INSIDE_PAPER = 10;
+let initialGraphState: unknown;
 
-const MARGIN = 36;
-const RANK_SPACING = 180;
-const LANE_SPACING = 120;
-
-export function renderGraph(graph: GraphPayload): SVGSVGElement {
-  const nodes = graph.nodes ?? [];
-  const links = graph.links ?? [];
-
-  if (!nodes.length) {
-    return createMessageSvg("No graph data available.");
-  }
-
-  const topToBottom = nodes.some((node) =>
-    ["activity", "artificial start", "artificial end"].includes((node.type ?? "").toLowerCase()),
-  );
-  const processTree = nodes.some((node) =>
-    ["operator", "manual", "automatic"].includes((node.type ?? "").toLowerCase()),
-  );
-
-  const positioned = layout(nodes, links, topToBottom);
-  const width = Math.max(...positioned.map((node) => node.x + node.width)) + MARGIN;
-  const height = Math.max(...positioned.map((node) => node.y + node.height)) + MARGIN;
-
-  const svg = createSvg(width, height);
-  svg.appendChild(rect(0, 0, width, height, "#f8fafc"));
-
-  const positionsById = new Map(positioned.map((node) => [node.node.id, node]));
-
-  for (const edge of links) {
-    const source = positionsById.get(edge.source);
-    const target = positionsById.get(edge.target);
-    if (!source || !target) {
-      continue;
-    }
-
-    const x1 = topToBottom ? source.x + source.width / 2 : source.x + source.width;
-    const y1 = topToBottom ? source.y + source.height : source.y + source.height / 2;
-    const x2 = topToBottom ? target.x + target.width / 2 : target.x;
-    const y2 = topToBottom ? target.y : target.y + target.height / 2;
-
-    const type = (edge.type ?? "").toLowerCase();
-    const stroke =
-      type.includes("uncertainedge") || type.includes("hybriddirecteduncertaingraphedge")
-        ? "#dc2626"
-        : type.includes("longdepedge") || type.includes("hybriddirectedlongdepgraphedge")
-          ? "#d97706"
-          : "#334155";
-
-    const lineEl = line(x1, y1, x2, y2, stroke);
-    if (stroke === "#dc2626") {
-      lineEl.setAttribute("stroke-dasharray", "6 4");
-    }
-    if (!processTree) {
-      lineEl.setAttribute("marker-end", `url(#${markerId(stroke)})`);
-    }
-    svg.appendChild(lineEl);
-
-    const label = edgeLabel(edge, processTree);
-    if (label) {
-      const labelX = (x1 + x2) / 2;
-      const labelY = (y1 + y2) / 2 - 8;
-      const group = create("g");
-      group.appendChild(roundedRect(labelX - 16, labelY - 14, 32, 18, 6, "#ffffff"));
-      group.appendChild(text(label, labelX, labelY, 11));
-      svg.appendChild(group);
-    }
-  }
-
-  for (const item of positioned) {
-    svg.appendChild(renderNode(item));
-  }
-
-  return svg;
+export function renderGraphView(root: HTMLElement, graph: GraphPayload) {
+  createGraphElements(root);
+  return createPaper(graph.nodes ?? [], graph.links ?? []);
 }
 
-function layout(nodes: GraphNode[], links: GraphEdge[], topToBottom: boolean): PositionedNode[] {
-  const outgoing = new Map<string, string[]>();
-  const indegree = new Map<string, number>();
+function createGraphElements(root: HTMLElement) {
+  root.replaceChildren();
 
-  for (const node of nodes) {
-    outgoing.set(node.id, []);
-    indegree.set(node.id, 0);
+  const mainContainer = document.createElement("div");
+  mainContainer.id = "main";
+  mainContainer.style.display = "flex";
+  mainContainer.style.flexDirection = "column";
+  mainContainer.style.alignItems = "center";
+  mainContainer.style.justifyContent = "center";
+  mainContainer.style.border = "1px solid #ccc";
+  mainContainer.style.width = "100%";
+  mainContainer.style.height = "100%";
+  mainContainer.style.background = "white";
+  mainContainer.style.boxSizing = "border-box";
+
+  const controlBar = document.createElement("div");
+  controlBar.style.background = "#e0e0e0";
+  controlBar.style.color = "#fff";
+  controlBar.style.width = "100%";
+  controlBar.style.fontFamily = "Arial, sans-serif";
+  controlBar.style.boxSizing = "border-box";
+  controlBar.style.minHeight = "40px";
+  controlBar.style.display = "flex";
+  controlBar.style.alignItems = "center";
+
+  const graphContainer = document.createElement("div");
+  graphContainer.id = "graphContainer";
+  graphContainer.style.width = "100%";
+  graphContainer.style.height = "calc(100% - 40px)";
+  graphContainer.style.overflow = "auto";
+  graphContainer.style.margin = "auto";
+  graphContainer.style.boxSizing = "border-box";
+
+  const paperDiv = document.createElement("div");
+  paperDiv.id = "paper";
+  paperDiv.style.width = "100%";
+  paperDiv.style.height = "100%";
+  paperDiv.style.margin = "auto";
+
+  const controlsDiv = document.createElement("div");
+  controlsDiv.id = "zoom-controls";
+  controlsDiv.style.display = "flex";
+  controlsDiv.style.alignItems = "center";
+  controlsDiv.style.gap = "4px";
+  controlsDiv.style.padding = "4px 6px";
+
+  const zoomInButton = document.createElement("button");
+  zoomInButton.className = "zoom-button";
+  zoomInButton.id = "zoom-in";
+  zoomInButton.innerHTML = `<i class="fa-solid fa-magnifying-glass-plus"></i>`;
+
+  const zoomOutButton = document.createElement("button");
+  zoomOutButton.className = "zoom-button";
+  zoomOutButton.id = "zoom-out";
+  zoomOutButton.innerHTML = `<i class="fa-solid fa-magnifying-glass-minus"></i>`;
+
+  const resetButton = document.createElement("button");
+  resetButton.className = "reset-button";
+  resetButton.id = "reset-button";
+  resetButton.innerHTML = `<i class="fa-solid fa-rotate-left"></i>`;
+
+  const zoomToFitButton = document.createElement("button");
+  zoomToFitButton.className = "zoom-button";
+  zoomToFitButton.id = "zoom-to-fit";
+  zoomToFitButton.innerHTML = `<i class="fa-solid fa-arrows-to-circle"></i>`;
+
+  const downloadSvgButton = document.createElement("button");
+  downloadSvgButton.className = "zoom-button";
+  downloadSvgButton.id = "download-svg";
+  downloadSvgButton.innerHTML = `<i class="fa-solid fa-download"></i>`;
+
+  controlsDiv.appendChild(zoomInButton);
+  controlsDiv.appendChild(zoomOutButton);
+  controlsDiv.appendChild(zoomToFitButton);
+  controlsDiv.appendChild(resetButton);
+  controlsDiv.appendChild(downloadSvgButton);
+
+  controlBar.appendChild(controlsDiv);
+  graphContainer.appendChild(paperDiv);
+  mainContainer.appendChild(controlBar);
+  mainContainer.appendChild(graphContainer);
+  root.appendChild(mainContainer);
+}
+
+function estimateTextWidth(text: string | undefined, fontSize: number) {
+  if (typeof text === "undefined" || text === "") {
+    return 0;
   }
+  const averageCharWidth = fontSize * 0.7;
+  return text.length * averageCharWidth;
+}
 
-  for (const edge of links) {
-    if (!outgoing.has(edge.source) || !indegree.has(edge.target)) {
-      continue;
+function adjustPaperSize(graph: any, paper: any) {
+  let maxX = 0;
+  let maxY = 0;
+
+  graph.getElements().forEach((element: any) => {
+    const position = element.position();
+    const size = element.size();
+    maxX = Math.max(maxX, position.x + size.width);
+    maxY = Math.max(maxY, position.y + size.height);
+  });
+
+  paper.setDimensions(maxX + 100, maxY + 100);
+  paper.fitToContent({
+    useModelGeometry: true,
+    padding: PADDING_INSIDE_PAPER,
+    allowNewOrigin: "any",
+  });
+}
+
+function simplifyWaypoints(points: Array<{ x: number; y: number }>) {
+  const simplified: Array<{ x: number; y: number }> = [];
+
+  for (let i = 1; i < points.length - 1; i += 1) {
+    const prev = points[i - 1];
+    const curr = points[i];
+    const next = points[i + 1];
+
+    const det =
+      prev.x * (curr.y - next.y) +
+      curr.x * (next.y - prev.y) +
+      next.x * (prev.y - curr.y);
+
+    if (Math.abs(det) > 1e-10) {
+      simplified.push(curr);
     }
-    outgoing.get(edge.source)!.push(edge.target);
-    indegree.set(edge.target, (indegree.get(edge.target) ?? 0) + 1);
   }
 
-  const ranks = new Map<string, number>();
-  const queue: string[] = [];
+  return simplified;
+}
 
-  [...indegree.entries()]
-    .filter(([, degree]) => degree === 0)
-    .map(([id]) => id)
-    .sort()
-    .forEach((id) => {
-      ranks.set(id, 0);
-      queue.push(id);
+function createPaper(nodes: GraphNode[], edges: GraphEdge[]) {
+  const paperHost = document.getElementById("paper");
+
+  if (!paperHost) {
+    throw new Error("Graph paper container is missing.");
+  }
+
+  let tbFlag = 0;
+  let processTreeFlag = 0;
+  let zoomLevel = 1;
+
+  const graph = new joint.dia.Graph({}, { cellNamespace: joint.shapes });
+  const paper = new joint.dia.Paper({
+    el: paperHost,
+    width: "100%",
+    height: "100%",
+    defaultAnchor: { name: "perpendicular" },
+    defaultConnectionPoint: { name: "boundary" },
+    cellViewNamespace: joint.shapes,
+    model: graph,
+  });
+
+  paper.freeze();
+
+  const zoom = (nextZoomLevel: number) => {
+    zoomLevel = nextZoomLevel;
+    paper.scale(zoomLevel);
+    paper.fitToContent({
+      useModelGeometry: true,
+      padding: PADDING_INSIDE_PAPER,
+      allowNewOrigin: "any",
+    });
+  };
+
+  const pn = joint.shapes.pn;
+  const elements: Record<string, any> = {};
+  const nodeElements: any[] = [];
+
+  nodes.forEach((node) => {
+    const nodeType = (node.type ?? "").toLowerCase();
+
+    if (nodeType === "activity") {
+      tbFlag = 1;
+    }
+
+    if (nodeType === "operator") {
+      processTreeFlag = 1;
+    }
+
+    let element: any;
+
+    if (nodeType === "place") {
+      const attrs: Record<string, any> = {
+        ".root": { stroke: "grey", "stroke-width": 2 },
+        ".tokens > circle": { fill: "#38761d" },
+      };
+      let tokens = 0;
+
+      if (node.final === true || node.f_marking === true) {
+        attrs[".root"]["stroke-width"] = 4;
+      }
+      if (node.initial === true || node.i_marking === true) {
+        tokens = 1;
+      }
+
+      node.width = 50;
+      node.height = 50;
+
+      element = new pn.Place({
+        position: node.position,
+        attrs,
+        tokens,
+        size: { width: 50, height: 50 },
+      });
+    } else {
+      const fontSize = 14;
+      const textWidth = estimateTextWidth(node.label, fontSize);
+      const transitionWidth = Math.max(textWidth + 10, 20);
+      node.width = transitionWidth;
+      node.height = 35;
+
+      const baseAttrs = {
+        ".label": {
+          text: node.label || "",
+          fill: "black",
+          "ref-x": 0.5,
+          "ref-y": 0.5,
+          "text-anchor": "middle",
+          "y-alignment": "middle",
+        },
+        ".root": {
+          fill: "#e0e0e0",
+          stroke: "#999999",
+          "stroke-width": 2,
+        },
+      };
+
+      if (nodeType === "transition") {
+        baseAttrs[".root"] = {
+          fill: "#cfe2f3",
+          stroke: "#3f77cf",
+          "stroke-width": 2,
+        };
+      } else if (nodeType === "artificial start") {
+        baseAttrs[".root"] = {
+          fill: "#c8fcc0",
+          stroke: "#167f06",
+          "stroke-width": 2,
+        };
+      } else if (nodeType === "artificial end") {
+        baseAttrs[".root"] = {
+          fill: "#fcb6b6",
+          stroke: "#c30909",
+          "stroke-width": 2,
+        };
+      } else if (nodeType === "operator") {
+        baseAttrs[".label"].text = operatorSymbol(node.label);
+        baseAttrs[".root"] = {
+          fill: "#add8e6",
+          stroke: "#87ceeb",
+          "stroke-width": 2,
+        };
+      }
+
+      element = new pn.Transition({
+        position: node.position,
+        size: { width: transitionWidth, height: 50 },
+        attrs: baseAttrs,
+      });
+    }
+
+    nodeElements.push(element);
+    elements[node.id] = element;
+  });
+
+  const linkElements: any[] = [];
+
+  edges.forEach((edge) => {
+    if (!elements[edge.source] || !elements[edge.target]) {
+      return;
+    }
+
+    const linkAttrs = {
+      ".connection": { stroke: "grey", "stroke-width": 3 },
+      ".marker-target": { fill: "grey", stroke: "grey", "stroke-width": 2 },
+    };
+    const labels: Array<Record<string, unknown>> = [];
+
+    if (edge.frequency !== undefined && edge.frequency !== null) {
+      labels.push({
+        position: 0.5,
+        attrs: {
+          text: { text: edge.frequency.toString(), fill: "black", "font-size": 12 },
+          rect: { fill: "white", stroke: "none" },
+        },
+      });
+    }
+
+    const link = new pn.Link({
+      source: { id: elements[edge.source].id, selector: ".root" },
+      target: { id: elements[edge.target].id, selector: ".root" },
+      attrs: linkAttrs,
+      labels,
     });
 
-  if (!queue.length && nodes.length) {
-    const first = [...nodes].sort((a, b) => a.id.localeCompare(b.id))[0];
-    ranks.set(first.id, 0);
-    queue.push(first.id);
-  }
-
-  const indegreeCopy = new Map(indegree);
-
-  while (queue.length) {
-    const source = queue.shift()!;
-    const sourceRank = ranks.get(source) ?? 0;
-
-    for (const target of outgoing.get(source) ?? []) {
-      ranks.set(target, Math.max(ranks.get(target) ?? 0, sourceRank + 1));
-      indegreeCopy.set(target, (indegreeCopy.get(target) ?? 0) - 1);
-      if ((indegreeCopy.get(target) ?? 0) === 0) {
-        queue.push(target);
+    const frequency = Number(edge.frequency);
+    if (!Number.isNaN(frequency)) {
+      if (frequency > 0) {
+        link.attr(".connection", { stroke: "#000f80" });
+        if (processTreeFlag === 1) {
+          link.attr(".marker-target", { fill: "none", stroke: "none" });
+        } else {
+          link.attr(".marker-target", { fill: "#000f80", stroke: "#000f80" });
+        }
+        tbFlag = 1;
+      } else if (frequency === 0 || frequency < -1) {
+        link.attr(".connection", { stroke: "#000f80" });
+        link.attr(".marker-target", { fill: "none", stroke: "none" });
+        link.label(0, { attrs: { text: { text: "" } } });
+        tbFlag = 1;
+      } else if (frequency === -1) {
+        link.attr(".connection", { stroke: "#000f80" });
+        link.attr(".marker-target", { fill: "none", stroke: "none" });
+        link.label(0, { attrs: { text: { text: "do" } } });
+        tbFlag = 1;
       }
     }
-  }
 
-  let fallbackRank = Math.max(...ranks.values(), 0) + 1;
-  for (const node of nodes) {
-    if (!ranks.has(node.id)) {
-      ranks.set(node.id, fallbackRank++);
+    if (edge.type === "SureEdge" || edge.type === "HybridDirectedSureGraphEdge") {
+      link.attr(".connection", { stroke: "#000f80" });
+      link.attr(".marker-target", { fill: "#000f80", stroke: "#000f80" });
+    } else if (edge.type === "UncertainEdge" || edge.type === "HybridDirectedUncertainGraphEdge") {
+      link.attr(".connection", { stroke: "red", "stroke-dasharray": "4,2" });
+      link.attr(".marker-target", { fill: "red", stroke: "red" });
+    } else if (edge.type === "LongDepEdge" || edge.type === "HybridDirectedLongDepGraphEdge") {
+      link.attr(".connection", { stroke: "orange" });
+      link.attr(".marker-target", { fill: "orange", stroke: "orange" });
     }
-  }
 
-  const byRank = new Map<number, GraphNode[]>();
-  for (const node of nodes) {
-    const rank = ranks.get(node.id) ?? 0;
-    const rankNodes = byRank.get(rank) ?? [];
-    rankNodes.push(node);
-    byRank.set(rank, rankNodes);
-  }
+    linkElements.push(link);
+  });
 
-  for (const rankNodes of byRank.values()) {
-    rankNodes.sort((a, b) =>
-      `${a.type ?? ""}:${a.label ?? ""}:${a.id}`.localeCompare(`${b.type ?? ""}:${b.label ?? ""}:${b.id}`),
-    );
-  }
+  graph.addCells(nodeElements);
+  graph.addCells(linkElements);
+  applyAutoLayout();
 
-  const result: PositionedNode[] = [];
-  for (const [rank, rankNodes] of [...byRank.entries()].sort((a, b) => a[0] - b[0])) {
-    rankNodes.forEach((node, lane) => {
-      const width = estimateWidth(node);
-      const height = estimateHeight(node);
-      const primary = MARGIN + rank * RANK_SPACING;
-      const secondary = MARGIN + lane * LANE_SPACING;
-      result.push({
-        node,
-        x: topToBottom ? secondary : primary,
-        y: topToBottom ? primary : secondary,
-        width,
-        height,
+  paper.unfreeze();
+  adjustPaperSize(graph, paper);
+  initialGraphState = graph.toJSON();
+
+  addZoomListeners();
+  return paper;
+
+  function addZoomListeners() {
+    document.getElementById("zoom-in")?.addEventListener("click", () => {
+      zoom(zoomLevel + 0.2);
+    });
+
+    document.getElementById("zoom-out")?.addEventListener("click", () => {
+      zoom(zoomLevel - 0.2);
+    });
+
+    document.getElementById("zoom-to-fit")?.addEventListener("click", () => {
+      const graphContainer = document.getElementById("graphContainer");
+
+      if (!graphContainer) {
+        return;
+      }
+
+      const containerWidth = graphContainer.getBoundingClientRect().width - 3 * PADDING_INSIDE_PAPER;
+      const containerHeight = graphContainer.getBoundingClientRect().height - 3 * PADDING_INSIDE_PAPER;
+      const paperWidth = paper.getContentBBox().width;
+      const paperHeight = paper.getContentBBox().height;
+
+      const scaleX = containerWidth / paperWidth;
+      const scaleY = containerHeight / paperHeight;
+
+      zoom(zoomLevel * Math.min(scaleX, scaleY));
+    });
+
+    document.getElementById("reset-button")?.addEventListener("click", () => {
+      graph.clear();
+      graph.fromJSON(joint.util.cloneDeep(initialGraphState));
+      zoom(1);
+    });
+
+    let wheelTimer: number | undefined;
+
+    paper.el.addEventListener("wheel", (event: WheelEvent) => {
+      event.preventDefault();
+      const delta = event.deltaY;
+      const nextZoomLevel = Math.max(0.2, Math.min(3, zoomLevel + (delta > 0 ? -0.2 : 0.2)));
+
+      zoom(nextZoomLevel);
+
+      if (wheelTimer) {
+        window.clearTimeout(wheelTimer);
+      }
+      wheelTimer = window.setTimeout(() => {}, 120);
+    });
+
+    paper.on("element:pointerup link:pointerup", () => {
+      paper.fitToContent({
+        useModelGeometry: true,
+        padding: PADDING_INSIDE_PAPER,
+        allowNewOrigin: "any",
       });
     });
+
+    document.getElementById("download-svg")?.addEventListener("click", () => {
+      const serializedSVG = createSVG(paper);
+      const blob = new Blob([serializedSVG], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = "graph.svg";
+      anchor.click();
+      window.setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 60_000);
+    });
+
   }
 
-  return result;
+  function applyAutoLayout() {
+    const layoutGraph = new dagre.graphlib.Graph();
+
+    if (tbFlag === 0) {
+      layoutGraph.setGraph({
+        rankdir: "LR",
+        marginx: 20,
+        marginy: 20,
+      });
+    } else {
+      layoutGraph.setGraph({
+        rankdir: "TB",
+        marginx: 20,
+        marginy: 20,
+      });
+    }
+
+    layoutGraph.setDefaultEdgeLabel(() => ({}));
+
+    nodes.forEach((node) => {
+      layoutGraph.setNode(node.id, {
+        width: node.width,
+        height: node.height,
+        label: node.label,
+      });
+    });
+
+    edges.forEach((edge) => {
+      layoutGraph.setEdge(edge.source, edge.target, {
+        label: edge.label,
+        width: 0,
+        height: 0,
+      });
+    });
+
+    if (processTreeFlag === 1) {
+      dagre.layout(layoutGraph, { disableOrder: true });
+    } else {
+      dagre.layout(layoutGraph);
+    }
+
+    layoutGraph.nodes().forEach((nodeId: string) => {
+      const layoutNode = layoutGraph.node(nodeId);
+      elements[nodeId].position(
+        layoutNode.x - layoutNode.width / 2,
+        layoutNode.y - layoutNode.height / 2,
+      );
+      elements[nodeId].resize(layoutNode.width, layoutNode.height);
+    });
+
+    layoutGraph.edges().forEach((edgeRef: { v: string; w: string }) => {
+      const layoutEdge = layoutGraph.edge(edgeRef);
+      const sourceElement = elements[edgeRef.v];
+      const targetElement = elements[edgeRef.w];
+
+      if (!sourceElement || !targetElement) {
+        return;
+      }
+
+      const links = graph
+        .getConnectedLinks(sourceElement, { outbound: true })
+        .filter((link: any) => link.getTargetElement() === targetElement);
+
+      if (!links.length) {
+        return;
+      }
+
+      const link = links[0];
+      const waypoints = layoutEdge.points.map((point: { x: number; y: number }) => ({
+        x: point.x,
+        y: point.y,
+      }));
+      const simplifiedWaypoints = simplifyWaypoints(waypoints);
+      link.vertices(simplifiedWaypoints);
+    });
+
+    zoom(1);
+  }
 }
 
-function renderNode(item: PositionedNode): SVGGElement {
-  const group = create("g");
-  const node = item.node;
-  const type = (node.type ?? "").toLowerCase();
-
-  if (type === "place") {
-    const cx = item.x + item.width / 2;
-    const cy = item.y + item.height / 2;
-    const radius = item.width / 2 - 2;
-    group.appendChild(circle(cx, cy, radius, "#ffffff", "#475569"));
-    if (node.final || node.f_marking) {
-      group.appendChild(circle(cx, cy, radius - 5, "none", "#475569"));
-    }
-    if (node.initial || node.i_marking) {
-      group.appendChild(circle(cx, cy, 6, "#15803d", "#15803d"));
-    }
-    return group;
+function operatorSymbol(label: string | undefined) {
+  if (label === "xlp") {
+    return "⭯";
   }
+  if (label === "xor") {
+    return "✖";
+  }
+  if (label === "and") {
+    return "✙";
+  }
+  if (label === "seq") {
+    return "➜";
+  }
+  return label || "";
+}
 
-  const { fill, stroke } = nodeColors(type);
-  group.appendChild(
-    roundedRect(item.x, item.y, item.width, item.height, type === "transition" ? 4 : 12, fill, stroke),
+export function createSVG(paper: any) {
+  const svgElement = paper.svg.cloneNode(true) as SVGElement;
+  svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+
+  const bbox = paper.getContentBBox();
+  const padding = 30;
+  const widthWithPadding = bbox.width + 2 * padding;
+  const heightWithPadding = bbox.height + 2 * padding;
+
+  svgElement.setAttribute("width", String(widthWithPadding));
+  svgElement.setAttribute("height", String(heightWithPadding));
+  svgElement.setAttribute(
+    "viewBox",
+    `${bbox.x - padding} ${bbox.y - padding} ${widthWithPadding} ${heightWithPadding}`,
   );
 
-  const label = displayLabel(node);
-  if (label) {
-    group.appendChild(text(label, item.x + item.width / 2, item.y + item.height / 2 + 5, 13));
-  }
-  return group;
-}
+  const cssStyle = document.createElement("style");
+  cssStyle.setAttribute("type", "text/css");
+  cssStyle.textContent = normalizedGraphExportCss;
+  svgElement.prepend(cssStyle);
 
-function nodeColors(type: string) {
-  if (type === "artificial start") {
-    return { fill: "#c8fcc0", stroke: "#167f06" };
-  }
-  if (type === "artificial end") {
-    return { fill: "#fecaca", stroke: "#b91c1c" };
-  }
-  if (type === "activity") {
-    return { fill: "#e2e8f0", stroke: "#64748b" };
-  }
-  if (type === "operator") {
-    return { fill: "#dbeafe", stroke: "#60a5fa" };
-  }
-  if (type === "transition") {
-    return { fill: "#dbeafe", stroke: "#2563eb" };
-  }
-  return { fill: "#f8fafc", stroke: "#64748b" };
-}
-
-function displayLabel(node: GraphNode) {
-  if ((node.type ?? "").toLowerCase() !== "operator") {
-    return node.label ?? "";
-  }
-  switch ((node.label ?? "").toLowerCase()) {
-    case "xlp":
-      return "loop";
-    case "xor":
-      return "xor";
-    case "and":
-      return "and";
-    case "seq":
-      return "seq";
-    default:
-      return node.label ?? "";
-  }
-}
-
-function edgeLabel(edge: GraphEdge, processTree: boolean) {
-  if (edge.frequency === undefined || edge.frequency === null) {
-    return "";
-  }
-  const value = Number(edge.frequency);
-  if (!Number.isNaN(value)) {
-    if (processTree) {
-      if (value === -1) {
-        return "do";
-      }
-      if (value <= 0) {
-        return "";
-      }
-    }
-    return String(Math.trunc(value));
-  }
-  return String(edge.frequency);
-}
-
-function estimateWidth(node: GraphNode) {
-  if ((node.type ?? "").toLowerCase() === "place") {
-    return 42;
-  }
-  const labelLength = Math.max(displayLabel(node).length, 1);
-  return Math.max(70, 18 + labelLength * 8);
-}
-
-function estimateHeight(node: GraphNode) {
-  return (node.type ?? "").toLowerCase() === "place" ? 42 : 40;
-}
-
-function createMessageSvg(message: string) {
-  const svg = createSvg(640, 80);
-  svg.appendChild(rect(0, 0, 640, 80, "#f8fafc"));
-  svg.appendChild(text(message, 24, 44, 16, "start"));
-  return svg;
-}
-
-function createSvg(width: number, height: number) {
-  const svg = create("svg") as SVGSVGElement;
-  svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-  svg.setAttribute("width", String(width));
-  svg.setAttribute("height", String(height));
-  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-
-  const defs = create("defs");
-  defs.appendChild(marker("#334155", markerId("#334155")));
-  defs.appendChild(marker("#dc2626", markerId("#dc2626")));
-  defs.appendChild(marker("#d97706", markerId("#d97706")));
-  svg.appendChild(defs);
-  return svg;
-}
-
-function markerId(color: string) {
-  return color === "#dc2626" ? "arrow-red" : color === "#d97706" ? "arrow-orange" : "arrow-blue";
-}
-
-function marker(color: string, id: string) {
-  const markerEl = create("marker");
-  markerEl.setAttribute("id", id);
-  markerEl.setAttribute("markerWidth", "10");
-  markerEl.setAttribute("markerHeight", "10");
-  markerEl.setAttribute("refX", "8");
-  markerEl.setAttribute("refY", "3");
-  markerEl.setAttribute("orient", "auto");
-
-  const path = create("path");
-  path.setAttribute("d", "M0,0 L0,6 L8,3 z");
-  path.setAttribute("fill", color);
-  markerEl.appendChild(path);
-  return markerEl;
-}
-
-function roundedRect(
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  radius: number,
-  fill: string,
-  stroke = "none",
-) {
-  const rectEl = rect(x, y, width, height, fill, stroke);
-  rectEl.setAttribute("rx", String(radius));
-  return rectEl;
-}
-
-function rect(x: number, y: number, width: number, height: number, fill: string, stroke = "none") {
-  const rectEl = create("rect");
-  rectEl.setAttribute("x", String(x));
-  rectEl.setAttribute("y", String(y));
-  rectEl.setAttribute("width", String(width));
-  rectEl.setAttribute("height", String(height));
-  rectEl.setAttribute("fill", fill);
-  rectEl.setAttribute("stroke", stroke);
-  rectEl.setAttribute("stroke-width", stroke === "none" ? "0" : "2.5");
-  return rectEl;
-}
-
-function circle(cx: number, cy: number, radius: number, fill: string, stroke: string) {
-  const circleEl = create("circle");
-  circleEl.setAttribute("cx", String(cx));
-  circleEl.setAttribute("cy", String(cy));
-  circleEl.setAttribute("r", String(radius));
-  circleEl.setAttribute("fill", fill);
-  circleEl.setAttribute("stroke", stroke);
-  circleEl.setAttribute("stroke-width", stroke === "none" ? "0" : "2.5");
-  return circleEl;
-}
-
-function line(x1: number, y1: number, x2: number, y2: number, stroke: string) {
-  const lineEl = create("line");
-  lineEl.setAttribute("x1", String(x1));
-  lineEl.setAttribute("y1", String(y1));
-  lineEl.setAttribute("x2", String(x2));
-  lineEl.setAttribute("y2", String(y2));
-  lineEl.setAttribute("stroke", stroke);
-  lineEl.setAttribute("stroke-width", "2.5");
-  return lineEl;
-}
-
-function text(value: string, x: number, y: number, size: number, anchor = "middle") {
-  const textEl = create("text");
-  textEl.textContent = value;
-  textEl.setAttribute("x", String(x));
-  textEl.setAttribute("y", String(y));
-  textEl.setAttribute("text-anchor", anchor);
-  textEl.setAttribute("font-size", String(size));
-  textEl.setAttribute("font-family", "Arial, sans-serif");
-  textEl.setAttribute("fill", "#0f172a");
-  return textEl;
-}
-
-function create<K extends keyof SVGElementTagNameMap>(name: K): SVGElementTagNameMap[K] {
-  return document.createElementNS("http://www.w3.org/2000/svg", name);
+  return new XMLSerializer().serializeToString(svgElement);
 }
