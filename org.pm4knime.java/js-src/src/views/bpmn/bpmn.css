@@ -12,6 +12,34 @@ body {
   font-family: Arial, sans-serif;
 }
 
+.djs-context-pad .entry {
+  display: none !important;
+}
+
+.djs-palette .separator {
+  display: none !important;
+}
+
+.djs-palette {
+  display: none !important;
+}
+
+.djs-bendpoint {
+  display: none !important;
+}
+
+.djs-bendpoint .djs-hit {
+  display: none !important;
+}
+
+.djs-direct-editing-content {
+  display: none !important;
+}
+
+.djs-direct-editing-parent {
+  display: none !important;
+}
+
 #app {
   min-height: 100vh;
 }
