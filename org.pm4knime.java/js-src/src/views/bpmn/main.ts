@@ -1,4 +1,6 @@
 import { JsonDataService } from "@knime/ui-extension-service";
+import "./bpmn.css";
+import { renderBpmnView } from "./renderBpmn";
 
 type BpmnInitialData = {
   kind: "bpmn";
@@ -6,25 +8,19 @@ type BpmnInitialData = {
   layouter: boolean;
 };
 
-declare global {
-  interface Window {
-    createBpmn?: (xml: string, layouter: boolean) => Promise<void>;
-  }
-}
-
 async function bootstrap() {
+  const app = document.getElementById("app");
   const service = await JsonDataService.getInstance();
   const data = (await service.initialData()) as BpmnInitialData | null;
 
-  if (!data?.xml || typeof window.createBpmn !== "function") {
-    const app = document.getElementById("app");
+  if (!data?.xml || !app) {
     if (app) {
       app.textContent = "BPMN viewer could not be initialized.";
     }
     return;
   }
 
-  await window.createBpmn(data.xml, Boolean(data.layouter));
+  await renderBpmnView(app, data.xml, Boolean(data.layouter));
 }
 
 bootstrap().catch((error) => {

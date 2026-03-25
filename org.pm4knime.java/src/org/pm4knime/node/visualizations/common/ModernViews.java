@@ -37,6 +37,6 @@ public final class ModernViews {
     }
 
     private static FromFilePage addBpmnResources(final FromFilePage page) {
-        return addAssets(page).addResourceDirectory("js-libs");
+        return addAssets(page);
     }
 }
