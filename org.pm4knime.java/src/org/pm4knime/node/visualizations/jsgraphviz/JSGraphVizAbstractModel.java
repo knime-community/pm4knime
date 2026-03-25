@@ -1,5 +1,8 @@
 package org.pm4knime.node.visualizations.jsgraphviz;
 
+import org.knime.core.node.port.image.ImagePortObject;
+import org.knime.core.node.port.image.ImagePortObjectSpec;
+import org.knime.base.data.xml.SvgCell;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsWO;
@@ -8,26 +11,30 @@ import org.knime.core.node.port.PortObjectHolder;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
-import org.knime.core.node.port.image.ImagePortObject;
-import org.knime.core.node.port.image.ImagePortObjectSpec;
-import org.knime.base.data.xml.SvgCell;
 import org.pm4knime.node.visualizations.jsgraphviz.util.WebUIJSViewNodeModel;
 import org.pm4knime.portobject.AbstractJSONPortObject;
 import org.pm4knime.util.defaultnode.EmptyNodeSettings;
 
 
-public class JSGraphVizAbstractModel extends WebUIJSViewNodeModel<EmptyNodeSettings, JSGraphVizViewRepresentation, JSGraphVizViewValue> implements PortObjectHolder {
-	
-	private static PortType[] OUT_TYPES = {ImagePortObject.TYPE};
-	private static PortType IN_TYPE;
-	AbstractJSONPortObject port_obj;
-	
+public class JSGraphVizAbstractModel extends
+    WebUIJSViewNodeModel<EmptyNodeSettings, JSGraphVizViewRepresentation, JSGraphVizViewValue>
+    implements PortObjectHolder {
 
-	public JSGraphVizAbstractModel(PortType[] in_types, String view_name, Class<EmptyNodeSettings> modelSettingsClass) {
-		// TODO Auto-generated constructor stub
-		super(in_types, OUT_TYPES, view_name, modelSettingsClass);
-		IN_TYPE = in_types[0];	
-	}
+    private static final PortType[] OUT_TYPES = {ImagePortObject.TYPE};
+
+    private AbstractJSONPortObject port_obj;
+
+    public JSGraphVizAbstractModel(final PortType[] in_types, final String view_name,
+        final Class<EmptyNodeSettings> modelSettingsClass) {
+        super(in_types, OUT_TYPES, view_name, modelSettingsClass);
+    }
+
+    public ImagePortObject createImageFromView(final AbstractJSONPortObject portObject, final ExecutionContext exec)
+        throws Exception {
+        port_obj = portObject;
+        final var outputs = super.execute(new PortObject[]{portObject}, exec);
+        return (ImagePortObject)outputs[0];
+    }
 
 
 	@Override
@@ -73,8 +80,6 @@ public class JSGraphVizAbstractModel extends WebUIJSViewNodeModel<EmptyNodeSetti
 
 	@Override
 	protected void performExecuteCreateView(PortObject[] inObjects, ExecutionContext exec) throws Exception {
-		final String dotstr;
-		
 		JSGraphVizViewRepresentation representation = getViewRepresentation();
 
 		synchronized (getLock()) {
