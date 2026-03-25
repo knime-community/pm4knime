@@ -13,7 +13,7 @@ public class HybridPetrinetReaderNodeFactory extends DefaultNodeFactory {
         super(
             DefaultNode.create()
                 .name("Hybrid Petri Net Reader")
-                .icon("icon/read.png")
+                .icon("../../read.png")
                 .shortDescription("Import a hybrid Petri net from a PNML file.")
                 .fullDescription(
                     "Import a hybrid Petri net from a PNML file. A hybrid Petri net is a directed graph used to model "

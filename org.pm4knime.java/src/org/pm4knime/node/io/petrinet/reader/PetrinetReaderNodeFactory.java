@@ -13,7 +13,7 @@ public class PetrinetReaderNodeFactory extends DefaultNodeFactory {
         super(
             DefaultNode.create()
                 .name("Petri Net Reader")
-                .icon("icon/read.png")
+                .icon("../../read.png")
                 .shortDescription("Import a Petri net from a PNML file.")
                 .fullDescription(
                     "This node imports a Petri net from a PNML file. A Petri net is a directed bipartite graph used "

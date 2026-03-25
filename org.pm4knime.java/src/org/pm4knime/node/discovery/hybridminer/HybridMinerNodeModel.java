@@ -45,7 +45,7 @@ public class HybridMinerNodeModel extends WebUIJSViewNodeModel<HybridMinerNodeSe
 
 	protected HybridMinerNodeModel(final Class<HybridMinerNodeSettings> modelSettingsClass) {
 		super(new PortType[] { CausalGraphPortObject.TYPE }, 
-        		new PortType[] { HybridPetriNetPortObject.TYPE }, "Hybrid Petri Net JS View", modelSettingsClass);
+        		new PortType[] { HybridPetriNetPortObject.TYPE }, "Hybrid Petri Net View", modelSettingsClass);
     }
 
     public static void configure(final DefaultModel.ConfigureInput i, final DefaultModel.ConfigureOutput o,

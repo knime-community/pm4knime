@@ -44,7 +44,7 @@ public class InductiveMinerDFGTableNodeModel extends WebUIJSViewNodeModel<Induct
 
 	protected InductiveMinerDFGTableNodeModel(Class<InductiveMinerDFGTableNodeSettings> class1) {
 
-		super(new PortType[] { DfgMsdPortObject.TYPE }, new PortType[] { ProcessTreePortObject.TYPE }, "Process Tree JS View", class1);
+		super(new PortType[] { DfgMsdPortObject.TYPE }, new PortType[] { ProcessTreePortObject.TYPE }, "Process Tree View", class1);
 	}
 
     public static void configure(final DefaultModel.ConfigureInput i, final DefaultModel.ConfigureOutput o,

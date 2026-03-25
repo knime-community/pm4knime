@@ -13,7 +13,7 @@ public class BpmnReaderNodeFactory extends DefaultNodeFactory {
         super(
             DefaultNode.create()
                 .name("BPMN Reader")
-                .icon("icon/read.png")
+                .icon("../../read.png")
                 .shortDescription("Import a BPMN model.")
                 .fullDescription(
                     "This node imports a BPMN model from a BPMN file. BPMN, or Business Process Model and Notation, "

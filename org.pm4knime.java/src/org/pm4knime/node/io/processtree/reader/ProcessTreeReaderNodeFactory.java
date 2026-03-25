@@ -13,7 +13,7 @@ public class ProcessTreeReaderNodeFactory extends DefaultNodeFactory {
         super(
             DefaultNode.create()
                 .name("Process Tree Reader")
-                .icon("icon/read.png")
+                .icon("../../read.png")
                 .shortDescription("Import a process tree from a PTML file.")
                 .fullDescription("Import a process tree from a PTML file.")
                 .sinceVersion(2, 0, 0)

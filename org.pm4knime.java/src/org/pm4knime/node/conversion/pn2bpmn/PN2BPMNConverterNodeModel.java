@@ -76,7 +76,7 @@ public class PN2BPMNConverterNodeModel extends
 
 	public PN2BPMNConverterNodeModel(Class<EmptyNodeSettings> modelSettingsClass) {
 		// TODO Auto-generated constructor stub
-		super(new PortType[] { PetriNetPortObject.TYPE }, new PortType[] { BpmnPortObject.TYPE }, "BPMN JS View");
+		super(new PortType[] { PetriNetPortObject.TYPE }, new PortType[] { BpmnPortObject.TYPE }, "BPMN View");
 		m_settingsClass = modelSettingsClass;
 	}
 

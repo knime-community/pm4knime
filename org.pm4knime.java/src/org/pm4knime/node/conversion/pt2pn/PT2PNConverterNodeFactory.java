@@ -13,7 +13,7 @@ public class PT2PNConverterNodeFactory extends DefaultNodeFactory {
         super(
             DefaultNode.create()
                 .name("Process Tree to Petri Net")
-                .icon("icon/category-conversion.png")
+                .icon("../category-conversion.png")
                 .shortDescription("Convert a process tree into a Petri net.")
                 .fullDescription(
                     "This node converts a process tree into a Petri net. \r\n"

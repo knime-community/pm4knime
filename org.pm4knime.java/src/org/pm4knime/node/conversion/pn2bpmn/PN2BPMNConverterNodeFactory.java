@@ -13,24 +13,15 @@ public class PN2BPMNConverterNodeFactory extends DefaultNodeFactory {
         super(
             DefaultNode.create()
                 .name("Petri Net to BPMN")
-                .icon("icon/category-conversion.png")
+                .icon("../category-conversion.png")
                 .shortDescription("Convert a Petri net into a BPMN.")
                 .fullDescription(
                     "This node converts a Petri net into a bpmn model. No configuration is needed to complete the "
                         + "conversion.<br />\r\n"
                         + "         <br /> \r\n"
                         + "   		<b>About PN2BPMN Converter:</b>\r\n"
-                        + "   			This KNIME node converts a Petri net representation to a BPMN (Business Process "
-                        + "Model and Notation) representation. The code implements the logic for the conversion "
-                        + "process, handling various aspects of the Petri net, such as places, transitions, arcs, "
-                        + "and markings. The conversion involves creating a BPMN diagram and mapping elements "
-                        + "between the Petri net and BPMN representations. This node also addresses specific cases, "
-                        + "such as handling transitions without incoming flows, removing dead places, and ensuring a "
-                        + "proper conversion. It utilizes the Process Mining (PM4Knime) and KNIME APIs for handling "
-                        + "Petri net and BPMN data structures. Additionally, the code of this node includes methods "
-                        + "for handling free-choice nets, simplifying BPMN diagrams, and managing initial and final "
-                        + "markings. The node model is integrated into the KNIME workflow environment, and it outputs "
-                        + "a BPMN representation as a result.\r\n"
+                        + "   			This node converts a Petri net representation to a BPMN (Business Process "
+                        + "Model and Notation) representation. \r\n"
                         + "   		<br />\r\n"
                         + "    	<br />  \r\n"
                         + "   		<b>Petri Net:</b><br /> A Petri net is a directed bipartite graph that visualizes "
@@ -54,8 +45,7 @@ public class PN2BPMNConverterNodeFactory extends DefaultNodeFactory {
                         + "		\r\n"
                         + "		    Gateways, visualized as diamond shapes, play a crucial role in controlling the "
                         + "flow of execution within a process. They facilitate decision-making, split the flow into "
-                        + "multiple paths, or merge paths into a single one. Various Gateway Types include EXCLUSIVE "
-                        + "(âœ•), PARALLEL (âœš), COMPLEX (â‹), INCLUSIVE (â—¯), and EVENTBASED (âŒ¾).\r\n"
+                        + "multiple paths, or merge paths into a single one. Various Gateway Types include EXCLUSIVE (✕), PARALLEL (✚), COMPLEX (❋), INCLUSIVE (◯), and EVENTBASED (⌾).\r\n"
                         + "		\r\n"
                         + "			Flows, crucial for sequencing activities, delineate the order and connections "
                         + "between activities. These elements collectively provide a comprehensive visualization of "

@@ -41,7 +41,7 @@ public class PT2PNConverterNodeModel extends AbstractSVGWizardNodeModel<JSGraphV
 	public PT2PNConverterNodeModel(Class<EmptyNodeSettings> modelSettingsClass) {
 		// TODO Auto-generated constructor stub
 		super(new PortType[] { ProcessTreePortObject.TYPE },
-				new PortType[] { PetriNetPortObject.TYPE }, "Petri Net JS View");
+				new PortType[] { PetriNetPortObject.TYPE }, "Petri Net View");
 		m_settingsClass = modelSettingsClass;
 	}
 
