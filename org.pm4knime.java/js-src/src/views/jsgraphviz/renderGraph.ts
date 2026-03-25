@@ -33,6 +33,9 @@ export type GraphPayload = {
 };
 
 const PADDING_INSIDE_PAPER = 10;
+const MIN_ZOOM_LEVEL = 0.2;
+const MAX_ZOOM_LEVEL = 3;
+const MAX_AUTO_FIT_ZOOM_LEVEL = 1;
 let initialGraphState: unknown;
 
 export function renderGraphView(root: HTMLElement, graph: GraphPayload) {
@@ -197,7 +200,7 @@ function createPaper(nodes: GraphNode[], edges: GraphEdge[]) {
   paper.freeze();
 
   const zoom = (nextZoomLevel: number) => {
-    zoomLevel = nextZoomLevel;
+    zoomLevel = Math.max(MIN_ZOOM_LEVEL, Math.min(MAX_ZOOM_LEVEL, nextZoomLevel));
     paper.scale(zoomLevel);
     paper.fitToContent({
       useModelGeometry: true,
@@ -381,6 +384,7 @@ function createPaper(nodes: GraphNode[], edges: GraphEdge[]) {
   paper.unfreeze();
   adjustPaperSize(graph, paper);
   initialGraphState = graph.toJSON();
+  fitGraphToViewport();
 
   addZoomListeners();
   return paper;
@@ -395,27 +399,13 @@ function createPaper(nodes: GraphNode[], edges: GraphEdge[]) {
     });
 
     document.getElementById("zoom-to-fit")?.addEventListener("click", () => {
-      const graphContainer = document.getElementById("graphContainer");
-
-      if (!graphContainer) {
-        return;
-      }
-
-      const containerWidth = graphContainer.getBoundingClientRect().width - 3 * PADDING_INSIDE_PAPER;
-      const containerHeight = graphContainer.getBoundingClientRect().height - 3 * PADDING_INSIDE_PAPER;
-      const paperWidth = paper.getContentBBox().width;
-      const paperHeight = paper.getContentBBox().height;
-
-      const scaleX = containerWidth / paperWidth;
-      const scaleY = containerHeight / paperHeight;
-
-      zoom(zoomLevel * Math.min(scaleX, scaleY));
+      fitGraphToViewport();
     });
 
     document.getElementById("reset-button")?.addEventListener("click", () => {
       graph.clear();
       graph.fromJSON(joint.util.cloneDeep(initialGraphState));
-      zoom(1);
+      fitGraphToViewport();
     });
 
     let wheelTimer: number | undefined;
@@ -423,9 +413,7 @@ function createPaper(nodes: GraphNode[], edges: GraphEdge[]) {
     paper.el.addEventListener("wheel", (event: WheelEvent) => {
       event.preventDefault();
       const delta = event.deltaY;
-      const nextZoomLevel = Math.max(0.2, Math.min(3, zoomLevel + (delta > 0 ? -0.2 : 0.2)));
-
-      zoom(nextZoomLevel);
+      zoom(zoomLevel + (delta > 0 ? -0.2 : 0.2));
 
       if (wheelTimer) {
         window.clearTimeout(wheelTimer);
@@ -455,6 +443,55 @@ function createPaper(nodes: GraphNode[], edges: GraphEdge[]) {
     });
 
   }
+
+  function fitGraphToViewport() {
+    const graphContainer = document.getElementById("graphContainer");
+
+    if (!graphContainer) {
+      return;
+    }
+
+    const containerWidth = graphContainer.getBoundingClientRect().width - 3 * PADDING_INSIDE_PAPER;
+    const containerHeight = graphContainer.getBoundingClientRect().height - 3 * PADDING_INSIDE_PAPER;
+    const bbox = graph.getBBox(graph.getElements());
+	const paperWidth = bbox.width;
+	const paperHeight = bbox.height;
+
+    if (paperWidth <= 0 || paperHeight <= 0) {
+      zoom(1);
+      return;
+    }
+
+    const scaleX = containerWidth / paperWidth;
+    const scaleY = containerHeight / paperHeight;
+    const nextZoomLevel = Math.min(scaleX, scaleY, MAX_AUTO_FIT_ZOOM_LEVEL);
+
+    zoom(nextZoomLevel);
+  }
+  
+  
+  
+  
+  const graphContainer = document.getElementById("graphContainer");
+
+      if (!graphContainer) {
+        return;
+      }
+
+      const containerWidth = graphContainer.getBoundingClientRect().width - 3 * PADDING_INSIDE_PAPER;
+      const containerHeight = graphContainer.getBoundingClientRect().height - 3 * PADDING_INSIDE_PAPER;
+      const paperWidth = paper.getContentBBox().width;
+      const paperHeight = paper.getContentBBox().height;
+
+      const scaleX = containerWidth / paperWidth;
+      const scaleY = containerHeight / paperHeight;
+
+      zoom(zoomLevel * Math.min(scaleX, scaleY));
+  
+  
+  
+  
+  
 
   function applyAutoLayout() {
     const layoutGraph = new dagre.graphlib.Graph();
