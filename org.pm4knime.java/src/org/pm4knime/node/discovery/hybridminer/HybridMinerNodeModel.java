@@ -10,6 +10,7 @@ import org.knime.core.node.port.PortObjectHolder;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
+import org.knime.node.DefaultModel;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewRepresentation;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
 import org.pm4knime.node.visualizations.jsgraphviz.util.WebUIJSViewNodeModel;
@@ -45,6 +46,38 @@ public class HybridMinerNodeModel extends WebUIJSViewNodeModel<HybridMinerNodeSe
 	protected HybridMinerNodeModel(final Class<HybridMinerNodeSettings> modelSettingsClass) {
 		super(new PortType[] { CausalGraphPortObject.TYPE }, 
         		new PortType[] { HybridPetriNetPortObject.TYPE }, "Hybrid Petri Net JS View", modelSettingsClass);
+    }
+
+    public static void configure(final DefaultModel.ConfigureInput i, final DefaultModel.ConfigureOutput o,
+        final HybridMinerNodeModel model) throws InvalidSettingsException {
+
+        model.m_settings = i.getParameters();
+
+        if (i.getInPortSpec(0) == null) {
+            o.setOutSpec(0, null);
+            return;
+        }
+
+        if (!(i.getInPortSpec(0) instanceof CausalGraphPortObjectSpec spec)) {
+            throw new InvalidSettingsException("Input is not a causal graph!");
+        }
+
+        o.setOutSpec(0, model.configureOutSpec(spec)[0]);
+    }
+
+    public static void execute(final DefaultModel.ExecuteInput i, final DefaultModel.ExecuteOutput o,
+        final HybridMinerNodeModel model) {
+
+        try {
+            model.m_settings = i.getParameters();
+            model.cgPO = (CausalGraphPortObject)i.getInPortObject(0);
+            model.hpnPO = model.mine(model.cgPO.getCG(), i.getExecutionContext());
+
+            o.setOutData(0, model.hpnPO);
+            o.setInternalData(model.hpnPO);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 	
 	@Override

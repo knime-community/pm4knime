@@ -10,6 +10,7 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.webui.node.dialog.defaultdialog.NodeParametersUtil;
+import org.knime.node.DefaultModel;
 import org.knime.node.parameters.NodeParameters;
 import org.knime.js.core.node.AbstractSVGWizardNodeModel;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewRepresentation;
@@ -43,6 +44,35 @@ public class PT2PNConverterNodeModel extends AbstractSVGWizardNodeModel<JSGraphV
 				new PortType[] { PetriNetPortObject.TYPE }, "Petri Net JS View");
 		m_settingsClass = modelSettingsClass;
 	}
+
+    public static void configure(final DefaultModel.ConfigureInput i, final DefaultModel.ConfigureOutput o)
+        throws InvalidSettingsException {
+
+        if (!(i.getInPortSpec(0) instanceof ProcessTreePortObjectSpec)) {
+            throw new InvalidSettingsException("Input is not a valid process tree!");
+        }
+
+        o.setOutSpec(0, new PetriNetPortObjectSpec());
+    }
+
+    public static void execute(final DefaultModel.ExecuteInput i, final DefaultModel.ExecuteOutput o) {
+        try {
+            final ProcessTreePortObject ptPO = (ProcessTreePortObject)i.getInPortObject(0);
+            final ProcessTree tree = ptPO.getTree();
+
+            final ProcessTree2Petrinet converter = new ProcessTree2Petrinet();
+            final ProcessTree2Petrinet.PetrinetWithMarkings pn = converter.convert(tree, false);
+
+            final AcceptingPetriNet anet = AcceptingPetriNetFactory.createAcceptingPetriNet(
+                pn.petrinet, pn.initialMarking, pn.finalMarking);
+
+            final PetriNetPortObject pnPO = new PetriNetPortObject(anet);
+            o.setOutData(0, pnPO);
+            o.setInternalData(pnPO);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
 	@Override
 	protected PortObject[] performExecuteCreatePortObjects(final PortObject svgImageFromView,

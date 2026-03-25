@@ -10,6 +10,7 @@ import org.knime.core.node.port.PortObjectHolder;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
+import org.knime.node.DefaultModel;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewRepresentation;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
 import org.pm4knime.node.visualizations.jsgraphviz.util.WebUIJSViewNodeModel;
@@ -45,6 +46,60 @@ public class InductiveMinerDFGTableNodeModel extends WebUIJSViewNodeModel<Induct
 
 		super(new PortType[] { DfgMsdPortObject.TYPE }, new PortType[] { ProcessTreePortObject.TYPE }, "Process Tree JS View", class1);
 	}
+
+    public static void configure(final DefaultModel.ConfigureInput i, final DefaultModel.ConfigureOutput o,
+        final InductiveMinerDFGTableNodeModel model) throws InvalidSettingsException {
+
+        model.m_settings = i.getParameters();
+
+        if (i.getInPortSpec(0) == null) {
+            o.setOutSpec(0, null);
+            return;
+        }
+
+        if (!(i.getInPortSpec(0) instanceof DfgMsdPortObjectSpec)) {
+            throw new InvalidSettingsException("Input is not a valid DFG model!");
+        }
+
+        o.setOutSpec(0, new ProcessTreePortObjectSpec());
+    }
+
+    public static void execute(final DefaultModel.ExecuteInput i, final DefaultModel.ExecuteOutput o,
+        final InductiveMinerDFGTableNodeModel model) {
+
+        try {
+            model.m_settings = i.getParameters();
+            model.dfgMsdPO = (DfgMsdPortObject)i.getInPortObject(0);
+
+            logger.info("Begin:  Inductive miner Miner");
+
+            final DfgMsd dfmMsd = model.dfgMsdPO.getDfgMsd();
+            final MiningParametersIMWithoutLog params = new MiningParametersIMWithoutLog();
+            params.setNoiseThreshold((float)model.m_settings.m_noiseThreshold);
+
+            final EfficientTree ptEff = InductiveMinerWithoutLogPlugin.mineTree(dfmMsd, params, new Canceller() {
+                @Override
+                public boolean isCancelled() {
+                    try {
+                        i.getExecutionContext().checkCanceled();
+                    } catch (final CanceledExecutionException ce) {
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+            final ProcessTree tree = EfficientTree2processTree.convert(ptEff);
+            model.ptpo = new ProcessTreePortObject(tree);
+
+            logger.info("End:  Inductive Miner");
+
+            o.setOutData(0, model.ptpo);
+            o.setInternalData(model.ptpo);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
 	
 	@Override
@@ -97,10 +152,8 @@ public class InductiveMinerDFGTableNodeModel extends WebUIJSViewNodeModel<Induct
 	protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs, InductiveMinerDFGTableNodeSettings modelSettings) throws InvalidSettingsException {
 
 		m_settings = modelSettings;
-		if (!inSpecs[0].getClass().equals(DfgMsdPortObjectSpec.class))
+		if (!(inSpecs[0] instanceof DfgMsdPortObjectSpec))
 			throw new InvalidSettingsException("Input is not a valid DFG model!");
-
-		DfgMsdPortObjectSpec dfgSpec = new DfgMsdPortObjectSpec();
 
 		return new PortObjectSpec[]{new ProcessTreePortObjectSpec()};
 	}

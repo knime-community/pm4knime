@@ -18,6 +18,7 @@ import org.knime.filehandling.core.connections.FSConnection;
 import org.knime.filehandling.core.connections.FSFileSystem;
 import org.knime.filehandling.core.connections.FSFiles;
 import org.knime.filehandling.core.defaultnodesettings.FileSystemHelper;
+import org.knime.node.DefaultModel;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewRepresentation;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
 import org.pm4knime.node.visualizations.jsgraphviz.util.WebUIJSViewNodeModel;
@@ -28,7 +29,7 @@ import org.pm4knime.portobject.XLogPortObject;
 public abstract class ReaderNodeModel extends WebUIJSViewNodeModel<ReaderNodeSettings, JSGraphVizViewRepresentation, JSGraphVizViewValue> implements PortObjectHolder {
 	
 	
-	private ReaderNodeSettings m_settings;
+	protected ReaderNodeSettings m_settings;
 	String[] extensions;
     
 	PortObjectSpec m_spec;
@@ -40,6 +41,39 @@ public abstract class ReaderNodeModel extends WebUIJSViewNodeModel<ReaderNodeSet
     	super(null, portTypes, view_name, class1);
     	m_spec = portObjectSpec; 
     	extensions = types;
+    }
+
+    public static <M extends ReaderNodeModel> void configure(final DefaultModel.ConfigureInput i,
+        final DefaultModel.ConfigureOutput o, final M model) throws InvalidSettingsException {
+
+        model.m_settings = i.getParameters();
+        model.validate();
+        o.setOutSpecs(model.configureOutSpec());
+    }
+
+    public static <M extends ReaderNodeModel> void execute(final DefaultModel.ExecuteInput i,
+        final DefaultModel.ExecuteOutput o, final M model) {
+
+        model.m_settings = i.getParameters();
+        final ExecutionContext exec = i.getExecutionContext();
+
+        try {
+            final var fsLocation = model.m_settings.m_file.getFSLocation();
+            final FSConnection connection = FileSystemHelper.retrieveFSConnection(Optional.empty(), fsLocation)
+                .orElseThrow(() -> new IOException("File system is not available"));
+            final FSFileSystem<?> fileSystem = connection.getFileSystem();
+            final Path filePath = fileSystem.getPath(fsLocation);
+
+            try (InputStream inputStream = FSFiles.newInputStream(filePath)) {
+                model.m_Port = model.write_file_from_stream(inputStream);
+            }
+
+            exec.checkCanceled();
+            o.setOutData(0, model.m_Port);
+            o.setInternalData(model.m_Port);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
 	@Override

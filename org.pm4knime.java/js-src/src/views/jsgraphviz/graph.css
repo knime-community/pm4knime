@@ -1,0 +1,75 @@
+body {
+  margin: 0;
+  background: #f3f6fb;
+  color: #0f172a;
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+.graph-shell {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+}
+
+.graph-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #ffffff 0%, #e8eef8 100%);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.graph-toolbar h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.graph-toolbar p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #475569;
+}
+
+.graph-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.graph-actions button {
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.graph-actions button:hover {
+  background: #e2e8f0;
+}
+
+.graph-stage {
+  padding: 18px;
+  overflow: auto;
+}
+
+.graph-card {
+  display: inline-block;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+  transform-origin: top left;
+}
+
+.graph-empty {
+  padding: 32px;
+  color: #475569;
+}

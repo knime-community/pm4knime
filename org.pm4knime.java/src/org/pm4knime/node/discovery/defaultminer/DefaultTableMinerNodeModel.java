@@ -16,6 +16,7 @@ import org.knime.core.node.port.PortObjectHolder;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
+import org.knime.node.DefaultModel;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewRepresentation;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
 import org.pm4knime.node.visualizations.jsgraphviz.util.WebUIJSViewNodeModel;
@@ -28,10 +29,52 @@ public abstract class DefaultTableMinerNodeModel<S extends DefaultTableMinerSett
 		super(inPortTypes, outPortTypes, view_name, modelSettingsClass);
 	}
 
-	
+
 	protected BufferedDataTable logPO;
 	protected AbstractJSONPortObject pmPO;
 	protected S m_settings;
+
+    public static <S extends DefaultTableMinerSettings, M extends DefaultTableMinerNodeModel<S>> void configure(
+        final DefaultModel.ConfigureInput i, final DefaultModel.ConfigureOutput o, final M model)
+        throws InvalidSettingsException {
+
+        model.m_settings = i.getParameters();
+
+        if (i.getInPortSpec(0) == null) {
+            o.setOutSpec(0, null);
+            return;
+        }
+
+        final DataTableSpec logSpec = i.getInTableSpec(0);
+        if (model.m_settings.e_classifier == null || model.m_settings.t_classifier == null
+            || model.m_settings.time_classifier == null) {
+            throw new InvalidSettingsException("Classifiers are not set! Please open the dialog and configure the node!");
+        }
+
+        o.setOutSpecs(model.configureOutSpec(logSpec));
+    }
+
+    public static <S extends DefaultTableMinerSettings, M extends DefaultTableMinerNodeModel<S>> void execute(
+        final DefaultModel.ExecuteInput i, final DefaultModel.ExecuteOutput o, final M model) {
+
+        try {
+            model.m_settings = i.getParameters();
+            model.logPO = i.getInTable(0);
+
+            final var sorter = new BufferedDataTableSorter(model.logPO,
+                toRowComparator(model.logPO.getDataTableSpec(),
+                    new String[]{model.m_settings.t_classifier, model.m_settings.time_classifier}));
+            sorter.setSortInMemory(false);
+            model.logPO = sorter.sort(i.getExecutionContext());
+
+            model.pmPO = model.mine(model.logPO, i.getExecutionContext());
+
+            o.setOutData(0, model.pmPO);
+            o.setInternalData(model.pmPO);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 	
 	
 	@Override

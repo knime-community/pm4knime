@@ -1,56 +1,34 @@
 package org.pm4knime.node.discovery.dfgminer.dfgTableMiner;
 
-import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-import org.knime.core.node.NodeFactory.NodeType;
-import org.knime.core.node.wizard.WizardNodeFactoryExtension;
-import org.knime.core.webui.node.impl.WebUINodeConfiguration;
-import org.knime.core.webui.node.impl.WebUINodeFactory;
+import org.knime.node.DefaultNode;
+import org.knime.node.DefaultNodeFactory;
+import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerNodeModel;
 import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerSettings;
-import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewRepresentation;
-import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
+import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.DfgMsdPortObject;
-import org.pm4knime.portobject.PetriNetPortObject;
 
+public class DfgMinerTableNodeFactory extends DefaultNodeFactory {
 
-
-public class DfgMinerTableNodeFactory extends WebUINodeFactory<DfgMinerTableNodeModel> implements WizardNodeFactoryExtension<DfgMinerTableNodeModel, JSGraphVizViewRepresentation, JSGraphVizViewValue> {
-	
-	DfgMinerTableNodeModel node;
-
-	public static final WebUINodeConfiguration CONFIG = WebUINodeConfiguration.builder()
-			.name("DFG Miner")
-			.icon("../../category-discovery.png")
-			.shortDescription("This node implements the first step of the Inductive Miner to discover a directly-follows graph from an event table.")
-			.fullDescription("  This node is used to discover a directly-follows graph (DFG) from an event table. \r\n"
-					+ "        A DFG consists of nodes representing activities and directed edges connecting nodes to model the directly-follows relations between activities. \r\n"
-					+ "        The green nodes represent the start activities, while the red ones are for the end activities.") 
-			.modelSettingsClass(DefaultTableMinerSettings.class)//
-			.addInputPort("Table", BufferedDataTable.TYPE ,"an event table")//
-			.addOutputPort("Directly-Follows Graph", DfgMsdPortObject.TYPE, "a directly-follows graph")//
-			.nodeType(NodeType.Learner)
-			.sinceVersion(2, 0, 0)
-			.build();
-
-
-	public DfgMinerTableNodeFactory() {
-		super(CONFIG);
-	}
-
-
-	protected DfgMinerTableNodeFactory(final WebUINodeConfiguration configuration) {
-		super(configuration);
-	}
-
-
-	@Override
-	public DfgMinerTableNodeModel createNodeModel() {
-		node = new DfgMinerTableNodeModel(DefaultTableMinerSettings.class);
-		return node;
-	}
-
-
+    public DfgMinerTableNodeFactory() {
+        super(
+            DefaultNode.create()
+                .name("DFG Miner")
+                .icon("../../category-discovery.png")
+                .shortDescription("This node implements the first step of the Inductive Miner to discover a directly-follows graph from an event table.")
+                .fullDescription("  This node is used to discover a directly-follows graph (DFG) from an event table. \r\n"
+                    + "        A DFG consists of nodes representing activities and directed edges connecting nodes to model the directly-follows relations between activities. \r\n"
+                    + "        The green nodes represent the start activities, while the red ones are for the end activities.")
+                .sinceVersion(2, 0, 0)
+                .ports(p -> p
+                    .addInputTable("Table", "an event table")
+                    .addOutputPort("Directly-Follows Graph", "a directly-follows graph", DfgMsdPortObject.TYPE))
+                .model(m -> m
+                    .parametersClass(DefaultTableMinerSettings.class)
+                    .configure((i, o) -> DefaultTableMinerNodeModel.configure(i, o,
+                        new DfgMinerTableNodeModel(DefaultTableMinerSettings.class)))
+                    .execute((i, o) -> DefaultTableMinerNodeModel.execute(i, o,
+                        new DfgMinerTableNodeModel(DefaultTableMinerSettings.class))))
+                .addView(v -> ModernViews.graph(v, DfgMinerTableNodeFactory.class, "DFG view"))
+                .nodeType(NodeType.Learner));
+    }
 }
-

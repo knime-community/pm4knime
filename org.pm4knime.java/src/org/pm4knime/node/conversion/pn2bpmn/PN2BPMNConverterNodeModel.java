@@ -16,6 +16,7 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.webui.node.dialog.defaultdialog.NodeParametersUtil;
+import org.knime.node.DefaultModel;
 import org.knime.js.core.node.AbstractSVGWizardNodeModel;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewRepresentation;
 import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
@@ -78,6 +79,33 @@ public class PN2BPMNConverterNodeModel extends
 		super(new PortType[] { PetriNetPortObject.TYPE }, new PortType[] { BpmnPortObject.TYPE }, "BPMN JS View");
 		m_settingsClass = modelSettingsClass;
 	}
+
+    public static void configure(final DefaultModel.ConfigureInput i, final DefaultModel.ConfigureOutput o)
+        throws InvalidSettingsException {
+
+        if (!(i.getInPortSpec(0) instanceof PetriNetPortObjectSpec)) {
+            throw new InvalidSettingsException("Input is not a valid Petri Net!");
+        }
+
+        o.setOutSpec(0, new BpmnPortObjectSpec());
+    }
+
+    public static void execute(final DefaultModel.ExecuteInput i, final DefaultModel.ExecuteOutput o) {
+        try {
+            final PetriNetPortObject pnPO = (PetriNetPortObject)i.getInPortObject(0);
+            final AcceptingPetriNet petrinet = pnPO.getANet();
+
+            final PN2BPMNConverterNodeModel model = new PN2BPMNConverterNodeModel(EmptyNodeSettings.class);
+            final BPMNDiagram bpmnDiagram = model.convert(petrinet);
+            final String modelXml = BPMNExporter.convertToXML(bpmnDiagram);
+            final BpmnPortObject bpmnPO = new BpmnPortObject(modelXml);
+
+            o.setOutData(0, bpmnPO);
+            o.setInternalData(bpmnPO);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
 	@Override
 	protected PortObject[] performExecuteCreatePortObjects(final PortObject svgImageFromView,
