@@ -3,6 +3,7 @@
 #### Prerequisites
 - Java 11 or higher
 - Eclipse for RCP and RAP developers
+- Node.js + npm (required for building JS views)
 
 #### Setup Instructions
 
@@ -35,6 +36,12 @@
 [8] **Run the Project**:
    - In `org.knime.sdk.setup`, right-click `KNIME Analytics Platform.launch`.
    - Select `Run As`.
+
+### Developing JS Views
+
+- Sources live under `org.pm4knime.java/js-src/src/views/<view-name>/`.
+- Build only the frontend via the `build-frontend` target in `org.pm4knime.java/build.xml`.
+- Build output is written to `org.pm4knime.java/js-src/dist`.
 
 ### Activating Python Nodes in Development Mode (Eclipse)
 

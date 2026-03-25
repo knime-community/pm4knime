@@ -1,4 +1,4 @@
-var varExplorer = (function () {
+export const varExplorer = (function () {
 
     let _representation;
     let _value;
@@ -13,6 +13,10 @@ var varExplorer = (function () {
 	let _sortDirection = "desc";
 
     const BATCH_SIZE = 5;
+    const ARROW_DOWN = "\u2193";
+    const ARROW_UP = "\u2191";
+    const ARROW_BOTH = "\u2194";
+    const ELLIPSIS = "\u2026";
 
     // Track expanded state per visible row index
     const _expandedRows = new Map(); // key: variant index (0-based), value: boolean
@@ -35,7 +39,7 @@ var varExplorer = (function () {
 
         _renderIndex = 0;
 
-        // Build activity→color map ONCE
+        // Build activity color map ONCE
         _activityColorMap = createActivityColorMap(representation.variants.activities || []);
 
         // Build UI skeleton
@@ -138,10 +142,10 @@ var varExplorer = (function () {
 		sortSelect.title = "Sort variants";
 		
 		sortSelect.innerHTML = `
-		  <option value="frequency-desc">frequency ↓</option>
-		  <option value="frequency-asc">frequency ↑</option>
-		  <option value="length-desc">length ↓</option>
-		  <option value="length-asc">length ↑</option>
+		  <option value="frequency-desc">frequency ${ARROW_DOWN}</option>
+		  <option value="frequency-asc">frequency ${ARROW_UP}</option>
+		  <option value="length-desc">length ${ARROW_DOWN}</option>
+		  <option value="length-asc">length ${ARROW_UP}</option>
 		`;
 		
 		sortSelect.onchange = function () {
@@ -151,7 +155,7 @@ var varExplorer = (function () {
 		// ---- Expand All Toggle (Toolbar) ----
 		let expandBtn = document.createElement("button");
 		expandBtn.id = "expandall-btn";
-		expandBtn.innerHTML = "↔";
+		expandBtn.textContent = ARROW_BOTH;
 
 		expandBtn.style.cssText = `
 		  width:26px;
@@ -202,7 +206,7 @@ var varExplorer = (function () {
 		    flex-direction: column;
 		    gap: 12px;
 		
-		    /* ✅ Single horizontal scrollbar for all variants */
+		    /* Single horizontal scrollbar for all variants */
 		    overflow-x: auto;
 		    overflow-y: visible;
 		
@@ -409,7 +413,7 @@ var varExplorer = (function () {
     function buildVariantSVG(trace, activityColorMap, expanded) {
 
         function shorten(text, maxLen = 12) {
-            return text.length > maxLen ? text.substring(0, maxLen) + "…" : text;
+            return text.length > maxLen ? text.substring(0, maxLen) + ELLIPSIS : text;
         }
 
         function computeBlockWidth(label) {
@@ -793,7 +797,7 @@ var varExplorer = (function () {
 	
 	      btn.innerText =
 	        (field === "frequency" ? "Frequency" : "Trace length") +
-	        (_sortDirection === "desc" ? " ↓" : " ↑");
+	        (_sortDirection === "desc" ? ` ${ARROW_DOWN}` : ` ${ARROW_UP}`);
 	    } else {
 	      btn.innerText =
 	        field === "frequency" ? "Frequency" : "Trace length";
@@ -842,3 +846,4 @@ var varExplorer = (function () {
     return view;
 
 })();
+
