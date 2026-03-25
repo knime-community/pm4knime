@@ -2,12 +2,10 @@ package org.pm4knime.node.visualizations.jsgraphviz;
 
 import org.knime.base.data.xml.SvgCell;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.PortTypeRegistry;
 import org.knime.core.node.port.image.ImagePortObjectSpec;
 import org.knime.node.DefaultModel;
 import org.pm4knime.portobject.AbstractJSONPortObject;
-import org.pm4knime.util.defaultnode.EmptyNodeSettings;
 
 public final class GraphVisualizerModel {
 
@@ -24,9 +22,7 @@ public final class GraphVisualizerModel {
         try {
             final var portObject = (AbstractJSONPortObject)i.getInPortObject(0);
             final var inputType = PortTypeRegistry.getInstance().getPortType(portObject.getClass());
-            final var imageModel =
-                new JSGraphVizAbstractModel(new PortType[]{inputType}, "Graph JS View", EmptyNodeSettings.class);
-            final var imagePort = imageModel.createImageFromView(portObject, i.getExecutionContext());
+            final var imagePort = JSGraphVizImageNodeModel.render(portObject, inputType, i.getExecutionContext());
             o.setOutData(0, imagePort);
             o.setInternalData(portObject);
         } catch (Exception ex) {
