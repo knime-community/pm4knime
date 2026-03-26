@@ -13,7 +13,7 @@ public final class HybridPetriNetPortViewFactories extends AbstractGraphPortView
 
     
     private static Class<?> portClass = HybridPetriNetPortObject.class;
-	private static String portName = "Hybrid Petri net";
+	private static String portName = "Hybrid Petri Net View";
 
 
     public static void register() {

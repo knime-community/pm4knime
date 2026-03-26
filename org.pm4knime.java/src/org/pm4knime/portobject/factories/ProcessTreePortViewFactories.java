@@ -12,7 +12,7 @@ public final class ProcessTreePortViewFactories extends AbstractGraphPortViewFac
         obj -> INSTANCE.createPortObjectView(obj);
     
     private static Class<?> portClass = ProcessTreePortObject.class;
-	private static String portName = "Process tree";
+	private static String portName = "Process Tree View";
 
 	
     public static void register() {

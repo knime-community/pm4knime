@@ -13,7 +13,7 @@ public final class DFGPortViewFactories extends AbstractGraphPortViewFactories<D
 
     
     private static Class<?> portClass = DfgMsdPortObject.class;
-	private static String portName = "Directly-Follows Graph (DFG)";
+	private static String portName = "DFG View";
 
 
     public static void register() {

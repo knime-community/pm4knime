@@ -13,7 +13,7 @@ public final class CausalGraphPortViewFactories extends AbstractGraphPortViewFac
 
     
     private static Class<?> portClass = CausalGraphPortObject.class;
-	private static String portName = "Causal graph";
+	private static String portName = "Causal Graph View";
 
 
     public static void register() {

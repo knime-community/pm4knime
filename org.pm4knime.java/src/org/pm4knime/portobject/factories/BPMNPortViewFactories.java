@@ -13,7 +13,7 @@ public final class BPMNPortViewFactories extends AbstractGraphPortViewFactories<
         obj -> INSTANCE.createPortObjectView(obj);
 
 	private static Class<?> portClass = BpmnPortObject.class;
-	private static String portName = "BPMN";
+	private static String portName = "BPMN View";
 
 
     public static void register() {

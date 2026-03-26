@@ -13,7 +13,7 @@ public final class PetriNetPortViewFactories extends AbstractGraphPortViewFactor
 
     
     private static Class<?> portClass = PetriNetPortObject.class;
-	private static String portName = "Petri net";
+	private static String portName = "Petri Net View";
 
 
     public static void register() {
