@@ -1,12 +1,7 @@
 package org.pm4knime.portobject.factories;
 
-import java.util.List;
-
-import org.knime.core.webui.node.port.PortSpecViewFactory;
 import org.knime.core.webui.node.port.PortViewFactory;
-import org.knime.core.webui.node.port.PortViewManager;
 import org.pm4knime.portobject.HybridPetriNetPortObject;
-import org.pm4knime.portobject.HybridPetriNetPortObjectSpec;
 
 @SuppressWarnings("restriction")
 public final class HybridPetriNetPortViewFactories extends AbstractGraphPortViewFactories<HybridPetriNetPortObject> {
@@ -16,20 +11,14 @@ public final class HybridPetriNetPortViewFactories extends AbstractGraphPortView
     static final PortViewFactory<HybridPetriNetPortObject> PORT_VIEW_FACTORY =
         obj -> INSTANCE.createPortObjectView(obj);
 
-    static final PortSpecViewFactory<HybridPetriNetPortObjectSpec> PORT_SPEC_VIEW_FACTORY =
-        spec -> INSTANCE.createDefaultSpecView("Hybrid Petri net port");
+    
+    private static Class<?> portClass = HybridPetriNetPortObject.class;
+	private static String portName = "Hybrid Petri net";
+
 
     public static void register() {
-        final var portName = "Hybrid Petri net";
-        PortViewManager.registerPortViews(
-        		HybridPetriNetPortObject.class,
-            List.of(
-                new PortViewManager.PortViewDescriptor(portName, PORT_SPEC_VIEW_FACTORY),
-                new PortViewManager.PortViewDescriptor(portName, PORT_VIEW_FACTORY)
-            ),
-            List.of(0),
-            List.of(1)
-        );
+
+        register(portClass, portName, PORT_VIEW_FACTORY);
     }
 
     @Override

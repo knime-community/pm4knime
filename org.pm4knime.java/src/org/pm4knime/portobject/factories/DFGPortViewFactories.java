@@ -1,12 +1,7 @@
 package org.pm4knime.portobject.factories;
 
-import java.util.List;
-
-import org.knime.core.webui.node.port.PortSpecViewFactory;
 import org.knime.core.webui.node.port.PortViewFactory;
-import org.knime.core.webui.node.port.PortViewManager;
 import org.pm4knime.portobject.DfgMsdPortObject;
-import org.pm4knime.portobject.DfgMsdPortObjectSpec;
 
 @SuppressWarnings("restriction")
 public final class DFGPortViewFactories extends AbstractGraphPortViewFactories<DfgMsdPortObject> {
@@ -16,20 +11,14 @@ public final class DFGPortViewFactories extends AbstractGraphPortViewFactories<D
     static final PortViewFactory<DfgMsdPortObject> PORT_VIEW_FACTORY =
         obj -> INSTANCE.createPortObjectView(obj);
 
-    static final PortSpecViewFactory<DfgMsdPortObjectSpec> PORT_SPEC_VIEW_FACTORY =
-        spec -> INSTANCE.createDefaultSpecView("Directly-Follows Graph (DFG) port");
+    
+    private static Class<?> portClass = DfgMsdPortObject.class;
+	private static String portName = "Directly-Follows Graph (DFG)";
+
 
     public static void register() {
-        final var portName = "Directly-Follows Graph (DFG)";
-        PortViewManager.registerPortViews(
-        	DfgMsdPortObject.class,
-            List.of(
-                new PortViewManager.PortViewDescriptor(portName, PORT_SPEC_VIEW_FACTORY),
-                new PortViewManager.PortViewDescriptor(portName, PORT_VIEW_FACTORY)
-            ),
-            List.of(0),
-            List.of(1)
-        );
+
+        register(portClass, portName, PORT_VIEW_FACTORY);
     }
 
     @Override

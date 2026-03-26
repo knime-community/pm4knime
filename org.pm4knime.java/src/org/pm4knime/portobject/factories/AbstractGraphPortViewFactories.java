@@ -1,12 +1,15 @@
 package org.pm4knime.portobject.factories;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.knime.core.webui.data.InitialDataService;
 import org.knime.core.webui.data.RpcDataService;
 import org.knime.core.webui.node.port.PortView;
+import org.knime.core.webui.node.port.PortViewFactory;
+import org.knime.core.webui.node.port.PortViewManager;
 import org.knime.core.webui.page.Page;
 import org.pm4knime.portobject.AbstractJSONPortObject;
 
@@ -44,28 +47,18 @@ public abstract class AbstractGraphPortViewFactories<T extends AbstractJSONPortO
             }
         };
     }
-
-    protected PortView createDefaultSpecView(final String title) {
-        return new PortView() {
-
-            @Override
-            public Page getPage() {
-                return Page.create()
-                    .fromString(() -> "<html><body><h3>" + title + "</h3><p>" + "No preview available on spec level." + "</p></body></html>")
-                    .relativePath("index.html");
-            }
-
-            @Override
-            public Optional<InitialDataService<Object>> createInitialDataService() {
-                return Optional.empty();
-            }
-
-            @Override
-            public Optional<RpcDataService> createRpcDataService() {
-                return Optional.empty();
-            }
-        };
-    }
+    
+    protected static void register(Class<?> portClass, String portName, PortViewFactory<?> view_factory) {
+    	
+    	PortViewManager.registerPortViews(
+    			portClass,
+                List.of(
+                    new PortViewManager.PortViewDescriptor(portName, view_factory)
+                ),
+                List.of(0),
+                List.of(0)
+            );
+	}
 
     protected Map<String, Object> getGraphData(final T obj) {
         @SuppressWarnings("unchecked")
