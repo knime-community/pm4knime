@@ -1,7 +1,8 @@
-package org.pm4knime.node.io.petrinet.reader;
+package org.pm4knime.util;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
+import org.pm4knime.portobject.factories.PetriNetPortViewFactories;
 
 /**
  * This is the eclipse bundle activator.
@@ -12,14 +13,14 @@ import org.osgi.framework.BundleContext;
  *
  * @author 
  */
-public class PetrinetReaderNodePlugin extends Plugin {
+public class PM4KNIMEPlugin extends Plugin {
     // The shared instance.
-    private static PetrinetReaderNodePlugin plugin;
+    private static PM4KNIMEPlugin plugin;
 
     /**
      * The constructor.
      */
-    public PetrinetReaderNodePlugin() {
+    public PM4KNIMEPlugin() {
         super();
         plugin = this;
     }
@@ -33,6 +34,7 @@ public class PetrinetReaderNodePlugin extends Plugin {
     @Override
     public void start(final BundleContext context) throws Exception {
         super.start(context);
+        PetriNetPortViewFactories.register();
 
     }
 
@@ -53,7 +55,7 @@ public class PetrinetReaderNodePlugin extends Plugin {
      * 
      * @return Singleton instance of the Plugin
      */
-    public static PetrinetReaderNodePlugin getDefault() {
+    public static PM4KNIMEPlugin getDefault() {
         return plugin;
     }
 

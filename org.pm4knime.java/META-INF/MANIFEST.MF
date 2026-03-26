@@ -20,8 +20,7 @@ Require-Bundle: org.eclipse.ui;bundle-version="[3.201.0,4.0.0)",org.ec
  bundle-version="[5.0.0,6.0.0)",org.knime.core.ui;bundle-version="[5.0
  .0,6.0.0)",org.knime.python3.types;bundle-version="[5.6.0,6.0.0)"
 Export-Package: src
-Bundle-Activator: org.pm4knime.node.io.petrinet.reader.PetrinetReaderN
- odePlugin
+Bundle-Activator: org.pm4knime.util.PM4KNIMEPlugin
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: org.pm4knime.java.jar,lib/AcceptingPetriNet-latest.j
  ar,lib/ActivityClusterArray-latest.jar,lib/ActivityClusterArrayCreato
