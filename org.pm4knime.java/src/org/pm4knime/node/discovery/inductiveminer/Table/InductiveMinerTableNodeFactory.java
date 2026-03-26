@@ -3,7 +3,6 @@ package org.pm4knime.node.discovery.inductiveminer.Table;
 import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
 import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerNodeModel;
-import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.ProcessTreePortObject;
 
 public class InductiveMinerTableNodeFactory extends DefaultNodeFactory {
@@ -28,7 +27,7 @@ public class InductiveMinerTableNodeFactory extends DefaultNodeFactory {
                         new InductiveMinerTableNodeModel(InductiveMinerTableNodeSettings.class)))
                     .execute((i, o) -> DefaultTableMinerNodeModel.execute(i, o,
                         new InductiveMinerTableNodeModel(InductiveMinerTableNodeSettings.class))))
-                .addView(v -> ModernViews.graph(v, InductiveMinerTableNodeFactory.class, "Process tree view"))
+//                .addView(v -> ModernViews.graph(v, InductiveMinerTableNodeFactory.class, "Process tree view"))
                 .nodeType(NodeType.Learner));
     }
 }

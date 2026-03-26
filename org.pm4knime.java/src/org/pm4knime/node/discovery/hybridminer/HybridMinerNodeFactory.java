@@ -2,7 +2,6 @@ package org.pm4knime.node.discovery.hybridminer;
 
 import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
-import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.CausalGraphPortObject;
 import org.pm4knime.portobject.HybridPetriNetPortObject;
 
@@ -29,7 +28,7 @@ public final class HybridMinerNodeFactory extends DefaultNodeFactory {
                         new HybridMinerNodeModel(HybridMinerNodeSettings.class)))
                     .execute((i, o) -> HybridMinerNodeModel.execute(i, o,
                         new HybridMinerNodeModel(HybridMinerNodeSettings.class))))
-                .addView(v -> ModernViews.graph(v, HybridMinerNodeFactory.class, "Hybrid Petri net view"))
+//                .addView(v -> ModernViews.graph(v, HybridMinerNodeFactory.class, "Hybrid Petri net view"))
                 .nodeType(NodeType.Learner));
     }
 }

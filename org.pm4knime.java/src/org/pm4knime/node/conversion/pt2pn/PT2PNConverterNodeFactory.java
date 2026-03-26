@@ -2,7 +2,6 @@ package org.pm4knime.node.conversion.pt2pn;
 
 import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
-import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.PetriNetPortObject;
 import org.pm4knime.portobject.ProcessTreePortObject;
 import org.pm4knime.util.defaultnode.EmptyNodeSettings;
@@ -31,7 +30,7 @@ public class PT2PNConverterNodeFactory extends DefaultNodeFactory {
                     .parametersClass(EmptyNodeSettings.class)
                     .configure(PT2PNConverterNodeModel::configure)
                     .execute(PT2PNConverterNodeModel::execute))
-                .addView(v -> ModernViews.graph(v, PT2PNConverterNodeFactory.class, "Petri net view"))
+//                .addView(v -> ModernViews.graph(v, PT2PNConverterNodeFactory.class, "Petri net view"))
                 .nodeType(NodeType.Manipulator));
     }
 }

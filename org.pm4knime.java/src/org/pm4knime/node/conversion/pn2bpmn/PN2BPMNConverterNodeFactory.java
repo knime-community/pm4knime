@@ -2,7 +2,6 @@ package org.pm4knime.node.conversion.pn2bpmn;
 
 import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
-import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.BpmnPortObject;
 import org.pm4knime.portobject.PetriNetPortObject;
 import org.pm4knime.util.defaultnode.EmptyNodeSettings;
@@ -58,7 +57,7 @@ public class PN2BPMNConverterNodeFactory extends DefaultNodeFactory {
                     .parametersClass(EmptyNodeSettings.class)
                     .configure(PN2BPMNConverterNodeModel::configure)
                     .execute(PN2BPMNConverterNodeModel::execute))
-                .addView(v -> ModernViews.bpmn(v, PN2BPMNConverterNodeFactory.class, "BPMN view"))
+//                .addView(v -> ModernViews.bpmn(v, PN2BPMNConverterNodeFactory.class, "BPMN view"))
                 .nodeType(NodeType.Manipulator));
     }
 }

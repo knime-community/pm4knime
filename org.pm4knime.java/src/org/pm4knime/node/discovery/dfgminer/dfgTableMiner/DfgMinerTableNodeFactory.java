@@ -4,7 +4,6 @@ import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
 import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerNodeModel;
 import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerSettings;
-import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.DfgMsdPortObject;
 
 public class DfgMinerTableNodeFactory extends DefaultNodeFactory {
@@ -28,7 +27,7 @@ public class DfgMinerTableNodeFactory extends DefaultNodeFactory {
                         new DfgMinerTableNodeModel(DefaultTableMinerSettings.class)))
                     .execute((i, o) -> DefaultTableMinerNodeModel.execute(i, o,
                         new DfgMinerTableNodeModel(DefaultTableMinerSettings.class))))
-                .addView(v -> ModernViews.graph(v, DfgMinerTableNodeFactory.class, "DFG view"))
+//                .addView(v -> ModernViews.graph(v, DfgMinerTableNodeFactory.class, "DFG view"))
                 .nodeType(NodeType.Learner));
     }
 }

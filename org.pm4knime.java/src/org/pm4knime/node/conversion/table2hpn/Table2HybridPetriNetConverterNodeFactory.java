@@ -2,7 +2,6 @@ package org.pm4knime.node.conversion.table2hpn;
 
 import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
-import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.HybridPetriNetPortObject;
 import org.pm4knime.util.defaultnode.EmptyNodeSettings;
 
@@ -24,8 +23,7 @@ public class Table2HybridPetriNetConverterNodeFactory extends DefaultNodeFactory
                     .parametersClass(EmptyNodeSettings.class)
                     .configure(Table2HybridPetriNetConverterNodeModel::configure)
                     .execute(Table2HybridPetriNetConverterNodeModel::execute))
-                .addView(v -> ModernViews.graph(v, Table2HybridPetriNetConverterNodeFactory.class,
-                    "Hybrid Petri net view"))
+//                .addView(v -> ModernViews.graph(v, Table2HybridPetriNetConverterNodeFactory.class, "Hybrid Petri net view"))
                 .nodeType(NodeType.Manipulator));
     }
 }

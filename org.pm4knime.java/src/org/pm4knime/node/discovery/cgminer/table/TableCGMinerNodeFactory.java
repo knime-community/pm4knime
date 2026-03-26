@@ -3,7 +3,6 @@ package org.pm4knime.node.discovery.cgminer.table;
 import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
 import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerNodeModel;
-import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.CausalGraphPortObject;
 
 public class TableCGMinerNodeFactory extends DefaultNodeFactory {
@@ -28,7 +27,7 @@ public class TableCGMinerNodeFactory extends DefaultNodeFactory {
                         new TableCGMinerNodeModel(TableCGMinerNodeSettings.class)))
                     .execute((i, o) -> DefaultTableMinerNodeModel.execute(i, o,
                         new TableCGMinerNodeModel(TableCGMinerNodeSettings.class))))
-                .addView(v -> ModernViews.graph(v, TableCGMinerNodeFactory.class, "Causal graph view"))
+//                .addView(v -> ModernViews.graph(v, TableCGMinerNodeFactory.class, "Causal graph view"))
                 .nodeType(NodeType.Learner));
     }
 }

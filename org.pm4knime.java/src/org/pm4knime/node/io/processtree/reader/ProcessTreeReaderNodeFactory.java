@@ -2,7 +2,6 @@ package org.pm4knime.node.io.processtree.reader;
 
 import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
-import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.ProcessTreePortObject;
 import org.pm4knime.util.defaultnode.ReaderNodeModel;
 import org.pm4knime.util.defaultnode.ReaderNodeSettings;
@@ -24,7 +23,7 @@ public class ProcessTreeReaderNodeFactory extends DefaultNodeFactory {
                         new ProcessTreeReaderNodeModel(ReaderNodeSettings.class)))
                     .execute((i, o) -> ReaderNodeModel.execute(i, o,
                         new ProcessTreeReaderNodeModel(ReaderNodeSettings.class))))
-                .addView(v -> ModernViews.graph(v, ProcessTreeReaderNodeFactory.class, "Process tree view"))
+//                .addView(v -> ModernViews.graph(v, ProcessTreeReaderNodeFactory.class, "Process tree view"))
                 .nodeType(NodeType.Source));
     }
 }

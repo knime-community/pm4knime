@@ -3,7 +3,6 @@ package org.pm4knime.node.discovery.ilpminer.Table;
 import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
 import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerNodeModel;
-import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.PetriNetPortObject;
 
 public class ILPMinerTableNodeFactory extends DefaultNodeFactory {
@@ -26,7 +25,7 @@ public class ILPMinerTableNodeFactory extends DefaultNodeFactory {
                         new ILPMinerTableNodeModel(ILPMinerTableNodeSettings.class)))
                     .execute((i, o) -> DefaultTableMinerNodeModel.execute(i, o,
                         new ILPMinerTableNodeModel(ILPMinerTableNodeSettings.class))))
-                .addView(v -> ModernViews.graph(v, ILPMinerTableNodeFactory.class, "Petri net view"))
+//                .addView(v -> ModernViews.graph(v, ILPMinerTableNodeFactory.class, "Petri net view"))
                 .nodeType(NodeType.Learner));
     }
 }

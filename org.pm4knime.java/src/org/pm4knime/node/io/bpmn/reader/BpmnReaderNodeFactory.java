@@ -2,7 +2,6 @@ package org.pm4knime.node.io.bpmn.reader;
 
 import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
-import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.BpmnPortObject;
 import org.pm4knime.util.defaultnode.ReaderNodeModel;
 import org.pm4knime.util.defaultnode.ReaderNodeSettings;
@@ -26,7 +25,7 @@ public class BpmnReaderNodeFactory extends DefaultNodeFactory {
                         new BpmnReaderNodeModel(ReaderNodeSettings.class)))
                     .execute((i, o) -> ReaderNodeModel.execute(i, o,
                         new BpmnReaderNodeModel(ReaderNodeSettings.class))))
-                .addView(v -> ModernViews.bpmn(v, BpmnReaderNodeFactory.class, "BPMN view"))
+//                .addView(v -> ModernViews.bpmn(v, BpmnReaderNodeFactory.class, "BPMN view"))
                 .nodeType(NodeType.Source));
     }
 }

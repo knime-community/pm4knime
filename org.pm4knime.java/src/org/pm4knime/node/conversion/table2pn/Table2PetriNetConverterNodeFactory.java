@@ -2,7 +2,6 @@ package org.pm4knime.node.conversion.table2pn;
 
 import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
-import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.PetriNetPortObject;
 import org.pm4knime.util.defaultnode.EmptyNodeSettings;
 
@@ -24,7 +23,7 @@ public class Table2PetriNetConverterNodeFactory extends DefaultNodeFactory {
                     .parametersClass(EmptyNodeSettings.class)
                     .configure(Table2PetriNetConverterNodeModel::configure)
                     .execute(Table2PetriNetConverterNodeModel::execute))
-                .addView(v -> ModernViews.graph(v, Table2PetriNetConverterNodeFactory.class, "Petri net view"))
+//                .addView(v -> ModernViews.graph(v, Table2PetriNetConverterNodeFactory.class, "Petri net view"))
                 .nodeType(NodeType.Manipulator));
     }
 }

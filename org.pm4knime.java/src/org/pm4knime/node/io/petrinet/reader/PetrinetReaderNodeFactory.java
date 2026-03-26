@@ -2,7 +2,6 @@ package org.pm4knime.node.io.petrinet.reader;
 
 import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
-import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.PetriNetPortObject;
 import org.pm4knime.util.defaultnode.ReaderNodeModel;
 import org.pm4knime.util.defaultnode.ReaderNodeSettings;
@@ -32,7 +31,7 @@ public class PetrinetReaderNodeFactory extends DefaultNodeFactory {
                         new PetrinetReaderNodeModel(ReaderNodeSettings.class)))
                     .execute((i, o) -> ReaderNodeModel.execute(i, o,
                         new PetrinetReaderNodeModel(ReaderNodeSettings.class))))
-                .addView(v -> ModernViews.graph(v, PetrinetReaderNodeFactory.class, "Petri net view"))
+//                .addView(v -> ModernViews.graph(v, PetrinetReaderNodeFactory.class, "Petri net view"))
                 .nodeType(NodeType.Source));
     }
 }

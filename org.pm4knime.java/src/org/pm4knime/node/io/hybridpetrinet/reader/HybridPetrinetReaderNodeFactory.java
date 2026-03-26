@@ -2,7 +2,6 @@ package org.pm4knime.node.io.hybridpetrinet.reader;
 
 import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
-import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.HybridPetriNetPortObject;
 import org.pm4knime.util.defaultnode.ReaderNodeModel;
 import org.pm4knime.util.defaultnode.ReaderNodeSettings;
@@ -37,7 +36,7 @@ public class HybridPetrinetReaderNodeFactory extends DefaultNodeFactory {
                         new HybridPetrinetReaderNodeModel(ReaderNodeSettings.class)))
                     .execute((i, o) -> ReaderNodeModel.execute(i, o,
                         new HybridPetrinetReaderNodeModel(ReaderNodeSettings.class))))
-                .addView(v -> ModernViews.graph(v, HybridPetrinetReaderNodeFactory.class, "Hybrid Petri net view"))
+//                .addView(v -> ModernViews.graph(v, HybridPetrinetReaderNodeFactory.class, "Hybrid Petri net view"))
                 .nodeType(NodeType.Source));
     }
 }

@@ -2,7 +2,6 @@ package org.pm4knime.node.discovery.dfgminer.knimeTable;
 
 import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
-import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.DfgMsdPortObject;
 import org.pm4knime.portobject.ProcessTreePortObject;
 
@@ -28,7 +27,7 @@ public final class InductiveMinerDFGTableNodeFactory extends DefaultNodeFactory 
                         new InductiveMinerDFGTableNodeModel(InductiveMinerDFGTableNodeSettings.class)))
                     .execute((i, o) -> InductiveMinerDFGTableNodeModel.execute(i, o,
                         new InductiveMinerDFGTableNodeModel(InductiveMinerDFGTableNodeSettings.class))))
-                .addView(v -> ModernViews.graph(v, InductiveMinerDFGTableNodeFactory.class, "Process tree view"))
+//                .addView(v -> ModernViews.graph(v, InductiveMinerDFGTableNodeFactory.class, "Process tree view"))
                 .nodeType(NodeType.Learner));
     }
 }

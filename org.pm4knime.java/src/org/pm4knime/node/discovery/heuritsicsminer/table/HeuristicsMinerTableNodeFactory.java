@@ -3,7 +3,6 @@ package org.pm4knime.node.discovery.heuritsicsminer.table;
 import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
 import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerNodeModel;
-import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.PetriNetPortObject;
 
 public class HeuristicsMinerTableNodeFactory extends DefaultNodeFactory {
@@ -28,7 +27,7 @@ public class HeuristicsMinerTableNodeFactory extends DefaultNodeFactory {
                         new HeuristicsMinerTableNodeModel(HeuristicsMinerTableNodeSettings.class)))
                     .execute((i, o) -> DefaultTableMinerNodeModel.execute(i, o,
                         new HeuristicsMinerTableNodeModel(HeuristicsMinerTableNodeSettings.class))))
-                .addView(v -> ModernViews.graph(v, HeuristicsMinerTableNodeFactory.class, "Petri net view"))
+//                .addView(v -> ModernViews.graph(v, HeuristicsMinerTableNodeFactory.class, "Petri net view"))
                 .nodeType(NodeType.Learner));
     }
 }
