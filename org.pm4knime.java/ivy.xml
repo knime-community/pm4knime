@@ -34,7 +34,6 @@
 	    
 	    <dependency org="org.mozilla" name="rhino" rev="1.8.1" force="true"/>
 	    <dependency org="io.airlift" name="aircompressor" rev="2.0.3" force="true"/>
-	    <dependency org="org.assertj" name="assertj-core" rev="3.27.7" force="true"/>
 	    <dependency org="xalan" name="xalan" rev="2.7.3" force="true"/>
 		<dependency org="xalan" name="serializer" rev="2.7.3" force="true"/>
 		
@@ -77,13 +76,7 @@
     	<dependency org="prom" name="PNetAlignmentAnalysis" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="Performance" rev="latest" changing="true" transitive="true" />	
     	<dependency org="prom" name="ETConformance" rev="latest" changing="true" transitive="true" />
-    	
-    	<dependency org="com.squareup.okio" name="okio" rev="3.4.0" force="true"/>
-		<dependency org="org.jetbrains.kotlin" name="kotlin-stdlib" rev="1.6.0" force="true"/>
-		<dependency org="org.jetbrains.kotlin" name="kotlin-stdlib-common" rev="1.6.0" force="true"/>
-		<dependency org="org.iq80.snappy" name="snappy" rev="0.5" force="true"/>
-    	<dependency org="io.trino.hadoop" name="hadoop-apache" rev="3.3.5-3" force="true"/>
- 		
+
     	
     	<!-- Global exclusions -->
     	<exclude org="prom" module="GraphViz"/>
@@ -139,6 +132,28 @@
 		<exclude org="*" module="jython-standalone"/>
 		
 		<exclude org="org.testng" module="testng"/>
+		<exclude org="org.assertj" module="assertj-core"/>
+		<exclude org="org.junit.jupiter" module="junit-jupiter"/>
+		<exclude org="org.junit.jupiter" module="junit-jupiter-api"/>
+		<exclude org="org.junit.jupiter" module="junit-jupiter-engine"/>
+		<exclude org="org.junit.jupiter" module="junit-jupiter-params"/>
+		<exclude org="org.junit.platform" module="junit-platform-commons"/>
+		<exclude org="org.junit.platform" module="junit-platform-engine"/>
+		<exclude org="org.junit.platform" module="junit-platform-launcher"/>
+		<exclude org="org.junit.vintage" module="junit-vintage-engine"/>
+		<exclude org="org.junit-pioneer" module="junit-pioneer"/>
+		<exclude org="org.mockito" module="mockito-core"/>
+		<exclude org="org.mockito" module="mockito-inline"/>
+		<exclude org="org.mockito" module="mockito-junit-jupiter"/>
+		<exclude org="org.mockito" module="mockito-all"/>
+		<exclude org="com.tngtech.archunit" module="archunit"/>
+		<exclude org="com.tngtech.archunit" module="archunit-junit5"/>
+		<exclude org="com.tngtech.archunit" module="archunit-junit5-api"/>
+		<exclude org="com.tngtech.archunit" module="archunit-junit5-engine"/>
+		<exclude org="com.tngtech.archunit" module="archunit-junit5-engine-api"/>
+		<exclude org="org.hamcrest" module="hamcrest"/>
+		<exclude org="org.hamcrest" module="hamcrest-core"/>
+		<exclude org="org.hamcrest" module="hamcrest-library"/>
 
 
     </dependencies>
