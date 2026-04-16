@@ -5,25 +5,42 @@ import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
 import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.CausalGraphPortObject;
-import org.pm4knime.util.defaultnode.EmptyNodeSettings;
 
 public class JSVisCGNodeFactory extends DefaultNodeFactory {
+
+    private static final String INPUT_PORT_GROUP = "cg-input";
+    private static final String IMAGE_OUTPUT_PORT_GROUP = "image-output";
 
     public JSVisCGNodeFactory() {
         super(
             DefaultNode.create()
-                .name("Causal Graph To Image")
+                .name("Causal Graph Viewer")
                 .icon("./dfg.png")
-                .shortDescription("JavaScript Visualizer for Causal Graphs.")
-                .fullDescription("This node implements a JavaScript visualization of causal graphs. A causal graph consists of nodes representing activities and two types of directed edges connecting nodes. \r\n"
-                    + "            Certain edges (blue by default) represent strong causal dependencies and uncertain edges (red by default) represent weak dependencies. \r\n"
-                    + "            A third type of edges is used to represent long-term dependencies (yellow by default).")
+                .shortDescription("Open an interactive viewer for causal graphs and optionally export an SVG image.")
+                .fullDescription("""
+                    <p>
+                    This node opens an interactive viewer for causal graphs.
+                    </p>
+                    <p>
+                    The node is intended primarily for inspection in the KNIME view. If needed, an SVG image can also be created via the optional output port.
+                    </p>
+                    <p>
+                    Activities are shown as nodes. Strong causal dependencies are drawn in blue, uncertain dependencies in red, and long-term dependencies in yellow.
+                    </p>
+                    """)
                 .sinceVersion(2, 0, 0)
-                .ports(p -> p
-                    .addInputPort("Causal Graph", "a causal graph", CausalGraphPortObject.TYPE)
-                    .addOutputPort("Image", "an SVG image", ImagePortObject.TYPE))
+                .dynamicPorts(p -> p
+                    .addInputPortGroup(INPUT_PORT_GROUP, in -> in
+                        .name("Causal Graph")
+                        .description("a causal graph")
+                        .fixed(CausalGraphPortObject.TYPE))
+                    .addOutputPortGroup(IMAGE_OUTPUT_PORT_GROUP, out -> out
+                        .name("Image")
+                        .description("an optional SVG image export")
+                        .optional()
+                        .supportedTypes(ImagePortObject.TYPE)))
                 .model(m -> m
-                    .parametersClass(EmptyNodeSettings.class)
+                    .withoutParameters()
                     .configure(GraphVisualizerModel::configure)
                     .execute(GraphVisualizerModel::execute))
                 .addView(v -> ModernViews.graph(v, JSVisCGNodeFactory.class, "Causal graph view"))

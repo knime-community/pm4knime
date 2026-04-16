@@ -5,33 +5,39 @@ import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
 import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.ProcessTreePortObject;
-import org.pm4knime.util.defaultnode.EmptyNodeSettings;
 
 public class JSGraphVizPTNodeFactory extends DefaultNodeFactory {
+
+    private static final String INPUT_PORT_GROUP = "pt-input";
+    private static final String IMAGE_OUTPUT_PORT_GROUP = "image-output";
 
     public JSGraphVizPTNodeFactory() {
         super(
             DefaultNode.create()
-                .name("Process Tree To Image")
+                .name("Process Tree Viewer")
                 .icon("./tree.png")
-                .shortDescription("JavaScript Visualizer for Process Trees")
-                .fullDescription("This node implements a JavaScript visualization of Process Trees.\r\n"
-                    + "    <br />\r\n"
-                    + "    A process tree is a block-structured process model where the (inner) nodes are operators (sequence, choice, parallel, and loop) and the leaves are activities. \r\n"
-                    + "    <br /> \r\n"
-                    + "    The \"seq\" operator executes its children from right to left.\r\n"
-                    + "    <br />\r\n"
-                    + "    The \"xor\" operator executes one of its children.\r\n"
-                    + "    <br />\r\n"
-                    + "    The \"and\" operator executes the children in parallel.\r\n"
-                    + "    <br />\r\n"
-                    + "    The \"xor loop\" operator models a do-redo loop. The first child is used as the do part, while an exclusive choice between the other children is used as the redo part.")
+                .shortDescription("Open an interactive viewer for process trees and optionally export an SVG image.")
+                .fullDescription("""
+                    <p>
+                    This node opens an interactive viewer for process trees.
+                    </p>
+                    <p>
+                    The node is intended primarily for inspection in the KNIME view. If needed, an SVG image can also be created via the optional output port.
+                    </p>
+                    """)
                 .sinceVersion(2, 0, 0)
-                .ports(p -> p
-                    .addInputPort("Process Tree", "a process tree", ProcessTreePortObject.TYPE)
-                    .addOutputPort("Image", "an SVG image", ImagePortObject.TYPE))
+                .dynamicPorts(p -> p
+                    .addInputPortGroup(INPUT_PORT_GROUP, in -> in
+                        .name("Process Tree")
+                        .description("a process tree")
+                        .fixed(ProcessTreePortObject.TYPE))
+                    .addOutputPortGroup(IMAGE_OUTPUT_PORT_GROUP, out -> out
+                        .name("Image")
+                        .description("an optional SVG image export")
+                        .optional()
+                        .supportedTypes(ImagePortObject.TYPE)))
                 .model(m -> m
-                    .parametersClass(EmptyNodeSettings.class)
+                    .withoutParameters()
                     .configure(GraphVisualizerModel::configure)
                     .execute(GraphVisualizerModel::execute))
                 .addView(v -> ModernViews.graph(v, JSGraphVizPTNodeFactory.class, "Process tree view"))

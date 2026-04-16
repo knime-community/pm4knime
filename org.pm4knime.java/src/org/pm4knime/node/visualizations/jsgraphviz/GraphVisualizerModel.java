@@ -3,6 +3,8 @@ package org.pm4knime.node.visualizations.jsgraphviz;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,8 +18,6 @@ import org.knime.base.data.xml.SvgCell;
 import org.knime.base.data.xml.SvgImageContent;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.port.PortType;
-import org.knime.core.node.port.PortTypeRegistry;
 import org.knime.core.node.port.image.ImagePortObject;
 import org.knime.core.node.port.image.ImagePortObjectSpec;
 import org.knime.node.DefaultModel;
@@ -57,6 +57,9 @@ public final class GraphVisualizerModel {
 
     static void configure(final DefaultModel.ConfigureInput i, final DefaultModel.ConfigureOutput o)
         throws InvalidSettingsException {
+        if (!hasConfiguredOutput(o)) {
+            return;
+        }
 
         o.setOutSpec(0, new ImagePortObjectSpec(SvgCell.TYPE));
     }
@@ -64,17 +67,44 @@ public final class GraphVisualizerModel {
     static void execute(final DefaultModel.ExecuteInput i, final DefaultModel.ExecuteOutput o) {
         try {
             final var portObject = (AbstractJSONPortObject)i.getInPortObject(0);
-            final var inputType = PortTypeRegistry.getInstance().getPortType(portObject.getClass());
-            final var imagePort = render(portObject, inputType, i.getExecutionContext());
-            o.setOutData(0, imagePort);
+            if (hasConfiguredOutput(o)) {
+                final var imagePort = render(portObject, i.getExecutionContext());
+                o.setOutData(0, imagePort);
+            }
             o.setInternalData(portObject);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }       
     }
+
+    private static boolean hasConfiguredOutput(final Object output) {
+        return configuredOutputCount(output) > 0;
+    }
+
+    private static int configuredOutputCount(final Object output) {
+        for (final Field field : output.getClass().getDeclaredFields()) {
+            if (!field.getType().isArray()) {
+                continue;
+            }
+            final Class<?> componentType = field.getType().getComponentType();
+            if (!componentType.getName().startsWith("org.knime.core.node.port.PortObject")) {
+                continue;
+            }
+            field.setAccessible(true);
+            try {
+                final Object value = field.get(output);
+                if (value != null) {
+                    return Array.getLength(value);
+                }
+            } catch (IllegalAccessException ex) {
+                throw new IllegalStateException("Unable to inspect configured output ports.", ex);
+            }
+        }
+        return 0;
+    }
     
-    static ImagePortObject render(final AbstractJSONPortObject portObject, final PortType inputType,
-        final ExecutionContext exec) throws Exception {
+    static ImagePortObject render(final AbstractJSONPortObject portObject, final ExecutionContext exec)
+        throws Exception {
 
         exec.checkCanceled();
 

@@ -5,26 +5,39 @@ import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
 import org.pm4knime.node.visualizations.common.ModernViews;
 import org.pm4knime.portobject.DfgMsdPortObject;
-import org.pm4knime.util.defaultnode.EmptyNodeSettings;
 
 public class JSGraphVizDFGNodeFactory extends DefaultNodeFactory {
+
+    private static final String INPUT_PORT_GROUP = "dfg-input";
+    private static final String IMAGE_OUTPUT_PORT_GROUP = "image-output";
 
     public JSGraphVizDFGNodeFactory() {
         super(
             DefaultNode.create()
-                .name("DFG To Image")
+                .name("DFG Viewer")
                 .icon("./dfg.png")
-                .shortDescription("JavaScript Visualizer for Directly-Follows Graphs")
-                .fullDescription("This node implements a JavaScript visualization of directly follows graphs (DFGs). \r\n"
-                    + "            <br/>\r\n"
-                    + "            The green nodes are the start activities and the red activities are the end activity. \r\n"
-                    + "            The edges are annotated by the absolute frequencies of the directly follows relations between the activities.")
+                .shortDescription("Open an interactive viewer for directly-follows graphs and optionally export an SVG image.")
+                .fullDescription("""
+                    <p>
+                    This node opens an interactive viewer for directly-follows graphs (DFGs).
+                    </p>
+                    <p>
+                    The node is intended primarily for inspection in the KNIME view. If needed, an SVG image can also be created via the optional output port.
+                    </p>
+                    """)
                 .sinceVersion(2, 0, 0)
-                .ports(p -> p
-                    .addInputPort("Directly-Follows Graph", "a directly follows graph", DfgMsdPortObject.TYPE)
-                    .addOutputPort("Image", "an SVG image", ImagePortObject.TYPE))
+                .dynamicPorts(p -> p
+                    .addInputPortGroup(INPUT_PORT_GROUP, in -> in
+                        .name("Directly-Follows Graph")
+                        .description("a directly follows graph")
+                        .fixed(DfgMsdPortObject.TYPE))
+                    .addOutputPortGroup(IMAGE_OUTPUT_PORT_GROUP, out -> out
+                        .name("Image")
+                        .description("an optional SVG image export")
+                        .optional()
+                        .supportedTypes(ImagePortObject.TYPE)))
                 .model(m -> m
-                    .parametersClass(EmptyNodeSettings.class)
+                    .withoutParameters()
                     .configure(GraphVisualizerModel::configure)
                     .execute(GraphVisualizerModel::execute))
                 .addView(v -> ModernViews.graph(v, JSGraphVizDFGNodeFactory.class, "DFG view"))
