@@ -78,7 +78,11 @@
     	<dependency org="prom" name="Performance" rev="latest" changing="true" transitive="true" />	
     	<dependency org="prom" name="ETConformance" rev="latest" changing="true" transitive="true" />
     	
-    	
+    	<dependency org="com.squareup.okio" name="okio" rev="3.4.0" force="true"/>
+		<dependency org="org.jetbrains.kotlin" name="kotlin-stdlib" rev="1.6.0" force="true"/>
+		<dependency org="org.jetbrains.kotlin" name="kotlin-stdlib-common" rev="1.6.0" force="true"/>
+		<dependency org="org.iq80.snappy" name="snappy" rev="0.5" force="true"/>
+    	<dependency org="io.trino.hadoop" name="hadoop-apache" rev="3.3.5-3" force="true"/>
  		
     	
     	<!-- Global exclusions -->
@@ -133,6 +137,8 @@
 		<exclude org="apache" module="commons-lang"/>
 		<exclude org="prom-libs" module="commons-lang"/>
 		<exclude org="*" module="jython-standalone"/>
+		
+		<exclude org="org.testng" module="testng"/>
 
 
     </dependencies>
