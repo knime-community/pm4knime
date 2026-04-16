@@ -17,7 +17,7 @@ pip = "*"
 python = "*"
 knime-extension-bundling = "5.*"
 nodejs = "*"
-npm = "*
+npm = "*"
 
 [feature.debug.dependencies]
 debugpy = "*"
