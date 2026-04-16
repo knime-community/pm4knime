@@ -32,7 +32,9 @@
 	    <dependency org="commons-beanutils" name="commons-beanutils" rev="1.11.0" force="true"/>
 	    <dependency org="com.fasterxml.util" name="java-merge-sort" rev="1.1.0" force="true"/>
 	    
-	    <dependency org="org.mozilla" name="rhino" rev="1.8.0" force="true"/>
+	    <dependency org="org.mozilla" name="rhino" rev="1.8.1" force="true"/>
+	    <dependency org="io.airlift" name="aircompressor" rev="2.0.3" force="true"/>
+	    <dependency org="org.assertj" name="assertj-core" rev="3.27.7" force="true"/>
 	    <dependency org="xalan" name="xalan" rev="2.7.3" force="true"/>
 		<dependency org="xalan" name="serializer" rev="2.7.3" force="true"/>
 		
