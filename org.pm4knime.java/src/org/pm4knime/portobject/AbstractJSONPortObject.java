@@ -18,6 +18,18 @@ public abstract class AbstractJSONPortObject extends AbstractPortObject {
             this.type = type;
             this.label = label; 
         }
+
+        public String getId() {
+            return id;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public String getLabel() {
+            return label;
+        }
     }
 	
 	public static class PlaceNode extends Node {
@@ -29,6 +41,14 @@ public abstract class AbstractJSONPortObject extends AbstractPortObject {
         	super(id, type, label);
             this.i_marking = initial_marking;
             this.f_marking = final_marking;
+        }
+
+        public boolean getI_marking() {
+            return i_marking;
+        }
+
+        public boolean getF_marking() {
+            return f_marking;
         }
     }
 
@@ -47,6 +67,18 @@ public abstract class AbstractJSONPortObject extends AbstractPortObject {
             this.target = target;
             this.type = type;
         }
+
+        public String getSource() {
+            return source;
+        }
+
+        public String getTarget() {
+            return target;
+        }
+
+        public String getType() {
+            return type;
+        }
     }
     
     public static class LinkWithFrequency {
@@ -58,6 +90,18 @@ public abstract class AbstractJSONPortObject extends AbstractPortObject {
             this.source = source;
             this.target = target;
             this.frequency = frequency;
+        }
+
+        public String getSource() {
+            return source;
+        }
+
+        public String getTarget() {
+            return target;
+        }
+
+        public int getFrequency() {
+            return frequency;
         }
     }
 	

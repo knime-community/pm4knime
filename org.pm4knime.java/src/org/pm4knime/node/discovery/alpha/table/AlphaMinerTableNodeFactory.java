@@ -1,49 +1,31 @@
 package org.pm4knime.node.discovery.alpha.table;
 
-
-
-import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.wizard.WizardNodeFactoryExtension;
-import org.knime.core.webui.node.impl.WebUINodeConfiguration;
-import org.knime.core.webui.node.impl.WebUINodeFactory;
-import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewRepresentation;
-import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
+import org.knime.node.DefaultNode;
+import org.knime.node.DefaultNodeFactory;
+import org.pm4knime.node.discovery.defaultminer.DefaultTableMinerNodeModel;
 import org.pm4knime.portobject.PetriNetPortObject;
 
+public class AlphaMinerTableNodeFactory extends DefaultNodeFactory {
 
-
-public class AlphaMinerTableNodeFactory extends WebUINodeFactory<AlphaMinerTableNodeModel> implements WizardNodeFactoryExtension<AlphaMinerTableNodeModel, JSGraphVizViewRepresentation, JSGraphVizViewValue> {
-
-	AlphaMinerTableNodeModel node;
-
-	public static final WebUINodeConfiguration CONFIG = WebUINodeConfiguration.builder()
-			.name("Alpha Miner")
-			.icon("../../category-discovery.png")
-			.shortDescription("This node implements the Alpha Miner to discover a Petri net from an event table.")
-			.fullDescription(" This node implements the Alpha Miner to discover a Petri net from an event table. "
-					+ PetriNetPortObject.PETRI_NET_TEXT)//
-			.modelSettingsClass(AlphaMinerTableNodeSettings.class)//
-			.addInputPort("Table", BufferedDataTable.TYPE ,"an event table")//
-			.addOutputPort("Petri Net", PetriNetPortObject.TYPE, "a Petri net")//
-			.nodeType(NodeType.Learner)
-			.sinceVersion(2, 0, 0)
-			.build();
-
-
-	public AlphaMinerTableNodeFactory() {
-		super(CONFIG);
-	}
-
-
-	protected AlphaMinerTableNodeFactory(final WebUINodeConfiguration configuration) {
-		super(configuration);
-	}
-
-
-	@Override
-	public AlphaMinerTableNodeModel createNodeModel() {
-		node = new AlphaMinerTableNodeModel(AlphaMinerTableNodeSettings.class);
-		return node;
-	}
-
+    public AlphaMinerTableNodeFactory() {
+        super(
+            DefaultNode.create()
+                .name("Alpha Miner")
+                .icon("../../category-discovery.png")
+                .shortDescription("This node implements the Alpha Miner to discover a Petri net from an event table.")
+                .fullDescription(" This node implements the Alpha Miner to discover a Petri net from an event table. "
+                    + PetriNetPortObject.PETRI_NET_TEXT)
+                .sinceVersion(2, 0, 0)
+                .ports(p -> p
+                    .addInputTable("Table", "an event table")
+                    .addOutputPort("Petri Net", "a Petri net", PetriNetPortObject.TYPE))
+                .model(m -> m
+                    .parametersClass(AlphaMinerTableNodeSettings.class)
+                    .configure((i, o) -> DefaultTableMinerNodeModel.configure(i, o,
+                        new AlphaMinerTableNodeModel(AlphaMinerTableNodeSettings.class)))
+                    .execute((i, o) -> DefaultTableMinerNodeModel.execute(i, o,
+                        new AlphaMinerTableNodeModel(AlphaMinerTableNodeSettings.class))))
+//                .addView(v -> ModernViews.graph(v, AlphaMinerTableNodeFactory.class, "Petri net view"))
+                .nodeType(NodeType.Learner));
+    }
 }
