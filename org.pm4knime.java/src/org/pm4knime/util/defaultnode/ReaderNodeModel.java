@@ -8,160 +8,75 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.port.PortObject;
-import org.knime.core.node.port.PortObjectHolder;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
-import org.knime.core.node.web.ValidationError;
 import org.knime.filehandling.core.connections.FSConnection;
 import org.knime.filehandling.core.connections.FSFileSystem;
 import org.knime.filehandling.core.connections.FSFiles;
 import org.knime.filehandling.core.defaultnodesettings.FileSystemHelper;
-import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewRepresentation;
-import org.pm4knime.node.visualizations.jsgraphviz.JSGraphVizViewValue;
-import org.pm4knime.node.visualizations.jsgraphviz.util.WebUIJSViewNodeModel;
+import org.knime.node.DefaultModel;
 import org.pm4knime.portobject.AbstractJSONPortObject;
-import org.pm4knime.portobject.XLogPortObject;
 
+public abstract class ReaderNodeModel {
 
-public abstract class ReaderNodeModel extends WebUIJSViewNodeModel<ReaderNodeSettings, JSGraphVizViewRepresentation, JSGraphVizViewValue> implements PortObjectHolder {
-	
-	
-	private ReaderNodeSettings m_settings;
-	String[] extensions;
-    
-	PortObjectSpec m_spec;
-	protected AbstractJSONPortObject m_Port;
-	protected XLogPortObject m_logPO;
-	
-    public ReaderNodeModel(Class<ReaderNodeSettings> class1, String[] types, PortObjectSpec portObjectSpec, PortType[] portTypes, String view_name) {
-    
-    	super(null, portTypes, view_name, class1);
-    	m_spec = portObjectSpec; 
-    	extensions = types;
+    protected ReaderNodeSettings m_settings;
+    protected final String[] extensions;
+    protected AbstractJSONPortObject m_Port;
+
+    protected ReaderNodeModel(final Class<ReaderNodeSettings> class1, final String[] types,
+        final PortObjectSpec portObjectSpec, final PortType[] portTypes, final String viewName) {
+
+        extensions = types;
     }
 
-	@Override
-    protected PortObject[] performExecuteCreatePortObjects(final PortObject svgImageFromView,
-        final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        return new PortObject[]{m_Port};
+    public static <M extends ReaderNodeModel> void configure(final DefaultModel.ConfigureInput i,
+        final DefaultModel.ConfigureOutput o, final M model) throws InvalidSettingsException {
+
+        model.m_settings = i.getParameters();
+        model.validate();
+        o.setOutSpecs(model.configureOutSpec());
     }
-	
-	@Override
-	protected void performExecuteCreateView(PortObject[] inObjects, ExecutionContext exec) throws Exception {
-		
-		exec.checkCanceled();
-        try {       	
-        	
-        	var fsLocation = m_settings.m_file.getFSLocation();
-            FSConnection connection = FileSystemHelper.retrieveFSConnection(Optional.empty(), fsLocation)
-                    .orElseThrow(() -> new IOException("File system is not available"));
-            FSFileSystem<?> fileSystem = connection.getFileSystem();
-			final Path filePath = fileSystem.getPath(fsLocation);
-			InputStream inputStream = FSFiles.newInputStream(filePath);
-			
-			m_Port = write_file_from_stream(inputStream);
-			
-			JSGraphVizViewRepresentation representation = getViewRepresentation();
-			representation.setJSONString(m_Port.getJSON());
-			
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-        
-        exec.checkCanceled();
-        
-     } 
- 
-	protected abstract AbstractJSONPortObject write_file_from_stream(InputStream inputStream);
-	
-	@Override
-	protected PortObjectSpec[] configure(PortObjectSpec[] inSpecs, final ReaderNodeSettings modelSettings) throws InvalidSettingsException {
-		m_settings = modelSettings;
-		validate();
-		return configureOutSpec();
-	}
-	
-	public void validate() throws InvalidSettingsException {
 
-		if (StringUtils.isEmpty(m_settings.m_file.getFSLocation().getPath())) {
-			throw new InvalidSettingsException("Please specify a path to the file to read!");
-		}
+    public static <M extends ReaderNodeModel> void execute(final DefaultModel.ExecuteInput i,
+        final DefaultModel.ExecuteOutput o, final M model) {
 
-		if (!StringUtils.endsWith(m_settings.m_file.getFSLocation().getPath(), extensions[0])) {
-			throw new InvalidSettingsException("Unsupported file type: Please select a " + extensions[0] + " file");
-		}
+        model.m_settings = i.getParameters();
+        final ExecutionContext exec = i.getExecutionContext();
 
-	}
-	
-	protected abstract PortObjectSpec[] configureOutSpec();
-
-    
-    @Override
-	protected void performReset() {
-	}
-
-	@Override
-	protected void useCurrentValueAsDefault() {
-	}
-
-	
-	@Override
-    protected boolean generateImage() {
-        return false;
+        try {
+            model.m_Port = model.readPortObject();
+            exec.checkCanceled();
+            o.setOutData(0, model.m_Port);
+            o.setInternalData(model.m_Port);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
-	
-	
-	@Override
-	public JSGraphVizViewRepresentation createEmptyViewRepresentation() {
-		return new JSGraphVizViewRepresentation();
-	}
 
-	@Override
-	public JSGraphVizViewValue createEmptyViewValue() {
-		return new JSGraphVizViewValue();
-	}
-	
-	@Override
-	public boolean isHideInWizard() {
-		return false;
-	}
+    protected final AbstractJSONPortObject readPortObject() throws IOException {
+        final var fsLocation = m_settings.m_file.getFSLocation();
+        final FSConnection connection = FileSystemHelper.retrieveFSConnection(Optional.empty(), fsLocation)
+            .orElseThrow(() -> new IOException("File system is not available"));
+        final FSFileSystem<?> fileSystem = connection.getFileSystem();
+        final Path filePath = fileSystem.getPath(fsLocation);
 
-	@Override
-	public void setHideInWizard(boolean hide) {
-	}
+        try (InputStream inputStream = FSFiles.newInputStream(filePath)) {
+            return write_file_from_stream(inputStream);
+        }
+    }
 
-	@Override
-	public ValidationError validateViewValue(JSGraphVizViewValue viewContent) {
-		return null;
-	}
+    protected abstract AbstractJSONPortObject write_file_from_stream(InputStream inputStream);
 
-	@Override
-	public void saveCurrentValue(NodeSettingsWO content) {
-	}
-	
-	
-	@Override
-	public String getJavascriptObjectID() {
-		return "org.pm4knime.node.visualizations.jsgraphviz.component";
-	}
+    protected abstract PortObjectSpec[] configureOutSpec();
 
+    public void validate() throws InvalidSettingsException {
 
-	@Override
-	public PortObject[] getInternalPortObjects() {
-		// TODO Auto-generated method stub
-		return new PortObject[] {};
-	}
+        if (StringUtils.isEmpty(m_settings.m_file.getFSLocation().getPath())) {
+            throw new InvalidSettingsException("Please specify a path to the file to read!");
+        }
 
-
-	@Override
-	public void setInternalPortObjects(PortObject[] portObjects) {
-		
-	}
-
-
-
+        if (!StringUtils.endsWith(m_settings.m_file.getFSLocation().getPath(), extensions[0])) {
+            throw new InvalidSettingsException("Unsupported file type: Please select a " + extensions[0] + " file");
+        }
+    }
 }
-
