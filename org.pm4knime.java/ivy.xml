@@ -46,8 +46,12 @@
 		<dependency org="javax.xml.bind" name="jaxb-api" rev="2.3.1" force="true"/>
 		<dependency org="org.glassfish.jaxb" name="jaxb-runtime" rev="2.3.9" force="true"/>
 		<dependency org="com.sun.activation" name="javax.activation" rev="1.2.0" force="true"/>
+		
+		<dependency org="org.apache.hadoop" name="hadoop-common" rev="3.4.2" force="true"/>
+		<dependency org="org.apache.hadoop" name="hadoop-hdfs-client" rev="3.4.2" force="true"/>
+		<dependency org="org.jetbrains.kotlin" name="kotlin-stdlib" rev="1.6.0" force="true"/>
+		<dependency org="com.squareup.okio" name="okio" rev="3.4.0" force="true"/>
 		<dependency org="org.iq80.snappy" name="snappy" rev="0.5" force="true"/>
-
 
 		
     	<!-- ProM dependencies. -->
@@ -129,7 +133,6 @@
 		
 		<exclude org="commons-lang" module="commons-lang"/>
 		<exclude org="apache" module="commons-lang"/>
-		<exclude org="io.trino.hadoop" module="hadoop-apache"/>
 		<exclude org="prom-libs" module="commons-lang"/>
 		<exclude org="*" module="jython-standalone"/>
 		
