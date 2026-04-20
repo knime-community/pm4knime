@@ -1,165 +1,301 @@
 <ivy-module version="2.0">
     <info organisation="prom" module="antivy-practice" revision="latest">
-    	<description>
-    		Version VERSION
-    	</description>
+        <description>
+            Version VERSION
+        </description>
     </info>
 
     <dependencies>
 
-		<!-- new versions of dependencies to override what ProM requires -->
-		<dependency org="com.thoughtworks.xstream" name="xstream" rev="1.4.21" force="true"/>
-		<dependency org="org.xerial" name="sqlite-jdbc" rev="3.51.0.0" force="true"/>
-		<dependency org="org.python" name="jython-standalone" rev="2.7.4" force="true"/>
-		
-	    <dependency org="com.fasterxml.jackson.core" name="jackson-databind"    rev="2.19.2"/>
-	    <dependency org="com.fasterxml.jackson.core" name="jackson-core"       rev="2.19.2"/>
-	    <dependency org="com.fasterxml.jackson.core" name="jackson-annotations" rev="2.19.2"/>
-	    
-	    <dependency org="com.google.protobuf" name="protobuf-java" rev="3.25.5" force="true"/>
-	    <dependency org="org.codehaus.jettison" name="jettison" rev="1.5.4" force="true"/>
-	    <dependency org="org.jdom" name="jdom2" rev="2.0.6.1" force="true"/>
-	    <dependency org="com.google.guava" name="guava" rev="33.5.0-jre" force="true"/>
-	    
-	    <dependency org="org.apache.ant" name="ant" rev="1.10.15" force="true"/>
-	    <dependency org="com.google.code.gson" name="gson" rev="2.13.2" force="true"/>
-	    <dependency org="org.apache.commons" name="commons-compress" rev="1.28.0" force="true"/>
-	    <dependency org="commons-io" name="commons-io" rev="2.21.0" force="true"/>
-	    <dependency org="org.apache.commons" name="commons-lang3" rev="3.20.0" force="true"/>
-	    <dependency org="net.sourceforge.collections" name="collections-generic" rev="4.01" force="true"/>
-	    <dependency org="org.dom4j" name="dom4j" rev="2.2.0" force="true"/>
-	    
-	    <dependency org="commons-beanutils" name="commons-beanutils" rev="1.11.0" force="true"/>
-	    <dependency org="com.fasterxml.util" name="java-merge-sort" rev="1.1.0" force="true"/>
-	    
-	    <dependency org="org.mozilla" name="rhino" rev="1.8.1" force="true"/>
-	    <dependency org="io.airlift" name="aircompressor" rev="2.0.3" force="true"/>
-	    <dependency org="xalan" name="xalan" rev="2.7.3" force="true"/>
-		<dependency org="xalan" name="serializer" rev="2.7.3" force="true"/>
-		
-		<dependency org="org.mapdb" name="mapdb" rev="2.0-beta13" force="true">
-		  <artifact name="mapdb" type="jar" ext="jar"/>
-		</dependency>
-		<dependency org="org.lz4" name="lz4-java" rev="1.8.0" force="true">
-		  <artifact name="lz4-java" type="jar" ext="jar"/>
-		</dependency>
-		<dependency org="javax.xml.bind" name="jaxb-api" rev="2.3.1" force="true"/>
-		<dependency org="org.glassfish.jaxb" name="jaxb-runtime" rev="2.3.9" force="true"/>
-		<dependency org="com.sun.activation" name="javax.activation" rev="1.2.0" force="true"/>
-		
-		<dependency org="org.apache.hadoop" name="hadoop-common" rev="3.4.2" force="true"/>
-		<dependency org="org.apache.hadoop" name="hadoop-hdfs-client" rev="3.4.2" force="true"/>
-		<dependency org="org.jetbrains.kotlin" name="kotlin-stdlib" rev="1.6.0" force="true"/>
-		<dependency org="com.squareup.okio" name="okio" rev="3.4.0" force="true"/>
-		<dependency org="org.iq80.snappy" name="snappy" rev="0.5" force="true"/>
+        <!-- Core overrides -->
+        <dependency org="com.thoughtworks.xstream" name="xstream" rev="1.4.21" force="true"/>
+        <dependency org="org.xerial" name="sqlite-jdbc" rev="3.51.0.0" force="true"/>
+        <dependency org="org.python" name="jython-standalone" rev="2.7.4" force="true"/>
 
-		
-    	<!-- ProM dependencies. -->
-    	<!-- Please put every ProM dependency on a single line. -->
-    	<!-- ProM framework. -->
-    	<!-- category : diccovery -->
-    	<dependency org="prom" name="AlphaMiner" rev="latest" changing="true" transitive="true" />
-    	<dependency org="prom" name="HeuristicsMiner" rev="latest" changing="true" transitive="true" />
-    	<dependency org="prom" name="InductiveMiner" rev="latest" changing="true" transitive="true" />    
-    	<dependency org="prom" name="DirectlyFollowsModelMiner" rev="latest" changing="true" transitive="true" />   
-    	<dependency org="prom" name="HybridILPMiner" rev="latest" changing="true" transitive="true" />  
-    	<dependency org="prom" name="ExtendedHybridMiner" rev="latest" changing="true" transitive="true" /> 
-    	<dependency org="prom" name="BPMN" rev="latest" changing="true" transitive="true" />  
-    	<dependency org="prom" name="BPMNConversions" rev="latest" changing="true" transitive="true" />      
-    	 
-    	
-    	
-    	<!-- category: manipulation -->
-    	<dependency org="prom" name="LogEnhancement" rev="latest" changing="true" transitive="true" />
-    	<dependency org="prom" name="LogProjection" rev="latest" changing="true" transitive="true" />
-    	<dependency org="prom" name="IncorporateNegativeInformation" rev="latest" changing="true" transitive="true" />
-    	<dependency org="prom" name="XESStandard" rev="latest" changing="true" transitive="true"/>
-    	<dependency org="prom" name="XESStandardConnector" rev="latest" changing="true" transitive="true"/>
-    	
-    	
-    	<!-- category: conformance and performance -->
-    	<dependency org="prom" name="PNetAlignmentAnalysis" rev="latest" changing="true" transitive="true" />
-    	<dependency org="prom" name="Performance" rev="latest" changing="true" transitive="true" />	
-    	<dependency org="prom" name="ETConformance" rev="latest" changing="true" transitive="true" />
+        <dependency org="com.fasterxml.jackson.core" name="jackson-databind" rev="2.19.2" force="true"/>
+        <dependency org="com.fasterxml.jackson.core" name="jackson-core" rev="2.19.2" force="true"/>
+        <dependency org="com.fasterxml.jackson.core" name="jackson-annotations" rev="2.19.2" force="true"/>
 
-    	
-    	<!-- Global exclusions -->
-    	<exclude org="prom" module="GraphViz"/>
-    	<exclude org="org.jdom" module="jdom"/> 
-    	<exclude org="org.jdom" module="jdom-legacy"/>
-    	<exclude org="io.gatling.uncommons.maths" module="uncommons-maths"/>
-    	<exclude org="org.mozilla" module="javascript"/>
-    	<exclude org="prom-libs" module="guava"/>
-		<exclude org="prom-libs" module="bsh"/>
-		
-		<exclude org="prom-libs" module="flanagan"/>
-		<exclude org="prom-libs" module="javabdd"/>
-		<exclude org="prom-libs" module="ujmp-complete"/>
-		<exclude org="prom-libs" module="gurobi"/>
-		<exclude org="prom-libs" module="jas-plotter"/>
-		<exclude org="prom-libs" module="javailp"/>
-		<exclude org="prom-libs" module="japura"/>
-		<exclude org="prom-libs" module="jbpt"/>
-		<exclude org="prom-libs" module="saxon"/>
-		<exclude org="prom-libs" module="simmetrics"/>
-		<exclude org="prom-libs" module="jargs"/>
-		<exclude org="prom-libs" module="org.eclipse.uml2.uml"/>
-		<exclude org="prom-libs" module="javacsv"/>
-		<exclude org="prom-libs" module="opencsv"/>
-		<exclude org="prom-libs" module="AccessCPN"/>
-		<exclude org="prom-libs" module="org.eclipse.emf.ecore"/>
-		<exclude org="prom-libs" module="YAWLEditor"/>
-		<exclude org="prom-libs" module="jmathplot"/>
-		<exclude org="prom-libs" module="FilterableSortableTablePanel"/>
-		<exclude org="prom-libs" module="openide-lookup"/>
-		<exclude org="prom-libs" module="jgrapht"/>
-		<exclude org="org.beanshell" module="bsh"/>
-		
-		<exclude org="prom-libs" module="ant"/>
-		<exclude org="net.sourceforge.f2j" module="arpack_combined_all"/>
-		<exclude org="prom-libs" module="arpack_combined_all"/>
-		<exclude org="prom" module="ApacheUtils"/>
-		<exclude org="axis" module="axis"/>
-		<exclude org="javax.xml" module="jaxrpc"/>
-		<exclude org="javax.xml" module="saaj"/>
-		<exclude org="wsdl4j" module="wsdl4j"/>
-		<exclude org="com.google.guava" module="guava-testlib"/>	
-		
-		<exclude org="org.apache.ant" module="ant-antunit"/>
-		<exclude org="*" module="junit4-ant"/>
-		<exclude org="commons-collections" module="commons-collections-testframework"/>	
-		<exclude org="*" module="org.mozilla.javascript"/>	
-		<exclude org="dom4j" module="dom4j"/>
-		
-		<exclude org="commons-lang" module="commons-lang"/>
-		<exclude org="apache" module="commons-lang"/>
-		<exclude org="prom-libs" module="commons-lang"/>
-		<exclude org="*" module="jython-standalone"/>
-		
-		<exclude org="org.testng" module="testng"/>
-		<exclude org="org.assertj" module="assertj-core"/>
-		<exclude org="org.junit.jupiter" module="junit-jupiter"/>
-		<exclude org="org.junit.jupiter" module="junit-jupiter-api"/>
-		<exclude org="org.junit.jupiter" module="junit-jupiter-engine"/>
-		<exclude org="org.junit.jupiter" module="junit-jupiter-params"/>
-		<exclude org="org.junit.platform" module="junit-platform-commons"/>
-		<exclude org="org.junit.platform" module="junit-platform-engine"/>
-		<exclude org="org.junit.platform" module="junit-platform-launcher"/>
-		<exclude org="org.junit.vintage" module="junit-vintage-engine"/>
-		<exclude org="org.junit-pioneer" module="junit-pioneer"/>
-		<exclude org="org.mockito" module="mockito-core"/>
-		<exclude org="org.mockito" module="mockito-inline"/>
-		<exclude org="org.mockito" module="mockito-junit-jupiter"/>
-		<exclude org="org.mockito" module="mockito-all"/>
-		<exclude org="com.tngtech.archunit" module="archunit"/>
-		<exclude org="com.tngtech.archunit" module="archunit-junit5"/>
-		<exclude org="com.tngtech.archunit" module="archunit-junit5-api"/>
-		<exclude org="com.tngtech.archunit" module="archunit-junit5-engine"/>
-		<exclude org="com.tngtech.archunit" module="archunit-junit5-engine-api"/>
-		<exclude org="org.hamcrest" module="hamcrest"/>
-		<exclude org="org.hamcrest" module="hamcrest-core"/>
-		<exclude org="org.hamcrest" module="hamcrest-library"/>
+        <dependency org="com.google.protobuf" name="protobuf-java" rev="3.25.5" force="true"/>
+        <dependency org="org.codehaus.jettison" name="jettison" rev="1.5.4" force="true"/>
+        <dependency org="org.jdom" name="jdom2" rev="2.0.6.1" force="true"/>
+        <dependency org="com.google.guava" name="guava" rev="33.5.0-jre" force="true"/>
 
+        <dependency org="org.apache.ant" name="ant" rev="1.10.15" force="true"/>
+        <dependency org="com.google.code.gson" name="gson" rev="2.13.2" force="true"/>
+        <dependency org="org.apache.commons" name="commons-compress" rev="1.28.0" force="true"/>
+        <dependency org="commons-io" name="commons-io" rev="2.21.0" force="true"/>
+        <dependency org="org.apache.commons" name="commons-lang3" rev="3.20.0" force="true"/>
+        <dependency org="net.sourceforge.collections" name="collections-generic" rev="4.01" force="true"/>
+        <dependency org="org.dom4j" name="dom4j" rev="2.2.0" force="true"/>
+
+        <dependency org="commons-beanutils" name="commons-beanutils" rev="1.11.0" force="true"/>
+        <dependency org="com.fasterxml.util" name="java-merge-sort" rev="1.1.0" force="true"/>
+
+        <dependency org="org.mozilla" name="rhino" rev="1.8.1" force="true"/>
+        <dependency org="io.airlift" name="aircompressor" rev="2.0.3" force="true"/>
+        <dependency org="xalan" name="xalan" rev="2.7.3" force="true"/>
+        <dependency org="xalan" name="serializer" rev="2.7.3" force="true"/>
+
+        <dependency org="org.mapdb" name="mapdb" rev="2.0-beta13" force="true">
+            <artifact name="mapdb" type="jar" ext="jar"/>
+        </dependency>
+
+        <dependency org="org.lz4" name="lz4-java" rev="1.8.0" force="true">
+            <artifact name="lz4-java" type="jar" ext="jar"/>
+        </dependency>
+
+        <dependency org="javax.xml.bind" name="jaxb-api" rev="2.3.1" force="true"/>
+        <dependency org="org.glassfish.jaxb" name="jaxb-runtime" rev="2.3.9" force="true"/>
+        <dependency org="com.sun.activation" name="javax.activation" rev="1.2.0" force="true"/>
+
+        <!-- Keep only if really needed; otherwise remove after validation -->
+        <dependency org="com.squareup.okio" name="okio" rev="3.4.0" force="true"/>
+        <dependency org="org.iq80.snappy" name="snappy" rev="0.5" force="true"/>
+
+        <!-- ProM dependencies -->
+        <dependency org="prom" name="AlphaMiner" rev="latest" changing="true" transitive="true"/>
+        <dependency org="prom" name="HeuristicsMiner" rev="latest" changing="true" transitive="true"/>
+        <dependency org="prom" name="InductiveMiner" rev="latest" changing="true" transitive="true"/>
+        <dependency org="prom" name="DirectlyFollowsModelMiner" rev="latest" changing="true" transitive="true"/>
+        <dependency org="prom" name="HybridILPMiner" rev="latest" changing="true" transitive="true"/>
+        <dependency org="prom" name="ExtendedHybridMiner" rev="latest" changing="true" transitive="true"/>
+        <dependency org="prom" name="BPMN" rev="latest" changing="true" transitive="true"/>
+        <dependency org="prom" name="BPMNConversions" rev="latest" changing="true" transitive="true"/>
+        <dependency org="prom" name="LogEnhancement" rev="latest" changing="true" transitive="true"/>
+        <dependency org="prom" name="LogProjection" rev="latest" changing="true" transitive="true"/>
+        <dependency org="prom" name="IncorporateNegativeInformation" rev="latest" changing="true" transitive="true"/>
+        <dependency org="prom" name="XESStandard" rev="latest" changing="true" transitive="true"/>
+        <dependency org="prom" name="XESStandardConnector" rev="latest" changing="true" transitive="true"/>
+        <dependency org="prom" name="PNetAlignmentAnalysis" rev="latest" changing="true" transitive="true"/>
+        <dependency org="prom" name="Performance" rev="latest" changing="true" transitive="true"/>
+        <dependency org="prom" name="ETConformance" rev="latest" changing="true" transitive="true"/>
+
+        <!-- Existing exclusions -->
+        <exclude org="prom" module="GraphViz"/>
+        <exclude org="org.jdom" module="jdom"/>
+        <exclude org="org.jdom" module="jdom-legacy"/>
+        <exclude org="io.gatling.uncommons.maths" module="uncommons-maths"/>
+        <exclude org="org.mozilla" module="javascript"/>
+        <exclude org="prom-libs" module="guava"/>
+        <exclude org="prom-libs" module="bsh"/>
+        <exclude org="prom-libs" module="flanagan"/>
+        <exclude org="prom-libs" module="javabdd"/>
+        <exclude org="prom-libs" module="ujmp-complete"/>
+        <exclude org="prom-libs" module="gurobi"/>
+        <exclude org="prom-libs" module="jas-plotter"/>
+        <exclude org="prom-libs" module="javailp"/>
+        <exclude org="prom-libs" module="japura"/>
+        <exclude org="prom-libs" module="jbpt"/>
+        <exclude org="prom-libs" module="saxon"/>
+        <exclude org="prom-libs" module="simmetrics"/>
+        <exclude org="prom-libs" module="jargs"/>
+        <exclude org="prom-libs" module="org.eclipse.uml2.uml"/>
+        <exclude org="prom-libs" module="javacsv"/>
+        <exclude org="prom-libs" module="opencsv"/>
+        <exclude org="prom-libs" module="AccessCPN"/>
+        <exclude org="prom-libs" module="org.eclipse.emf.ecore"/>
+        <exclude org="prom-libs" module="YAWLEditor"/>
+        <exclude org="prom-libs" module="jmathplot"/>
+        <exclude org="prom-libs" module="FilterableSortableTablePanel"/>
+        <exclude org="prom-libs" module="openide-lookup"/>
+        <exclude org="prom-libs" module="jgrapht"/>
+        <exclude org="org.beanshell" module="bsh"/>
+        <exclude org="prom-libs" module="ant"/>
+        <exclude org="net.sourceforge.f2j" module="arpack_combined_all"/>
+        <exclude org="prom-libs" module="arpack_combined_all"/>
+        <exclude org="prom" module="ApacheUtils"/>
+        <exclude org="axis" module="axis"/>
+        <exclude org="javax.xml" module="jaxrpc"/>
+        <exclude org="javax.xml" module="saaj"/>
+        <exclude org="wsdl4j" module="wsdl4j"/>
+        <exclude org="com.google.guava" module="guava-testlib"/>
+        <exclude org="org.apache.ant" module="ant-antunit"/>
+        <exclude org="*" module="junit4-ant"/>
+        <exclude org="commons-collections" module="commons-collections-testframework"/>
+        <exclude org="*" module="org.mozilla.javascript"/>
+        <exclude org="dom4j" module="dom4j"/>
+        <exclude org="commons-lang" module="commons-lang"/>
+        <exclude org="apache" module="commons-lang"/>
+        <exclude org="prom-libs" module="commons-lang"/>
+        <exclude org="*" module="jython-standalone"/>
+        <exclude org="org.testng" module="testng"/>
+        <exclude org="org.assertj" module="assertj-core"/>
+        <exclude org="org.junit.jupiter" module="junit-jupiter"/>
+        <exclude org="org.junit.jupiter" module="junit-jupiter-api"/>
+        <exclude org="org.junit.jupiter" module="junit-jupiter-engine"/>
+        <exclude org="org.junit.jupiter" module="junit-jupiter-params"/>
+        <exclude org="org.junit.platform" module="junit-platform-commons"/>
+        <exclude org="org.junit.platform" module="junit-platform-engine"/>
+        <exclude org="org.junit.platform" module="junit-platform-launcher"/>
+        <exclude org="org.junit.vintage" module="junit-vintage-engine"/>
+        <exclude org="org.junit-pioneer" module="junit-pioneer"/>
+        <exclude org="org.mockito" module="mockito-core"/>
+        <exclude org="org.mockito" module="mockito-inline"/>
+        <exclude org="org.mockito" module="mockito-junit-jupiter"/>
+        <exclude org="org.mockito" module="mockito-all"/>
+        <exclude org="com.tngtech.archunit" module="archunit"/>
+        <exclude org="com.tngtech.archunit" module="archunit-junit5"/>
+        <exclude org="com.tngtech.archunit" module="archunit-junit5-api"/>
+        <exclude org="com.tngtech.archunit" module="archunit-junit5-engine"/>
+        <exclude org="com.tngtech.archunit" module="archunit-junit5-engine-api"/>
+        <exclude org="org.hamcrest" module="hamcrest"/>
+        <exclude org="org.hamcrest" module="hamcrest-core"/>
+        <exclude org="org.hamcrest" module="hamcrest-library"/>
+
+        <!-- Families already proven unnecessary -->
+        <exclude org="org.eclipse.jetty" module="jetty-http"/>
+        <exclude org="org.eclipse.jetty" module="jetty-io"/>
+        <exclude org="org.eclipse.jetty" module="jetty-security"/>
+        <exclude org="org.eclipse.jetty" module="jetty-server"/>
+        <exclude org="org.eclipse.jetty" module="jetty-servlet"/>
+        <exclude org="org.eclipse.jetty" module="jetty-util"/>
+        <exclude org="org.eclipse.jetty" module="jetty-util-ajax"/>
+        <exclude org="org.eclipse.jetty" module="jetty-webapp"/>
+        <exclude org="org.eclipse.jetty" module="jetty-xml"/>
+
+        <exclude org="io.netty" module="netty-all"/>
+        <exclude org="io.netty" module="netty-buffer"/>
+        <exclude org="io.netty" module="netty-codec"/>
+        <exclude org="io.netty" module="netty-codec-dns"/>
+        <exclude org="io.netty" module="netty-codec-haproxy"/>
+        <exclude org="io.netty" module="netty-codec-http"/>
+        <exclude org="io.netty" module="netty-codec-http2"/>
+        <exclude org="io.netty" module="netty-codec-memcache"/>
+        <exclude org="io.netty" module="netty-codec-mqtt"/>
+        <exclude org="io.netty" module="netty-codec-redis"/>
+        <exclude org="io.netty" module="netty-codec-smtp"/>
+        <exclude org="io.netty" module="netty-codec-socks"/>
+        <exclude org="io.netty" module="netty-codec-stomp"/>
+        <exclude org="io.netty" module="netty-codec-xml"/>
+        <exclude org="io.netty" module="netty-common"/>
+        <exclude org="io.netty" module="netty-handler"/>
+        <exclude org="io.netty" module="netty-handler-proxy"/>
+        <exclude org="io.netty" module="netty-handler-ssl-ocsp"/>
+        <exclude org="io.netty" module="netty-resolver"/>
+        <exclude org="io.netty" module="netty-resolver-dns"/>
+        <exclude org="io.netty" module="netty-transport"/>
+        <exclude org="io.netty" module="netty-transport-classes-epoll"/>
+        <exclude org="io.netty" module="netty-transport-classes-kqueue"/>
+        <exclude org="io.netty" module="netty-transport-native-epoll"/>
+        <exclude org="io.netty" module="netty-transport-native-kqueue"/>
+        <exclude org="io.netty" module="netty-transport-native-unix-common"/>
+        <exclude org="io.netty" module="netty-transport-rxtx"/>
+        <exclude org="io.netty" module="netty-transport-sctp"/>
+        <exclude org="io.netty" module="netty-transport-udt"/>
+
+        <exclude org="org.apache.sshd" module="sshd-common"/>
+        <exclude org="org.apache.sshd" module="sshd-core"/>
+        <exclude org="org.apache.sshd" module="sshd-sftp"/>
+
+        <exclude org="org.apache.zookeeper" module="zookeeper"/>
+        <exclude org="org.apache.zookeeper" module="zookeeper-jute"/>
+
+        <exclude org="org.jline" module="jline"/>
+        <exclude org="org.jline" module="jline-builtins"/>
+        <exclude org="org.jline" module="jline-reader"/>
+        <exclude org="org.jline" module="jline-remote-ssh"/>
+        <exclude org="org.jline" module="jline-remote-telnet"/>
+        <exclude org="org.jline" module="jline-style"/>
+        <exclude org="org.jline" module="jline-terminal"/>
+        <exclude org="org.jline" module="jline-terminal-jansi"/>
+        <exclude org="org.jline" module="jline-terminal-jna"/>
+
+        <exclude org="com.jayway.jsonpath" module="json-path"/>
+        <exclude org="com.github.java-json-tools" module="json-schema-core"/>
+        <exclude org="com.github.java-json-tools" module="json-schema-validator"/>
+        <exclude org="io.swagger" module="swagger-parser"/>
+        <exclude org="io.swagger" module="swagger-compat-spec-parser"/>
+        <exclude org="io.swagger.parser.v3" module="swagger-parser"/>
+        <exclude org="io.swagger.parser.v3" module="swagger-parser-core"/>
+        <exclude org="io.swagger.parser.v3" module="swagger-parser-v2-converter"/>
+        <exclude org="io.swagger.parser.v3" module="swagger-parser-v3"/>
+
+        <exclude org="org.mock-server" module="mockserver-client-java"/>
+        <exclude org="org.mock-server" module="mockserver-core"/>
+        <exclude org="org.mock-server" module="mockserver-netty"/>
+        <exclude org="org.apache.curator" module="curator-test"/>
+        <exclude org="org.openjdk.jmh" module="jmh-core"/>
+        <exclude org="org.openjdk.jmh" module="jmh-generator-annprocess"/>
+        <exclude org="junit" module="junit"/>
+        <exclude org="org.easymock" module="easymock"/>
+        <exclude org="org.xmlunit" module="xmlunit-core"/>
+        <exclude org="org.xmlunit" module="xmlunit-placeholders"/>
+        <exclude org="org.ops4j.pax.exam" module="pax-exam-cm"/>
+        <exclude org="org.ops4j.pax.exam" module="pax-exam-container-native"/>
+        <exclude org="org.ops4j.pax.exam" module="pax-exam-junit4"/>
+        <exclude org="org.ops4j.pax.exam" module="pax-exam-link-mvn"/>
+        <exclude org="org.ops4j.pax.exam" module="pax-exam-spi"/>
+        <exclude org="com.google.truth" module="truth"/>
+        <exclude org="org.apache.velocity" module="velocity-engine-core"/>
+        <exclude org="org.apache.velocity" module="velocity-engine-scripting"/>
+        <exclude org="com.squareup.okhttp3" module="mockwebserver"/>
+        <exclude org="io.micronaut.test" module="micronaut-test-type-pollution"/>
+        <exclude module="freehep-graphicsio-tests"/>
+
+        <!-- Remove leftover instrumentation/test baggage -->
+        <exclude org="net.bytebuddy" module="byte-buddy"/>
+        <exclude org="net.bytebuddy" module="byte-buddy-agent"/>
+        <exclude org="cglib" module="cglib-nodep"/>
+        <exclude org="jmock" module="jmock"/>
+        <exclude org="org.openjdk.jol" module="jol-core"/>
+
+        <!-- Remove Kotlin family entirely from transitive graph; re-add only if needed explicitly -->
+        <exclude org="org.jetbrains.kotlin" module="kotlin-stdlib"/>
+        <exclude org="org.jetbrains.kotlin" module="kotlin-stdlib-common"/>
+        <exclude org="org.jetbrains.kotlin" module="kotlin-stdlib-jdk7"/>
+        <exclude org="org.jetbrains.kotlin" module="kotlin-stdlib-jdk8"/>
+
+        <!-- Remove likely-unneeded Hadoop family -->
+        <exclude org="org.apache.hadoop" module="hadoop-apache"/>
+        <exclude org="org.apache.hadoop" module="hadoop-common"/>
+        <exclude org="org.apache.hadoop" module="hadoop-hdfs-client"/>
+        <exclude org="org.apache.hadoop" module="hadoop-client-api"/>
+        <exclude org="org.apache.hadoop" module="hadoop-client-runtime"/>
+        <exclude org="org.apache.hadoop" module="hadoop-minikdc"/>
+        <exclude org="org.apache.hadoop" module="hadoop-annotations"/>
+        <exclude org="org.apache.hadoop" module="hadoop-shaded-guava"/>
+        <exclude org="org.apache.hadoop" module="hadoop-shaded-protobuf_3_25"/>
+        <exclude module="hadoop-apache"/>
+        <exclude module="lzo-hadoop"/>
+
+        <!-- Remove Hadoop-auth chain -->
+        <exclude org="org.apache.kerby" module="kerb-core"/>
+        <exclude org="org.apache.kerby" module="kerb-crypto"/>
+        <exclude org="org.apache.kerby" module="kerb-util"/>
+        <exclude org="org.apache.kerby" module="kerby-asn1"/>
+        <exclude org="org.apache.kerby" module="kerby-config"/>
+        <exclude org="org.apache.kerby" module="kerby-pkix"/>
+        <exclude org="org.apache.kerby" module="kerby-util"/>
+
+        <!-- Remove older web-service baggage unless a node truly needs it -->
+        <exclude org="javax.servlet" module="javax.servlet-api"/>
+        <exclude org="javax.servlet.jsp" module="jsp-api"/>
+        <exclude org="com.sun.xml.ws" module="jaxws-rt"/>
+        <exclude org="com.sun.xml.bind" module="jaxb-impl"/>
+        <exclude org="com.sun.mail" module="javax.mail"/>
+        <exclude module="activation"/>
+        <exclude module="stax"/>
+        <exclude module="stax-api"/>
+        <exclude module="stax-ex"/>
+        <exclude org="com.sun.jersey" module="jersey-core"/>
+        <exclude org="com.sun.jersey" module="jersey-json"/>
+        <exclude org="com.sun.jersey" module="jersey-server"/>
+        <exclude org="com.sun.jersey" module="jersey-servlet"/>
+        <exclude org="org.wildfly.openssl" module="wildfly-openssl"/>
+        <exclude org="org.wildfly.openssl" module="wildfly-openssl-java"/>
+        
+        <exclude org="org.junit.platform" module="junit-platform-suite-api"/>
+		<exclude org="org.junit.platform" module="junit-platform-suite-commons"/>
+		<exclude org="org.junit.platform" module="junit-platform-suite-engine"/>
+		<exclude module="memoryfilesystem"/>
+		<exclude org="org.apiguardian" module="apiguardian-api"/>
+		
+		<exclude org="org.codehaus.mojo" module="animal-sniffer-annotations"/>
+		<exclude org="com.google.errorprone" module="error_prone_annotations"/>
+		<exclude org="org.jspecify" module="jspecify"/>
+		<exclude org="com.google.j2objc" module="j2objc-annotations"/>
+		<exclude org="com.google.guava" module="listenablefuture"/>
 
     </dependencies>
 </ivy-module>

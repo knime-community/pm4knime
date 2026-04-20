@@ -109,7 +109,7 @@
 		<mkdir dir="${dirPro}" />
 	</target>
 
-	<target name="copy-deps" depends="lib-resolve" description="retrieve only resolved runtime jars (no cache copy)">
+	<target name="copy-deps" depends="lib-resolve,clean-plugin-lib" description="retrieve only resolved runtime jars (no cache copy)">
 
 		<!-- Get the resolved jars as a fileset -->
 	    <ivy:cachefileset setid="runtime.jars" conf="${ivy.conf}" type="jar"/>
@@ -118,19 +118,61 @@
 	    <restrict id="runtime.filtered">
 	        <fileset refid="runtime.jars"/>
 	        <not>
-	            <or>
-	                <name name="**/*-sources.jar"/>
-	                <name name="**/*-source.jar"/>
-	                <name name="**/*-src.jar"/>
+	        	<or>
+					<!-- sources / javadoc / tests -->
+					<name name="**/*-sources.jar"/>
+					<name name="**/*-source.jar"/>
+					<name name="**/*-src.jar"/>
+					<name name="**/*-javadoc.jar"/>
+					<name name="**/*-tests.jar"/>
+					<name name="**/*-test.jar"/>
+					<name name="**/*javadoc*.jar"/>
+					<name name="**/*sources*.jar"/>
 
-	                <name name="**/*-javadoc.jar"/>
+					<!-- already-removed server/runtime baggage -->
+					<name name="**/jetty-*.jar"/>
+					<name name="**/netty-*.jar"/>
+					<name name="**/mockserver-*.jar"/>
+					<name name="**/zookeeper*.jar"/>
+					<name name="**/sshd-*.jar"/>
+					<name name="**/swagger-*.jar"/>
+					<name name="**/json-path-*.jar"/>
+					<name name="**/json-schema-*.jar"/>
+					<name name="**/velocity-*.jar"/>
+					<name name="**/jline-*.jar"/>
 
-	                <name name="**/*-tests.jar"/>
-	                <name name="**/*-test.jar"/>
+					<!-- test / instrumentation leftovers -->
+					<name name="**/byte-buddy-*.jar"/>
+					<name name="**/byte-buddy-agent-*.jar"/>
+					<name name="**/cglib-nodep-*.jar"/>
+					<name name="**/jmock-*.jar"/>
+					<name name="**/jol-core-*.jar"/>
+					<name name="**/mockwebserver-*.jar"/>
+					<name name="**/micronaut-test-type-pollution-*.jar"/>
+					<name name="**/freehep-graphicsio-tests-*.jar"/>
+					<name name="**/junit-platform-suite-*.jar"/>
 
-	                <name name="**/*javadoc*.jar"/>
-	                <name name="**/*sources*.jar"/>
-	            </or>
+					<!-- optional Hadoop/auth removal -->
+					<name name="**/hadoop-*.jar"/>
+					<name name="**/lzo-hadoop-*.jar"/>
+					<name name="**/kerb-*.jar"/>
+					<name name="**/kerby-*.jar"/>
+
+					<!-- optional old web-service baggage -->
+					<name name="**/javax.servlet-api-*.jar"/>
+					<name name="**/jsp-api-*.jar"/>
+					<name name="**/jaxws-rt-*.jar"/>
+					<name name="**/jaxb-impl-*.jar"/>
+					<name name="**/javax.mail-*.jar"/>
+					<name name="**/activation-*.jar"/>
+					<name name="**/stax-*.jar"/>
+					<name name="**/jersey-*.jar"/>
+					<name name="**/wildfly-openssl-*.jar"/>
+					<name name="**/wildfly-openssl-java-*.jar"/>
+
+					<!-- Kotlin mismatch guard -->
+					<name name="**/kotlin-stdlib-1.6.0.jar"/>
+				</or>
 	        </not>
 	    </restrict>
 
@@ -139,6 +181,12 @@
 	        <resources refid="runtime.filtered"/>
 	    </copy>
 
+	</target>
+	
+	<target name="clean-plugin-lib">
+		<delete includeemptydirs="true">
+			<fileset dir="${plugin.lib.dir}" includes="**/*.jar"/>
+		</delete>
 	</target>
 	
 	
@@ -236,5 +284,5 @@
 	</target>
 
 	
-	<target name="main" depends="set ,lib-resolve, copy-deps, strip-embedded-js, update-bundle-classpath, build-frontend"/> 
+	<target name="main" depends="set,lib-resolve,clean-plugin-lib,copy-deps,strip-embedded-js,update-bundle-classpath,build-frontend"/>
 </project>
