@@ -11,6 +11,7 @@ knime-python-base = "5.*"
 knime-python-versions = "5.*"
 intervaltree = "*"
 pydotplus = "*"
+graphviz = "*"
 pip = "*"
 
 [feature.build.dependencies]
