@@ -21,11 +21,6 @@ public final class HybridPetriNetPortViewFactories extends AbstractGraphPortView
         register(portClass, portName, PORT_VIEW_FACTORY);
     }
 
-    @Override
-    protected Class<?> getBundleClass() {
-        return HybridPetriNetPortViewFactories.class;
-    }
-
     private HybridPetriNetPortViewFactories() {
     }
 }

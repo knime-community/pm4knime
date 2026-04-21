@@ -2,8 +2,11 @@ package org.pm4knime.node.visualizations.logviews.tracevariant;
 
 import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
+import org.pm4knime.node.visualizations.common.BundlePageResources;
 
 public class TraceVariantVisNodeFactory extends DefaultNodeFactory {
+
+    private static final String TRACE_VARIANT_PAGE = "src/views/tracevariant/index.html";
 
     public TraceVariantVisNodeFactory() {
         super(
@@ -40,13 +43,7 @@ public class TraceVariantVisNodeFactory extends DefaultNodeFactory {
                 .addView(v -> v
                 	.withoutParameters()
             	    .description("Trace Variant Explorer")
-            	    .page(p -> p
-            	        .fromFile()
-        	            .bundleClass(TraceVariantVisNodeFactory.class)
-        	            .basePath("js-src/dist")
-        	            .relativeFilePath("src/views/tracevariant/index.html")
-                        .addResourceDirectory("assets")
-            	    )
+            	    .page(p -> BundlePageResources.createPage(TRACE_VARIANT_PAGE))
             	    .initialData(TraceVariantView::createInitialData)
             	)
 

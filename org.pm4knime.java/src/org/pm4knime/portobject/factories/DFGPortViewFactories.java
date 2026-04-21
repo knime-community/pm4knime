@@ -21,11 +21,6 @@ public final class DFGPortViewFactories extends AbstractGraphPortViewFactories<D
         register(portClass, portName, PORT_VIEW_FACTORY);
     }
 
-    @Override
-    protected Class<?> getBundleClass() {
-        return DFGPortViewFactories.class;
-    }
-
     private DFGPortViewFactories() {
     }
 }

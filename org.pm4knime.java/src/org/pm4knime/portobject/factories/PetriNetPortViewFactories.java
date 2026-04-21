@@ -21,11 +21,6 @@ public final class PetriNetPortViewFactories extends AbstractGraphPortViewFactor
         register(portClass, portName, PORT_VIEW_FACTORY);
     }
 
-    @Override
-    protected Class<?> getBundleClass() {
-        return PetriNetPortViewFactories.class;
-    }
-
     private PetriNetPortViewFactories() {
     }
 }

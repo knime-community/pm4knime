@@ -21,11 +21,6 @@ public final class CausalGraphPortViewFactories extends AbstractGraphPortViewFac
         register(portClass, portName, PORT_VIEW_FACTORY);
     }
 
-    @Override
-    protected Class<?> getBundleClass() {
-        return CausalGraphPortViewFactories.class;
-    }
-
     private CausalGraphPortViewFactories() {
     }
 }

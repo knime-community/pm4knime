@@ -4,29 +4,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import org.knime.core.webui.data.InitialDataService;
 import org.knime.core.webui.data.RpcDataService;
 import org.knime.core.webui.node.port.PortView;
 import org.knime.core.webui.node.port.PortViewFactory;
 import org.knime.core.webui.node.port.PortViewManager;
 import org.knime.core.webui.page.Page;
+import org.pm4knime.node.visualizations.common.BundlePageResources;
 import org.pm4knime.portobject.AbstractJSONPortObject;
 
 @SuppressWarnings("restriction")
 public abstract class AbstractGraphPortViewFactories<T extends AbstractJSONPortObject> {
+
+    private static final String GRAPH_PAGE = "src/views/jsgraphviz/index.html";
 
     protected PortView createPortObjectView(final T obj) {
         return new PortView() {
 
             @Override
             public Page getPage() {
-                return Page.create()
-                    .fromFile()
-                    .bundleClass(getBundleClass())
-                    .basePath(".")
-                    .relativeFilePath("js-src/dist/src/views/jsgraphviz/index.html")
-                    .addResourceDirectory("js-src/dist/assets");
+                return BundlePageResources.createPage(GRAPH_PAGE);
             }
 
             @Override
@@ -66,5 +63,4 @@ public abstract class AbstractGraphPortViewFactories<T extends AbstractJSONPortO
         return result;
     }
 
-    protected abstract Class<?> getBundleClass();
 }
