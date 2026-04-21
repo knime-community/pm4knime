@@ -20,10 +20,6 @@ public final class ProcessTreePortViewFactories extends AbstractGraphPortViewFac
         register(portClass, portName, PORT_VIEW_FACTORY);
     }
 
-    @Override
-    protected Class<?> getBundleClass() {
-        return ProcessTreePortViewFactories.class;
-    }
 
     private ProcessTreePortViewFactories() {
     }
