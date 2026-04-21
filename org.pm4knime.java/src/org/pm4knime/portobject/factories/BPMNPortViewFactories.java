@@ -11,8 +11,8 @@ import org.knime.core.webui.node.port.PortView;
 import org.knime.core.webui.node.port.PortViewFactory;
 import org.knime.core.webui.node.port.PortViewManager;
 import org.knime.core.webui.page.Page;
+import org.pm4knime.node.visualizations.common.BundlePageResources;
 import org.pm4knime.portobject.BpmnPortObject;
-import org.pm4knime.util.PM4KNIMEPlugin;
 
 @SuppressWarnings("restriction")
 public final class BPMNPortViewFactories {
@@ -24,6 +24,7 @@ public final class BPMNPortViewFactories {
 
     private static final Class<?> PORT_CLASS = BpmnPortObject.class;
     private static final String PORT_NAME = "BPMN View";
+    private static final String BPMN_PAGE = "src/views/bpmn/index.html";
 
     public static void register() {
         PortViewManager.registerPortViews(
@@ -39,12 +40,7 @@ public final class BPMNPortViewFactories {
 
             @Override
             public Page getPage() {
-                return Page.create()
-            		.fromFile()
-            	    .bundleClass(PM4KNIMEPlugin.class)
-            	    .basePath("js-src/dist")
-            	    .relativeFilePath("src/views/bpmn/index.html")
-            	    .addResourceDirectory("assets");	
+                return BundlePageResources.createPage(BPMN_PAGE);
             }
 
             @Override
