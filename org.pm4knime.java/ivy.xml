@@ -9,7 +9,6 @@
 
         <!-- Core overrides -->
         <dependency org="com.thoughtworks.xstream" name="xstream" rev="1.4.21" force="true"/>
-        <dependency org="org.xerial" name="sqlite-jdbc" rev="3.51.0.0" force="true"/>
         <dependency org="org.python" name="jython-standalone" rev="2.7.4" force="true"/>
 
         <dependency org="com.fasterxml.jackson.core" name="jackson-databind" rev="2.19.2" force="true"/>
@@ -296,6 +295,8 @@
 		<exclude org="org.jspecify" module="jspecify"/>
 		<exclude org="com.google.j2objc" module="j2objc-annotations"/>
 		<exclude org="com.google.guava" module="listenablefuture"/>
+		
+		<exclude org="org.xerial" module="sqlite-jdbc"/>
 
     </dependencies>
 </ivy-module>
