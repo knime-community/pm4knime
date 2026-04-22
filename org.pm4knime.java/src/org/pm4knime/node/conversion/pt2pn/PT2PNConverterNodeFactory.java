@@ -4,7 +4,6 @@ import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
 import org.pm4knime.portobject.PetriNetPortObject;
 import org.pm4knime.portobject.ProcessTreePortObject;
-import org.pm4knime.util.defaultnode.EmptyNodeSettings;
 
 public class PT2PNConverterNodeFactory extends DefaultNodeFactory {
 
@@ -27,7 +26,7 @@ public class PT2PNConverterNodeFactory extends DefaultNodeFactory {
                     .addInputPort("Process Tree", "a process tree", ProcessTreePortObject.TYPE)
                     .addOutputPort("Petri net", "a Petri net", PetriNetPortObject.TYPE))
                 .model(m -> m
-                    .parametersClass(EmptyNodeSettings.class)
+                    .withoutParameters()
                     .configure(PT2PNConverterNodeModel::configure)
                     .execute(PT2PNConverterNodeModel::execute))
 //                .addView(v -> ModernViews.graph(v, PT2PNConverterNodeFactory.class, "Petri net view"))
