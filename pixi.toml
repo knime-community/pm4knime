@@ -23,7 +23,7 @@ nodejs = "*"
 debugpy = "*"
 
 [feature.build.tasks]
-build = { args = [{ "arg" = "dest", "default" = "./local-update-site" }], cmd = "build-python-extension . {{ dest }} --update-sites-version latest"}
+build = { args = [{ "arg" = "dest", "default" = "./local-update-site" }, { "arg" = "update_sites_version", "default" = "latest" }], cmd = "build-python-extension . {{ dest }} --update-sites-version {{ update_sites_version }}"}
 
 
 [environments]
