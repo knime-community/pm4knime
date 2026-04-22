@@ -1,313 +1,147 @@
 package org.pm4knime.node.conversion.log2table;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.deckfour.xes.model.XLog;
-import org.deckfour.xes.model.XTrace;
 import org.deckfour.xes.model.impl.XAttributeBooleanImpl;
 import org.deckfour.xes.model.impl.XAttributeContinuousImpl;
 import org.deckfour.xes.model.impl.XAttributeDiscreteImpl;
 import org.deckfour.xes.model.impl.XAttributeLiteralImpl;
 import org.deckfour.xes.model.impl.XAttributeTimestampImpl;
-import org.knime.core.data.DataCell;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
-import org.knime.core.data.MissingCell;
 import org.knime.core.data.def.BooleanCell;
-import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.time.zoneddatetime.ZonedDateTimeCell;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.CanceledExecutionException;
-import org.knime.core.node.ExecutionContext;
-import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
-import org.knime.core.node.NodeModel;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
-import org.knime.core.node.port.PortObject;
-import org.knime.core.node.port.PortObjectSpec;
-import org.knime.core.node.port.PortType;
-import org.knime.core.webui.node.dialog.defaultdialog.NodeParametersUtil;
+import org.knime.node.DefaultModel;
 import org.pm4knime.portobject.XLogPortObject;
 import org.pm4knime.portobject.XLogPortObjectSpec;
-import org.pm4knime.util.XLogSpecUtil;
-import org.pm4knime.util.defaultnode.EmptyNodeSettings;
 
 /**
- * <code>NodeModel</code> for the "Xlog2CSVConverter" node. If we could change XLog into DataTable, 
+ * <code>NodeModel</code> for the "Xlog2CSVConverter" node. If we could change XLog into DataTable,
  * we could convert it into CSV by using default CSV Writer in KNIME. Now, the thing here is how to convert
- * XLog into DataTable format. 
- * 
+ * XLog into DataTable format.
+ *
  * We need to have all the attributes of event class; It should include the attribute for trace, too.
- * If we use classifier, how could we store it into the DataTable?? 
+ * If we use classifier, how could we store it into the DataTable??
  * -- get attributes and create table spec
- * -- fill each row for one event class 
- * 
- * ++ convert the DataTable into CSV files. But it is actually based on Datatable, we can operate on the DATATABEL. 
+ * -- fill each row for one event class
+ *
+ * ++ convert the DataTable into CSV files. But it is actually based on Datatable, we can operate on the DATATABEL.
  * TableSpec, but how to fill it there?? Without data, but only the possible data there, check the csv reader codes
  * In ProM codes, it convert log directly into CVS files. It converts event log into string and output strings
- * 
+ *
  * Here, we need more extensions to say if we need this, or not. We just convert it directly to CSV file??
  * They are only DataTable conversion!! Rename the nodes, please!!!
+ *
  * @author Kefang
  */
-
 @SuppressWarnings("restriction")
-public class XLog2TableConverterNodeModel extends NodeModel {
-	private static final NodeLogger logger = NodeLogger.getLogger(XLog2TableConverterNodeModel.class);
-	
-	static final String CFG_TABLE_NAME = "Converted Data Table from Event Log";
-	
-	private SettingsModelFilterString m_traceAttrSet  = new SettingsModelFilterString(XLogSpecUtil.CFG_KEY_TRACE_ATTRSET, new String[]{}, new String[]{}, true);
-	
-	private SettingsModelFilterString m_eventAttrSet = new SettingsModelFilterString(XLogSpecUtil.CFG_KEY_EVENT_ATTRSET, new String[]{}, new String[]{}, true);
-	
-	private XLogPortObjectSpec m_inSpec;
-	
-	protected EmptyNodeSettings m_settings = new EmptyNodeSettings();
+final class XLog2TableConverterNodeModel {
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(XLog2TableConverterNodeModel.class);
 
-    private final Class<EmptyNodeSettings> m_settingsClass;
+    static final String CFG_TABLE_NAME = "Converted Data Table from Event Log";
 
-    /**
-     * Constructor for the node model.
-     */
-//    protected XLog2TableConverterNodeModel() {
-//    
-//        // TODO: Specify the amount of input and output ports needed.
-//        super( new PortType[]{XLogPortObject.TYPE}, new PortType[]{BufferedDataTable.TYPE});
-//    }
-
-    public XLog2TableConverterNodeModel(Class<EmptyNodeSettings> modelSettingsClass) {
-		// TODO Auto-generated constructor stub
-    	super(new PortType[]{XLogPortObject.TYPE}, new PortType[]{BufferedDataTable.TYPE, BufferedDataTable.TYPE});
-    	//super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{XLogPortObject.TYPE});
-    	m_settingsClass = modelSettingsClass;
+    private XLog2TableConverterNodeModel() {
     }
 
-	/**
-     * {@inheritDoc}
-     */
-    @Override
-    protected BufferedDataTable[] execute(final PortObject[] inData,
-            final ExecutionContext exec) throws Exception {
-    	logger.info("Start : Convert Event log to DataTable" );
-    	XLogPortObject logPortObject = null ;
-    	for(PortObject obj: inData) {
-    		exec.checkCanceled();
-        	if(obj instanceof XLogPortObject) {
-        		logPortObject = (XLogPortObject)obj;
-        		break;
-        	}
-    	}
-        
-    	XLog log = logPortObject.getLog();
-    	DataTableSpec eventSpec = createEventSpec();
-    	DataTableSpec caseSpec  = createCaseSpec();
+    static void configure(final DefaultModel.ConfigureInput i, final DefaultModel.ConfigureOutput o)
+        throws InvalidSettingsException {
 
-    	BufferedDataContainer eventBuf =
-    	        exec.createDataContainer(eventSpec);
+        if (!(i.getInPortSpec(0) instanceof XLogPortObjectSpec)) {
+            throw new InvalidSettingsException("Input is not a valid Event Log!");
+        }
 
-    	BufferedDataContainer caseBuf =
-    	        exec.createDataContainer(caseSpec);    	
-
-    	
-    	FromXLogConverter.convert(log, eventBuf, caseBuf, exec);
-
-    	
-    	eventBuf.close();
-    	caseBuf.close();
-    	logger.info("End : Convert Event log to DataTable" );
-    	
-    	return new BufferedDataTable[]{
-    	        eventBuf.getTable(),
-    	        caseBuf.getTable()
-    	};
+        final XLogPortObjectSpec spec = (XLogPortObjectSpec)i.getInPortSpec(0);
+        o.setOutSpec(0, createEventSpec(spec));
+        o.setOutSpec(1, createCaseSpec(spec));
     }
 
-    private DataTableSpec createEventSpec() {
-    	
-    	List<String> attrNames = new ArrayList();
-		List<DataType> attrTypes = new ArrayList();
-    	if(m_traceAttrSet.getIncludeList().isEmpty()) {
-        	Set<String> specTraceColumns = m_inSpec.getGTraceAttrMap().keySet();
-        	m_traceAttrSet.setIncludeList(specTraceColumns);
-        	m_traceAttrSet.setExcludeList(new String[0]);
-    	}
-    	
-    	if(m_eventAttrSet.getIncludeList().isEmpty()) {
-        	Set<String> specEventColumns = m_inSpec.getGEventAttrMap().keySet();
-        	m_eventAttrSet.setIncludeList(specEventColumns);
-        	m_eventAttrSet.setExcludeList(new String[0]);
-    	}
-		// from the trace attr to event attr here
-		for (String attrKey : m_traceAttrSet.getIncludeList()) {
-			// how to get the traceTypes here?? We have the m_spec from the input, we need to use it!!
-			attrNames.add(attrKey);
-			String attrType = m_inSpec.getGTraceAttrMap().get(attrKey).getSimpleName();
-			attrTypes.add(findDataType(attrType));
-		}
-		
-		for (String attrKey : m_eventAttrSet.getIncludeList()) {
-			// how to get the traceTypes here?? We have the m_spec from the input, we need to use it!!
-			attrNames.add(attrKey);
-			String attrType = m_inSpec.getGEventAttrMap().get(attrKey).getSimpleName();
-			attrTypes.add(findDataType(attrType));
-		}
-		
-		DataTableSpec outSpec = new DataTableSpec(CFG_TABLE_NAME, 
-				attrNames.toArray(new String[0]), attrTypes.toArray(new DataType[0]));
-		
-    	return outSpec;
+    static void execute(final DefaultModel.ExecuteInput i, final DefaultModel.ExecuteOutput o) {
+        try {
+            LOGGER.info("Start : Convert Event log to DataTable");
+            final XLogPortObject logPortObject = (XLogPortObject)i.getInPortObject(0);
+            final XLogPortObjectSpec spec = (XLogPortObjectSpec)logPortObject.getSpec();
+
+            final DataTableSpec eventSpec = createEventSpec(spec);
+            final DataTableSpec caseSpec = createCaseSpec(spec);
+
+            final BufferedDataContainer eventBuf = i.getExecutionContext().createDataContainer(eventSpec);
+            final BufferedDataContainer caseBuf = i.getExecutionContext().createDataContainer(caseSpec);
+
+            FromXLogConverter.convert(logPortObject.getLog(), eventBuf, caseBuf, i.getExecutionContext());
+
+            eventBuf.close();
+            caseBuf.close();
+            LOGGER.info("End : Convert Event log to DataTable");
+
+            final BufferedDataTable eventTable = eventBuf.getTable();
+            final BufferedDataTable caseTable = caseBuf.getTable();
+            o.setOutData(0, eventTable);
+            o.setOutData(1, caseTable);
+            o.setInternalData(eventTable);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
-    
-    private DataTableSpec createCaseSpec() {
 
-        List<String> attrNames = new ArrayList<>();
-        List<DataType> attrTypes = new ArrayList<>();
+    private static DataTableSpec createEventSpec(final XLogPortObjectSpec spec) {
+        final List<String> attrNames = new ArrayList<>();
+        final List<DataType> attrTypes = new ArrayList<>();
 
-        Set<String> specTraceColumns = m_inSpec.getGTraceAttrMap().keySet();
-
-        for (String attrKey : specTraceColumns) {
-
+        for (final String attrKey : spec.getGTraceAttrMap().keySet()) {
             attrNames.add(attrKey);
+            attrTypes.add(findDataType(spec.getGTraceAttrMap().get(attrKey).getSimpleName()));
+        }
 
-            String attrType = m_inSpec
-                    .getGTraceAttrMap()
-                    .get(attrKey)
-                    .getSimpleName();
+        for (final String attrKey : spec.getGEventAttrMap().keySet()) {
+            attrNames.add(attrKey);
+            attrTypes.add(findDataType(spec.getGEventAttrMap().get(attrKey).getSimpleName()));
+        }
 
-            attrTypes.add(findDataType(attrType));
+        return new DataTableSpec(
+            CFG_TABLE_NAME,
+            attrNames.toArray(new String[0]),
+            attrTypes.toArray(new DataType[0]));
+    }
+
+    private static DataTableSpec createCaseSpec(final XLogPortObjectSpec spec) {
+        final List<String> attrNames = new ArrayList<>();
+        final List<DataType> attrTypes = new ArrayList<>();
+
+        final Set<String> specTraceColumns = spec.getGTraceAttrMap().keySet();
+        for (final String attrKey : specTraceColumns) {
+            attrNames.add(attrKey);
+            attrTypes.add(findDataType(spec.getGTraceAttrMap().get(attrKey).getSimpleName()));
         }
 
         return new DataTableSpec(
             "Case Table",
             attrNames.toArray(new String[0]),
-            attrTypes.toArray(new DataType[0])
-        );
-    }
-    
-    
-    private DataType findDataType(String cls) {
-		// TODO according to the type in string, we get the right data type for it
-    	if(cls.equals(XAttributeLiteralImpl.class.getSimpleName())) {
-			// we don't care about the values here
-			return StringCell.TYPE;
-		}else if(cls.equals(XAttributeBooleanImpl.class.getSimpleName())) {
-			// we don't care about the values here
-			return BooleanCell.TYPE;
-		}else if(cls.equals(XAttributeDiscreteImpl.class.getSimpleName())) {
-			// we don't care about the values here
-			return IntCell.TYPE;
-		}else if(cls.equals(XAttributeContinuousImpl.class.getSimpleName())) {
-			// we don't care about the values here
-			return DoubleCell.TYPE;
-		}else  if(cls.equals(XAttributeTimestampImpl.class.getSimpleName())) {
-			// we don't care about the values here
-			return DataType.getType(ZonedDateTimeCell.class);
-		}else {
-			System.out.println("The attribute is not recognized");
-		} 
-		return null;
-	}
-
-	/**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void reset() {
-        // TODO: generated method stub
-    	m_traceAttrSet  = new SettingsModelFilterString(XLogSpecUtil.CFG_KEY_TRACE_ATTRSET, new String[]{}, new String[]{}, false );
-    	m_eventAttrSet = new SettingsModelFilterString(XLogSpecUtil.CFG_KEY_EVENT_ATTRSET, new String[]{}, new String[]{}, false ); 	
-    }
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
-            throws InvalidSettingsException {
-
-
-    	XLogPortObjectSpec spec = (XLogPortObjectSpec) inSpecs[0];
-
-    	if(!spec.getClass().equals(XLogPortObjectSpec.class)) 
-    		throw new InvalidSettingsException("Input is not a valid Event Log!");
-    	
-//    	if( spec.getGTraceAttrMap().isEmpty()|| spec.getClassifiersMap().isEmpty()) {
-//    		throw new InvalidSettingsException("Log Spec Object is Empty. Probably because the reader node got reset");
-//    	}
-   	
-
-    	m_inSpec = spec;   	
-    	
-    	return new PortObjectSpec[]{
-    	        null,
-    	        null
-    	    };
+            attrTypes.toArray(new DataType[0]));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings) {
-         // TODO: generated method stub
-//    	m_traceAttrSet.saveSettingsTo(settings);
-//    	m_eventAttrSet.saveSettingsTo(settings);
-    	if (m_settings != null) {
-    		NodeParametersUtil.saveSettings(m_settingsClass, m_settings, settings);
+    private static DataType findDataType(final String cls) {
+        if (cls.equals(XAttributeLiteralImpl.class.getSimpleName())) {
+            return StringCell.TYPE;
+        } else if (cls.equals(XAttributeBooleanImpl.class.getSimpleName())) {
+            return BooleanCell.TYPE;
+        } else if (cls.equals(XAttributeDiscreteImpl.class.getSimpleName())) {
+            return IntCell.TYPE;
+        } else if (cls.equals(XAttributeContinuousImpl.class.getSimpleName())) {
+            return DoubleCell.TYPE;
+        } else if (cls.equals(XAttributeTimestampImpl.class.getSimpleName())) {
+            return DataType.getType(ZonedDateTimeCell.class);
+        } else {
+            System.out.println("The attribute is not recognized");
         }
-    	
+        return null;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-//    	m_traceAttrSet.loadSettingsFrom(settings);
-//    	m_eventAttrSet.loadSettingsFrom(settings);
-    	m_settings = NodeParametersUtil.loadSettings(settings, m_settingsClass);
-    	
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-        // TODO: generated method stub
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadInternals(final File internDir,
-            final ExecutionMonitor exec) throws IOException,
-            CanceledExecutionException {
-        // TODO: generated method stub
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveInternals(final File internDir,
-            final ExecutionMonitor exec) throws IOException,
-            CanceledExecutionException {
-        // TODO: generated method stub
-    }
-
 }
