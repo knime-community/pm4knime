@@ -3,7 +3,6 @@ package org.pm4knime.node.conversion.table2hpn;
 import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
 import org.pm4knime.portobject.HybridPetriNetPortObject;
-import org.pm4knime.util.defaultnode.EmptyNodeSettings;
 
 public class Table2HybridPetriNetConverterNodeFactory extends DefaultNodeFactory {
 
@@ -20,7 +19,7 @@ public class Table2HybridPetriNetConverterNodeFactory extends DefaultNodeFactory
                     .addInputTable("Table", "an event table")
                     .addOutputPort("Hybrid Petri Net", "a hybrid Petri net", HybridPetriNetPortObject.TYPE))
                 .model(m -> m
-                    .parametersClass(EmptyNodeSettings.class)
+                	.withoutParameters()
                     .configure(Table2HybridPetriNetConverterNodeModel::configure)
                     .execute(Table2HybridPetriNetConverterNodeModel::execute))
 //                .addView(v -> ModernViews.graph(v, Table2HybridPetriNetConverterNodeFactory.class, "Hybrid Petri net view"))

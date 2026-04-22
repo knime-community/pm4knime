@@ -4,7 +4,6 @@ import org.knime.node.DefaultNode;
 import org.knime.node.DefaultNodeFactory;
 import org.pm4knime.portobject.BpmnPortObject;
 import org.pm4knime.portobject.PetriNetPortObject;
-import org.pm4knime.util.defaultnode.EmptyNodeSettings;
 
 public class PN2BPMNConverterNodeFactory extends DefaultNodeFactory {
 
@@ -54,7 +53,7 @@ public class PN2BPMNConverterNodeFactory extends DefaultNodeFactory {
                     .addInputPort("Petri net", "a Petri net", PetriNetPortObject.TYPE)
                     .addOutputPort("BPMN", "a Business Process Modeling Notation (BPMN)", BpmnPortObject.TYPE))
                 .model(m -> m
-                    .parametersClass(EmptyNodeSettings.class)
+                	.withoutParameters()
                     .configure(PN2BPMNConverterNodeModel::configure)
                     .execute(PN2BPMNConverterNodeModel::execute))
 //                .addView(v -> ModernViews.bpmn(v, PN2BPMNConverterNodeFactory.class, "BPMN view"))
