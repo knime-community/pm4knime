@@ -23,6 +23,7 @@ import org.knime.core.node.NodeLogger;
 import org.knime.node.DefaultModel;
 import org.pm4knime.portobject.XLogPortObject;
 import org.pm4knime.portobject.XLogPortObjectSpec;
+import org.pm4knime.util.XLogSpecUtil;
 
 /**
  * <code>NodeModel</code> for the "Xlog2CSVConverter" node. If we could change XLog into DataTable,
@@ -60,6 +61,11 @@ final class XLog2TableConverterNodeModel {
         }
 
         final XLogPortObjectSpec spec = (XLogPortObjectSpec)i.getInPortSpec(0);
+        if (!hasCompleteSpec(spec)) {
+            o.setOutSpec(0, null);
+            o.setOutSpec(1, null);
+            return;
+        }
         o.setOutSpec(0, createEventSpec(spec));
         o.setOutSpec(1, createCaseSpec(spec));
     }
@@ -68,7 +74,7 @@ final class XLog2TableConverterNodeModel {
         try {
             LOGGER.info("Start : Convert Event log to DataTable");
             final XLogPortObject logPortObject = (XLogPortObject)i.getInPortObject(0);
-            final XLogPortObjectSpec spec = (XLogPortObjectSpec)logPortObject.getSpec();
+            final XLogPortObjectSpec spec = ensureCompleteSpec(logPortObject);
 
             final DataTableSpec eventSpec = createEventSpec(spec);
             final DataTableSpec caseSpec = createCaseSpec(spec);
@@ -90,6 +96,21 @@ final class XLog2TableConverterNodeModel {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    private static boolean hasCompleteSpec(final XLogPortObjectSpec spec) {
+        return spec != null && spec.getGTraceAttrMap() != null && spec.getGEventAttrMap() != null;
+    }
+
+    private static XLogPortObjectSpec ensureCompleteSpec(final XLogPortObject logPortObject) {
+        final XLogPortObjectSpec spec = (XLogPortObjectSpec)logPortObject.getSpec();
+        if (hasCompleteSpec(spec)) {
+            return spec;
+        }
+
+        final XLogPortObjectSpec extractedSpec = XLogSpecUtil.extractSpec(logPortObject.getLog());
+        logPortObject.setSpec(extractedSpec);
+        return extractedSpec;
     }
 
     private static DataTableSpec createEventSpec(final XLogPortObjectSpec spec) {
