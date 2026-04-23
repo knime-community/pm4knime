@@ -12,34 +12,31 @@ import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.out.XSerializer;
 import org.deckfour.xes.out.XesXmlGZIPSerializer;
 import org.deckfour.xes.out.XesXmlSerializer;
-import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
-import org.knime.core.webui.node.impl.WebUINodeConfiguration;
-import org.knime.core.webui.node.impl.WebUINodeModel;
 import org.knime.filehandling.core.connections.FSConnection;
 import org.knime.filehandling.core.connections.FSFileSystem;
 import org.knime.filehandling.core.connections.FSFiles;
 import org.knime.filehandling.core.defaultnodesettings.FileSystemHelper;
+import org.knime.node.DefaultModel;
 import org.pm4knime.portobject.XLogPortObject;
 import org.pm4knime.util.NodeSettingsUtils.ExistingOutputFileHandlingMode;
 
 @SuppressWarnings("restriction")
-final class XESWriterNodeModel extends WebUINodeModel<XESWriterNodeSettings> {
+final class XESWriterNodeModel {
 
 	private static final NodeLogger LOGGER = NodeLogger.getLogger(XESWriterNodeModel.class);
 
-	XESWriterNodeModel(final WebUINodeConfiguration config) {
-		super(config, XESWriterNodeSettings.class);
+	private XESWriterNodeModel() {
 	}
 
-	@Override
-	protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs, final XESWriterNodeSettings settings)
+	static void configure(final DefaultModel.ConfigureInput i, final DefaultModel.ConfigureOutput o)
 			throws InvalidSettingsException {
+		final XESWriterNodeSettings settings = i.getParameters();
 		
 		if (settings.m_outputFile == null || settings.m_outputFile.getFSLocation() == null) {
 			throw new InvalidSettingsException("Please specify a path to the output file!");
@@ -52,16 +49,24 @@ final class XESWriterNodeModel extends WebUINodeModel<XESWriterNodeSettings> {
 
 		String expectedExt = settings.getExtension();
 		if (!outputPath.endsWith(expectedExt)) {
-			setWarningMessage(
+			o.setWarningMessage(
 				String.format("Output file path did not have the correct file extension \"%s\", it will be appended.", expectedExt)
 			);
 		}
 
-		return new PortObjectSpec[0];
+		o.setOutSpecs(new PortObjectSpec[0]);
 	}
 
-	@Override
-	protected PortObject[] execute(final PortObject[] inData, final ExecutionContext exec,
+	static void execute(final DefaultModel.ExecuteInput i, final DefaultModel.ExecuteOutput o) {
+		try {
+			execute(i.getInPortObjects(), i.getExecutionContext(), i.getParameters());
+			o.setOutData(new PortObject[0]);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	private static PortObject[] execute(final PortObject[] inData, final org.knime.core.node.ExecutionContext exec,
 			final XESWriterNodeSettings settings) throws Exception {
 		
 		CheckUtils.checkArgumentNotNull(settings.m_outputFile, "Output file selection must be present.");
@@ -111,7 +116,7 @@ final class XESWriterNodeModel extends WebUINodeModel<XESWriterNodeSettings> {
 		return new PortObject[0];
 	}
 
-	protected void writeToFile(OutputStream outputStream, XLog log, final XESWriterNodeSettings settings)
+	private static void writeToFile(OutputStream outputStream, XLog log, final XESWriterNodeSettings settings)
 			throws IOException {
 		if (settings.m_compressWithGzipChecker) {
 			XSerializer logSerializer = new XesXmlGZIPSerializer();
@@ -122,7 +127,7 @@ final class XESWriterNodeModel extends WebUINodeModel<XESWriterNodeSettings> {
 		}
 	}
 
-	private String pathWithExtension(final String path, final XESWriterNodeSettings settings) {
+	private static String pathWithExtension(final String path, final XESWriterNodeSettings settings) {
 		String ext = settings.getExtension();
 		
 		if (!path.toLowerCase(Locale.US).endsWith(ext.toLowerCase(Locale.US))) {

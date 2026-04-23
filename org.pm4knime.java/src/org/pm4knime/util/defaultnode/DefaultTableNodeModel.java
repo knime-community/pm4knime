@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.webui.node.dialog.defaultdialog.NodeParametersUtil;
@@ -54,6 +56,17 @@ public abstract class DefaultTableNodeModel<S extends DefaultTableNodeSettings> 
 		if(modelSettings.e_classifier == null || modelSettings.t_classifier == null || modelSettings.time_classifier == null)
 			throw new InvalidSettingsException("Classifiers are not set! Please open the dialog and configure the node!");
 		return configureOutSpec(logSpec);
+	}
+
+	public final PortObjectSpec[] configureForDefaultNode(final PortObjectSpec[] inSpecs, final S modelSettings)
+	        throws InvalidSettingsException {
+	    return configure(inSpecs, modelSettings);
+	}
+
+	public final PortObject[] executeForDefaultNode(final PortObject[] inData, final ExecutionContext exec,
+	        final S modelSettings) throws Exception {
+	    m_settings = modelSettings;
+	    return execute(inData, exec);
 	}
         
     protected abstract PortObjectSpec[] configureOutSpec(DataTableSpec logSpec);	

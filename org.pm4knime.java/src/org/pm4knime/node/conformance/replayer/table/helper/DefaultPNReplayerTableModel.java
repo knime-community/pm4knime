@@ -79,6 +79,10 @@ public class DefaultPNReplayerTableModel extends DefaultNodeModel {
     	  	
     }
 
+    void setSettings(final PNReplayerTableNodeSettings settings) {
+    	m_modelSettings = settings;
+    }
+
 
    
     @Override
