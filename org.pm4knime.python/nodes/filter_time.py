@@ -31,7 +31,7 @@ class FilteringModes(knext.EnumParameterOptions):
     description="This node is used to filter an event table on a time interval. Several filtering modes are supported."
 )
 @knext.input_table(name="Event Table", description="Input Event Table")
-@knext.output_table(name="Event Table", description="Filtered Event Table")
+@knext.output_table(name="Filtered Event Table", description="Filtered Event Table")
 class TimeFilter:
     column_param_case = knext.ColumnParameter(label="Case Column",
                                               description="The column that contains the case identifiers.",
