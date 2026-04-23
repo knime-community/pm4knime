@@ -2,6 +2,7 @@ import io
 import knime.extension as knext
 import pandas as pd
 import os
+import html
 import logging
 import pytz
 import powl
@@ -24,6 +25,39 @@ petri_net_port_type = knext.nodes.get_port_type_for_id(
 )
 
 
+def _exception_to_svg(exc: Exception, width: int = 1000, height: int = 260) -> str:
+    """
+    Create a simple SVG that displays the visualization error.
+    This keeps image/view outputs valid even if Graphviz is unavailable.
+    """
+    title = "POWL visualization could not be generated"
+    msg = f"{type(exc).__name__}: {str(exc)}"
+
+    title = html.escape(title)
+    msg = html.escape(msg)
+
+    # crude line wrapping for long exception messages
+    max_chars = 95
+    lines = [msg[i:i + max_chars] for i in range(0, len(msg), max_chars)]
+    tspan_lines = "\n".join(
+        f'<tspan x="30" dy="22">{line}</tspan>' for line in lines
+    )
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">
+  <rect width="100%" height="100%" fill="#fff8f8" stroke="#cc0000" stroke-width="2"/>
+  <text x="30" y="45" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#aa0000">
+    {title}
+  </text>
+  <text x="30" y="85" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#222">
+    <tspan x="30" dy="0">The POWL model was generated successfully, but rendering it failed.</tspan>
+    <tspan x="30" dy="28">This often happens when Graphviz installed or not available on PATH.</tspan>
+  </text>
+  <text x="30" y="155" font-family="Courier New, monospace" font-size="15" fill="#333">
+    {tspan_lines}
+  </text>
+</svg>"""
+
+
 @knext.node(name="POWL Miner",
             node_type=knext.NodeType.LEARNER,
             icon_path=path_to_icon,
@@ -34,7 +68,6 @@ petri_net_port_type = knext.nodes.get_port_type_for_id(
 @knext.input_table(name="Event Table", description="An Event Table.")
 @knext.output_port(name="Petri Net", description="A Petri Net.", port_type=petri_net_port_type)
 @knext.output_image(name="POWL Model", description="An SVG image of a POWL model.")
-@knext.output_view(name="POWL Model", description="A POWL model.")
 
 class POWL_Miner(knext.PythonNode):
     column_param_case = knext.ColumnParameter(label="Case Column",
@@ -81,10 +114,14 @@ class POWL_Miner(knext.PythonNode):
     
         powl_model = powl.discover(event_log, dfg_frequency_filtering_threshold=self.column_param_threshold)
         
+        
         pn_1, init_1, final_1 = powl.convert_to_petri_net(powl_model)
-    
         petri_net_port_object = convert_pm4py_to_port_object(pn_1, init_1, final_1)
-    
-        powl_vis = powl_visualizer.apply(powl_model)
-    
-        return petri_net_port_object, powl_vis, knext.view_svg(powl_vis)
+
+        try:
+            powl_vis = powl_visualizer.apply(powl_model)
+        except Exception as exc:
+            LOGGER.warning("POWL visualization failed; returning fallback SVG.", exc_info=True)
+            powl_vis = _exception_to_svg(exc)
+
+        return petri_net_port_object, powl_vis

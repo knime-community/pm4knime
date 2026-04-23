@@ -1,43 +1,36 @@
 package org.pm4knime.node.logmanipulation.filter.knimetable;
 
-import org.knime.core.node.BufferedDataTable;
-import org.knime.core.webui.node.impl.WebUINodeConfiguration;
-import org.knime.core.webui.node.impl.WebUINodeFactory;
+import org.knime.node.DefaultNode;
+import org.knime.node.DefaultNodeFactory;
 
+public final class FilterByLengthTableNodeFactory extends DefaultNodeFactory {
 
-
-public final class FilterByLengthTableNodeFactory extends WebUINodeFactory<FilterByLengthTableNodeModel> {
-
-	FilterByLengthTableNodeModel node;
-
-	private static final WebUINodeConfiguration CONFIG = WebUINodeConfiguration.builder()
-			.name("Filter Event Table by Length")
-			.icon("../../category-manipulation.png")
-			.shortDescription("This node filters the traces based on their length.")
-			.fullDescription("This node filters the traces based on their length.")
-			.modelSettingsClass(FilterByLengthTableNodeSettings.class)//
-			.addInputPort("Table", BufferedDataTable.TYPE ,"The event table to be filtered.")//
-			.addOutputPort("Table", BufferedDataTable.TYPE, "The filtered event table.")//
-			.nodeType(NodeType.Manipulator)
-			.sinceVersion(2, 0, 0)
-			.build();
-
-
-	public FilterByLengthTableNodeFactory() {
-		super(CONFIG);
-	}
-
-
-	protected FilterByLengthTableNodeFactory(final WebUINodeConfiguration configuration) {
-		super(configuration);
-	}
-
-
-	@Override
-	public FilterByLengthTableNodeModel createNodeModel() {
-		node = new FilterByLengthTableNodeModel(FilterByLengthTableNodeSettings.class);
-		return node;
-	}
-
+    public FilterByLengthTableNodeFactory() {
+        super(
+            DefaultNode.create()
+                .name("Filter Event Table by Length")
+                .icon("../../category-manipulation.png")
+                .shortDescription("This node filters the traces based on their length.")
+                .fullDescription("This node filters the traces based on their length.")
+                .sinceVersion(2, 0, 0)
+                .ports(p -> p
+                    .addInputTable("Event Table", "The event table to be filtered.")
+                    .addOutputTable("Filtered Event Table", "The filtered event table."))
+                .model(m -> m
+                    .parametersClass(FilterByLengthTableNodeSettings.class)
+                    .configure((i, o) -> {
+                        final var model = new FilterByLengthTableNodeModel(FilterByLengthTableNodeSettings.class);
+                        o.setOutSpecs(model.configureForDefaultNode(i.getInPortSpecs(), i.getParameters()));
+                    })
+                    .execute((i, o) -> {
+                        final var model = new FilterByLengthTableNodeModel(FilterByLengthTableNodeSettings.class);
+                        try {
+                            o.setOutData(model.executeForDefaultNode(i.getInPortObjects(), i.getExecutionContext(),
+                                i.getParameters()));
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }))
+                .nodeType(NodeType.Manipulator));
+    }
 }
-

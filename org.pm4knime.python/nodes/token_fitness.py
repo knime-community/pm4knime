@@ -4,7 +4,6 @@ from utils import knime_util
 from utils.petri_net_type import PetriNetPortObject, PetriNetSpec
 from utils.petri_net_type import convert_port_object_to_pm4py
 import pandas as pd
-import pytz
 import logging
 import os
 

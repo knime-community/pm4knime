@@ -52,6 +52,10 @@ public class XesImporterNodeModel extends NodeModel {
 		m_settingsClass = class1;
 	}
 
+	void setSettings(final XesImporterNodeSettings settings) {
+		m_settings = settings;
+	}
+
 	protected XLogPortObject write_file_from_stream(InputStream inputStream, ExecutionContext exec) throws Exception {
 
 		StreamImport streams = new StreamImport();

@@ -8,34 +8,31 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
-import org.knime.core.webui.node.impl.WebUINodeConfiguration;
-import org.knime.core.webui.node.impl.WebUINodeModel;
 import org.knime.filehandling.core.connections.FSConnection;
 import org.knime.filehandling.core.connections.FSFileSystem;
 import org.knime.filehandling.core.connections.FSFiles;
 import org.knime.filehandling.core.defaultnodesettings.FileSystemHelper;
+import org.knime.node.DefaultModel;
 import org.pm4knime.portobject.ProcessTreePortObject;
 import org.pm4knime.util.NodeSettingsUtils.ExistingOutputFileHandlingMode;
 
 @SuppressWarnings("restriction")
-final class ProcessTreeWriterNodeModel extends WebUINodeModel<ProcessTreeWriterNodeSettings> {
+final class ProcessTreeWriterNodeModel {
 
 	private static final NodeLogger LOGGER = NodeLogger.getLogger(ProcessTreeWriterNodeModel.class);
 
-	ProcessTreeWriterNodeModel(final WebUINodeConfiguration config) {
-		super(config, ProcessTreeWriterNodeSettings.class);
+	private ProcessTreeWriterNodeModel() {
 	}
 
-	@Override
-	protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs, final ProcessTreeWriterNodeSettings settings)
+	static void configure(final DefaultModel.ConfigureInput i, final DefaultModel.ConfigureOutput o)
 			throws InvalidSettingsException {
+		final ProcessTreeWriterNodeSettings settings = i.getParameters();
 		
 		if (settings.m_outputFile == null || settings.m_outputFile.getFSLocation() == null) {
 			throw new InvalidSettingsException("Please specify a path to the output file!");
@@ -48,16 +45,24 @@ final class ProcessTreeWriterNodeModel extends WebUINodeModel<ProcessTreeWriterN
 
 		String expectedExt = settings.getExtension();
 		if (!outputPath.endsWith(expectedExt)) {
-			setWarningMessage(
+			o.setWarningMessage(
 				String.format("Output file path did not have the correct file extension \"%s\", it will be appended.", expectedExt)
 			);
 		}
 
-		return new PortObjectSpec[0];
+		o.setOutSpecs(new PortObjectSpec[0]);
 	}
 
-	@Override
-	protected PortObject[] execute(final PortObject[] inData, final ExecutionContext exec,
+	static void execute(final DefaultModel.ExecuteInput i, final DefaultModel.ExecuteOutput o) {
+		try {
+			execute(i.getInPortObjects(), i.getExecutionContext(), i.getParameters());
+			o.setOutData(new PortObject[0]);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	private static PortObject[] execute(final PortObject[] inData, final org.knime.core.node.ExecutionContext exec,
 			final ProcessTreeWriterNodeSettings settings) throws Exception {
 		
 		CheckUtils.checkArgumentNotNull(settings.m_outputFile, "Output file selection must be present.");
@@ -107,7 +112,7 @@ final class ProcessTreeWriterNodeModel extends WebUINodeModel<ProcessTreeWriterN
 		return new PortObject[0];
 	}
 
-	private String pathWithExtension(final String path, final ProcessTreeWriterNodeSettings settings) {
+	private static String pathWithExtension(final String path, final ProcessTreeWriterNodeSettings settings) {
 		String ext = settings.getExtension();
 		
 		if (!path.toLowerCase(Locale.US).endsWith(ext.toLowerCase(Locale.US))) {
