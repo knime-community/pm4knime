@@ -1,11 +1,9 @@
 import pm4py
-from pm4py.util import constants
 import knime.extension as knext
 from utils import knime_util
 from utils.petri_net_type import PetriNetPortObject, PetriNetSpec
 from utils.petri_net_type import convert_port_object_to_pm4py
 import pandas as pd
-import pytz
 import logging
 import os
 
@@ -57,17 +55,15 @@ class GeneralizationChecker:
 
         event_log[self.column_param_time + "UTC"] = pd.to_datetime(event_log[self.column_param_time], utc=True)
         event_log = event_log.sort_values(by=[self.column_param_case, self.column_param_time + "UTC"])
-
-        reply_results = pm4py.algo.conformance.tokenreplay.algorithm.apply(log=event_log,
-                                                                           net=net,
-                                                                           initial_marking=initial_marking,
-                                                                           final_marking=final_marking,
-                                                                           parameters={
-                                                                               constants.PARAMETER_CONSTANT_ACTIVITY_KEY: self.column_param_activity,
-                                                                               constants.PARAMETER_CONSTANT_ATTRIBUTE_KEY: self.column_param_activity,
-                                                                               constants.PARAMETER_CONSTANT_CASEID_KEY: self.column_param_case,
-                                                                               constants.PARAMETER_CONSTANT_TIMESTAMP_KEY: self.column_param_time + "UTC"})
-        generalization = pm4py.algo.evaluation.generalization.variants.token_based.get_generalization(net,
-                                                                                                      reply_results)
+        
+        generalization = pm4py.generalization_tbr(
+            log=event_log,
+            petri_net=net,
+            initial_marking=initial_marking,
+            final_marking=final_marking,
+            activity_key=self.column_param_activity,
+            case_id_key=self.column_param_case,
+            timestamp_key=self.column_param_time + "UTC",
+        )
         res = pd.DataFrame.from_dict({"generalization": generalization}, orient='index', columns=['Value'])
         return knext.Table.from_pandas(res)
