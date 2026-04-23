@@ -1,36 +1,28 @@
 package org.pm4knime.node.io.processtree.writer;
 
-import org.knime.core.webui.node.impl.WebUINodeConfiguration;
-import org.knime.core.webui.node.impl.WebUINodeFactory;
+import org.knime.node.DefaultNode;
+import org.knime.node.DefaultNodeFactory;
 import org.pm4knime.portobject.ProcessTreePortObject;
 
-
-public class ProcessTreeWriterNodeFactory extends WebUINodeFactory<ProcessTreeWriterNodeModel> {
-
-    private static final WebUINodeConfiguration CONFIG = WebUINodeConfiguration.builder() //
-        .name("Process Tree Writer") //
-        .icon("../../write.png") //
-        .shortDescription("Export a process tree into a PTML file.") //
-        .fullDescription("""
-                <p>
-                This nodes exports a process tree into a PTML file.
-                </p>
-                """) //
-        .modelSettingsClass(ProcessTreeWriterNodeSettings.class) //
-        .addInputPort("Process Tree", ProcessTreePortObject.TYPE, "a process tree")
-        .nodeType(NodeType.Sink)
-        .sinceVersion(2, 0, 0)
-		.build();
+public class ProcessTreeWriterNodeFactory extends DefaultNodeFactory {
 
     public ProcessTreeWriterNodeFactory() {
-        super(CONFIG);
+        super(
+            DefaultNode.create()
+                .name("Process Tree Writer")
+                .icon("../../write.png")
+                .shortDescription("Export a process tree into a PTML file.")
+                .fullDescription("""
+                        <p>
+                        This nodes exports a process tree into a PTML file.
+                        </p>
+                        """)
+                .sinceVersion(2, 0, 0)
+                .ports(p -> p.addInputPort("Process Tree", "a process tree", ProcessTreePortObject.TYPE))
+                .model(m -> m
+                    .parametersClass(ProcessTreeWriterNodeSettings.class)
+                    .configure(ProcessTreeWriterNodeModel::configure)
+                    .execute(ProcessTreeWriterNodeModel::execute))
+                .nodeType(NodeType.Sink));
     }
-
-    @Override
-    public ProcessTreeWriterNodeModel createNodeModel() {
-        return new ProcessTreeWriterNodeModel(CONFIG);
-    }
-
-
 }
-

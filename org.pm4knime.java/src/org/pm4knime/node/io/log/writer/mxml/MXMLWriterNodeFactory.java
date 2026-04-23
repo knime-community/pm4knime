@@ -1,36 +1,28 @@
 package org.pm4knime.node.io.log.writer.mxml;
 
-import org.knime.core.webui.node.impl.WebUINodeConfiguration;
-import org.knime.core.webui.node.impl.WebUINodeFactory;
+import org.knime.node.DefaultNode;
+import org.knime.node.DefaultNodeFactory;
 import org.pm4knime.portobject.XLogPortObject;
 
-
-public class MXMLWriterNodeFactory extends WebUINodeFactory<MXMLWriterNodeModel> {
-
-    private static final WebUINodeConfiguration CONFIG = WebUINodeConfiguration.builder() //
-        .name("MXML Writer") //
-        .icon("../../../write.png") //
-        .shortDescription("This node exports an event log into an MXML file.") //
-        .fullDescription("""
-                <p>
-                This node exports an event log into an MXML file or a compressed MXML file (gz).
-                </p>
-                """) //
-        .modelSettingsClass(MXMLWriterNodeSettings.class) //
-        .addInputPort("Event Log", XLogPortObject.TYPE, "an event log")
-        .nodeType(NodeType.Sink)
-        .sinceVersion(2, 0, 0)
-		.build();
+public class MXMLWriterNodeFactory extends DefaultNodeFactory {
 
     public MXMLWriterNodeFactory() {
-        super(CONFIG);
+        super(
+            DefaultNode.create()
+                .name("MXML Writer")
+                .icon("../../../write.png")
+                .shortDescription("This node exports an event log into an MXML file.")
+                .fullDescription("""
+                        <p>
+                        This node exports an event log into an MXML file or a compressed MXML file (gz).
+                        </p>
+                        """)
+                .sinceVersion(2, 0, 0)
+                .ports(p -> p.addInputPort("Event Log", "an event log", XLogPortObject.TYPE))
+                .model(m -> m
+                    .parametersClass(MXMLWriterNodeSettings.class)
+                    .configure(MXMLWriterNodeModel::configure)
+                    .execute(MXMLWriterNodeModel::execute))
+                .nodeType(NodeType.Sink));
     }
-
-    @Override
-    public MXMLWriterNodeModel createNodeModel() {
-        return new MXMLWriterNodeModel(CONFIG);
-    }
-
-
 }
-
