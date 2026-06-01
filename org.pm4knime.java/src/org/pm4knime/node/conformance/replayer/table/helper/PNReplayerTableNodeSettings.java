@@ -9,9 +9,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.knime.core.webui.node.dialog.defaultdialog.widget.DomainValuesProvider;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.choices.DomainChoicesUtil;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.handler.WidgetHandlerException;
 import org.knime.node.parameters.NodeParameters;
 import org.knime.node.parameters.NodeParametersInput;
 import org.knime.node.parameters.layout.After;
@@ -21,7 +18,9 @@ import org.knime.node.parameters.layout.Section;
 import org.knime.node.parameters.Widget;
 import org.knime.node.parameters.array.ArrayWidget;
 import org.knime.node.parameters.widget.choices.ChoicesProvider;
+import org.knime.node.parameters.widget.choices.StringChoice;
 import org.knime.node.parameters.widget.choices.StringChoicesProvider;
+import org.knime.node.parameters.widget.choices.util.DomainChoicesProvider;
 import org.knime.node.parameters.widget.number.NumberInputWidget;
 import org.knime.node.parameters.widget.number.NumberInputWidgetValidation.MinValidation.IsNonNegativeValidation;
 import org.knime.node.parameters.updates.Effect;
@@ -145,7 +144,7 @@ public final class PNReplayerTableNodeSettings implements NodeParameters {
 	@ChoicesProvider(value = StrategyListChoicesProvider.class)
 	String strategy;	
 	
-	static final class SelectedColumnDomainValuesProvider implements DomainValuesProvider {
+	static final class SelectedColumnDomainValuesProvider implements DomainChoicesProvider {
 
         Supplier<String> m_selectedColumnSupplier;
 
@@ -153,20 +152,20 @@ public final class PNReplayerTableNodeSettings implements NodeParameters {
         public void init(final StateProviderInitializer initializer) {
             m_selectedColumnSupplier = initializer.computeFromValueSupplier(SelectedColumnDependency.class);
         }
-
-        @Override
-        public String getSelectedColumn() {
-            return m_selectedColumnSupplier.get();
-        }
         
         @Override
-		public List<String> computeState(final NodeParametersInput context) {
+		public List<String> choices(final NodeParametersInput context) {
         	try {
-                return DomainChoicesUtil.getChoicesByContextAndColumn(context, getSelectedColumn());
-            } catch (WidgetHandlerException e) { 
+                return DomainChoicesProvider.getChoicesByContextAndColumn(context, getColumnName());
+            } catch (Exception e) { 
                 return List.of();
             }
         }
+
+		@Override
+		public String getColumnName() {
+			return m_selectedColumnSupplier.get();
+		}
         
     }
 
@@ -174,11 +173,13 @@ public final class PNReplayerTableNodeSettings implements NodeParameters {
 	static final class SelectedColumnDomainChoicesStateProviderOnInitAndDepChange
 	    implements StringChoicesProvider {
 	
-	    private Supplier<List<String>> m_domainValues;
+	    private Supplier<List<StringChoice>> m_domainValues;
 	
 	    @Override
 	    public List<String> choices(final NodeParametersInput context) {
-	        return m_domainValues.get();
+	    	return m_domainValues.get().stream()
+	                .map(StringChoice::id)
+	                .collect(Collectors.toList());
 	    }
 	
 	    @Override
