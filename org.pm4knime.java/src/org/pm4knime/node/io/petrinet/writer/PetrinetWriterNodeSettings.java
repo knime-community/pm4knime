@@ -1,13 +1,12 @@
 package org.pm4knime.node.io.petrinet.writer;
 
 
-import org.knime.core.webui.node.dialog.defaultdialog.internal.file.FileSelection;
-import org.knime.core.webui.node.dialog.defaultdialog.internal.file.FileWriterWidget;
 import org.knime.node.parameters.Widget;
+import org.knime.node.parameters.widget.file.FileSelection;
+import org.knime.node.parameters.widget.file.FileWriterWidget;
 import org.pm4knime.util.defaultnode.WriterNodeSettings;
 
 
-@SuppressWarnings("restriction")
 public final class PetrinetWriterNodeSettings extends WriterNodeSettings {
 
 	@Widget( 
