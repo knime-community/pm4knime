@@ -1,5 +1,6 @@
 [workspace]
 channels = ["knime", "conda-forge"]
+conda-pypi-map = {}
 platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 
 [tasks]
