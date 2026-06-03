@@ -1,17 +1,11 @@
-import io
 import knime.extension as knext
 import pandas as pd
 import os
 import html
 import logging
-import pytz
 import powl
 from powl.visualization.powl import visualizer as powl_visualizer
 from utils import knime_util
-from utils.petri_net_type import PetriNetPortObject, PetriNetSpec, Node, Link 
-from utils.petri_net_type import petri_net_to_df
-from pm4py.objects.petri_net.exporter.variants.pnml import export_petri_tree, Parameters
-from pm4py.util import exec_utils, constants
 from utils.petri_net_type import convert_pm4py_to_port_object
 
 
