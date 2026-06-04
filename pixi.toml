@@ -13,6 +13,7 @@ knime-python-versions = "5.*"
 intervaltree = "*"
 pydotplus = "*"
 graphviz = "*"
+python-graphviz = "*"
 pip = "*"
 
 [feature.build.dependencies]
