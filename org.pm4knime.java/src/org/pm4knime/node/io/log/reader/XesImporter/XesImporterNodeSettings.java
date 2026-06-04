@@ -3,16 +3,15 @@ package org.pm4knime.node.io.log.reader.XesImporter;
 import java.util.Arrays;
 import java.util.List;
 
-import org.knime.core.webui.node.dialog.defaultdialog.internal.file.FileSelection;
 import org.knime.node.parameters.NodeParameters;
 import org.knime.node.parameters.NodeParametersInput;
 import org.knime.node.parameters.Widget;
 import org.knime.node.parameters.widget.choices.ChoicesProvider;
 import org.knime.node.parameters.widget.choices.StringChoicesProvider;
+import org.knime.node.parameters.widget.file.FileSelection;
 
 
 
-@SuppressWarnings("restriction")
 public class XesImporterNodeSettings implements NodeParameters {
 
 	@Widget(title = "File Location", description = "Path to the file to read.")

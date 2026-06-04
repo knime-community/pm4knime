@@ -33,7 +33,7 @@ class OtherNode:
     column_param_time = knext.ColumnParameter(label="Time Column",
                                               description="The column that contains the timestamps.",
                                               port_index=0,
-                                              column_filter=knime_util.is_date))
+                                              column_filter=knime_util.is_date)
 
     def configure(self, configure_context, input_schema_1):
         return input_schema_1
