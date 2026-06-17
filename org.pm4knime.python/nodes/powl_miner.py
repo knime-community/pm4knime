@@ -1,17 +1,9 @@
-import io
 import knime.extension as knext
 import pandas as pd
 import os
 import html
 import logging
-import pytz
-import powl
-from powl.visualization.powl import visualizer as powl_visualizer
 from utils import knime_util
-from utils.petri_net_type import PetriNetPortObject, PetriNetSpec, Node, Link 
-from utils.petri_net_type import petri_net_to_df
-from pm4py.objects.petri_net.exporter.variants.pnml import export_petri_tree, Parameters
-from pm4py.util import exec_utils, constants
 from utils.petri_net_type import convert_pm4py_to_port_object
 
 
@@ -50,7 +42,7 @@ def _exception_to_svg(exc: Exception, width: int = 1000, height: int = 260) -> s
   </text>
   <text x="30" y="85" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#222">
     <tspan x="30" dy="0">The POWL model was generated successfully, but rendering it failed.</tspan>
-    <tspan x="30" dy="28">This often happens when Graphviz installed or not available on PATH.</tspan>
+    <tspan x="30" dy="28">This often happens when Graphviz is not installed or not available on PATH.</tspan>
   </text>
   <text x="30" y="155" font-family="Courier New, monospace" font-size="15" fill="#333">
     {tspan_lines}
@@ -94,6 +86,9 @@ class POWL_Miner(knext.PythonNode):
 
 
     def execute(self, exec_context, input_1):
+        import powl
+        from powl.visualization.powl import visualizer as powl_visualizer
+
         event_log = input_1.to_pandas()
     
         event_log.drop(
