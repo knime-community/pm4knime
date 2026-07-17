@@ -306,6 +306,11 @@ function createPaper(nodes: GraphNode[], edges: GraphEdge[]) {
       });
     }
 
+    const tooltip = nodeTooltip(node);
+    if (tooltip) {
+      element.set("tooltip", tooltip);
+    }
+
     nodeElements.push(element);
     elements[node.id] = element;
   });
@@ -382,6 +387,7 @@ function createPaper(nodes: GraphNode[], edges: GraphEdge[]) {
   applyAutoLayout();
 
   paper.unfreeze();
+  addElementTooltips(paper, nodeElements);
   adjustPaperSize(graph, paper);
   initialGraphState = graph.toJSON();
   fitGraphToViewport();
@@ -405,6 +411,7 @@ function createPaper(nodes: GraphNode[], edges: GraphEdge[]) {
     document.getElementById("reset-button")?.addEventListener("click", () => {
       graph.clear();
       graph.fromJSON(joint.util.cloneDeep(initialGraphState));
+      addElementTooltips(paper, graph.getElements());
       fitGraphToViewport();
     });
 
@@ -573,18 +580,66 @@ function createPaper(nodes: GraphNode[], edges: GraphEdge[]) {
   }
 }
 
-function operatorSymbol(label: string | undefined) {
+function addElementTooltips(paper: any, elements: any[]) {
+  elements.forEach((element) => {
+    const tooltip = element.get?.("tooltip");
+    if (!tooltip) {
+      return;
+    }
+
+    const view = paper.findViewByModel(element);
+    const viewElement = view?.el as SVGElement | undefined;
+    if (!viewElement) {
+      return;
+    }
+
+    Array.from(viewElement.children).forEach((child) => {
+      if (child.localName === "title") {
+        child.remove();
+      }
+    });
+
+    const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+    title.textContent = tooltip;
+    viewElement.insertBefore(title, viewElement.firstChild);
+  });
+}
+
+function nodeTooltip(node: GraphNode) {
+  if ((node.type ?? "").toLowerCase() === "operator") {
+    return operatorTooltip(node.label);
+  }
+  return "";
+}
+
+function operatorTooltip(label: string | undefined) {
   if (label === "xlp") {
-    return "⭯";
+    return "Loop operator";
   }
   if (label === "xor") {
-    return "✖";
+    return "Exclusive choice operator";
   }
   if (label === "and") {
-    return "✙";
+    return "Parallel operator";
   }
   if (label === "seq") {
-    return "➜";
+    return "Sequence operator";
+  }
+  return "";
+}
+
+function operatorSymbol(label: string | undefined) {
+  if (label === "xlp") {
+    return "\u2b6f";
+  }
+  if (label === "xor") {
+    return "\u2716";
+  }
+  if (label === "and") {
+    return "\u2719";
+  }
+  if (label === "seq") {
+    return "\u279c";
   }
   return label || "";
 }
