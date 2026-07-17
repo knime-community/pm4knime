@@ -636,7 +636,7 @@ function operatorSymbol(label: string | undefined) {
     return "\u2716";
   }
   if (label === "and") {
-    return "\u2719";
+    return "\u271A";
   }
   if (label === "seq") {
     return "\u279c";

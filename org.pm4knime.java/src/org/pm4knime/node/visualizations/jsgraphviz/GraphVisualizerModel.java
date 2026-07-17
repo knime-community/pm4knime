@@ -490,7 +490,7 @@ public final class GraphVisualizerModel {
         return switch (label) {
             case "xlp" -> "\u2B6F";
             case "xor" -> "\u2716";
-            case "and" -> "\u2719";
+            case "and" -> "\u271A";
             case "seq" -> "\u279C";
             default -> label == null ? "" : label;
         };
