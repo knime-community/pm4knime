@@ -11,12 +11,12 @@ import org.processmining.plugins.petrinet.replayresult.StepTypes;
 import org.processmining.plugins.replayer.replayresult.SyncReplayResult;
 
 /** Converts ProM replay result objects to the JSON contract consumed by the alignment view. */
-final class AlignmentViewData {
+public final class AlignmentViewData {
 
     private AlignmentViewData() {
     }
 
-    static Map<String, Object> create(final RepResultPortObjectTable portObject) {
+    public static Map<String, Object> create(final RepResultPortObjectTable portObject) {
         final var replayResult = portObject.getRepResult();
         final List<Map<String, Object>> alignments = new ArrayList<>();
         int representedCases = 0;
