@@ -15,7 +15,7 @@ pip = "*"
 
 [feature.build.dependencies]
 python = "*"
-knime-extension-bundling = "5.*"
+knime-extension-bundling = "5.8.*"
 
 [feature.debug.dependencies]
 debugpy = "*"
