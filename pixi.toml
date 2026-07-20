@@ -21,7 +21,7 @@ knime-extension-bundling = "5.8.*"
 debugpy = "*"
 
 [feature.build.tasks]
-build = { args = [{ "arg" = "dest", "default" = "./local-update-site" }], cmd = "python ./.pixi/envs/build/bin/build_python_extension.py . {{ dest }}"}
+build = { args = [{ "arg" = "dest", "default" = "./local-update-site" }], cmd = "rm -f pixi.lock && python ./.pixi/envs/build/bin/build_python_extension.py . {{ dest }}"}
 
 [environments]
 build = {features = ["build"], no-default-feature = true}
