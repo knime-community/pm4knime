@@ -508,12 +508,9 @@
         
         
         <node category-path="/community/processmining/visualization" factory-class="org.pm4knime.node.visualizations.jsgraphviz.JSVisCGNodeFactory"/>
-                                                
-        
-        
-        
-        
+        <node category-path="/community/processmining/visualization" factory-class="org.pm4knime.node.visualizations.bpmn.BPMNViewerNodeFactory"/>
         <node category-path="/community/processmining/visualization" factory-class="org.pm4knime.node.visualizations.logviews.tracevariant.TraceVariantVisNodeFactory"/>
+        <node category-path="/community/processmining/visualization" factory-class="org.pm4knime.node.visualizations.alignment.AlignmentViewerNodeFactory"/>
                               
     
    
