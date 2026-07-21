@@ -16,7 +16,6 @@ pip = "*"
 [feature.build.dependencies]
 python = "*"
 knime-extension-bundling = "5.8.*"
-pixi = ">=0.73.0"
 
 [feature.debug.dependencies]
 debugpy = "*"
