@@ -1,5 +1,5 @@
 [workspace]
-channels = ["knime", "knime/label/nightly", "conda-forge"]
+channels = ["knime", "conda-forge"]
 platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 
 [tasks]
