@@ -1,5 +1,5 @@
 [workspace]
-channels = ["knime", "conda-forge"]
+channels = ["knime/label/nightly", "knime", "conda-forge"]
 conda-pypi-map = {}
 platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 
@@ -18,7 +18,7 @@ pip = "*"
 
 [feature.build.dependencies]
 python = "*"
-knime-extension-bundling = "5.*"
+knime-extension-bundling = "6.*"
 nodejs = "*"
 
 [feature.debug.dependencies]
