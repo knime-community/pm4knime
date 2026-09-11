@@ -7,9 +7,9 @@ platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 
 [dependencies]
 python = "3.*"
-knime-extension = "*"
-knime-python-base = "5.*"
-knime-python-versions = "5.*"
+knime-extension = "5.13.*"
+knime-python-base = "5.13.*"
+knime-python-versions = "5.13.*"
 intervaltree = "*"
 pydotplus = "*"
 graphviz = "*"
@@ -18,7 +18,7 @@ pip = "*"
 
 [feature.build.dependencies]
 python = "*"
-knime-extension-bundling = "6.*"
+knime-extension-bundling = "6.1.*"
 nodejs = "*"
 
 [feature.debug.dependencies]
