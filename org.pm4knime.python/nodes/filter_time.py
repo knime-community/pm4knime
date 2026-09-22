@@ -1,6 +1,6 @@
 import pm4py
 import knime.extension as knext
-from utils import knime_util
+from pm4knime_utils import knime_util
 import pandas as pd
 import pytz
 import logging

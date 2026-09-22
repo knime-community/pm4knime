@@ -1,8 +1,8 @@
 import pm4py
 import knime.extension as knext
-from utils import knime_util
-from utils.petri_net_type import PetriNetPortObject, PetriNetSpec
-from utils.petri_net_type import convert_port_object_to_pm4py
+from pm4knime_utils import knime_util
+from pm4knime_utils.petri_net_type import PetriNetPortObject, PetriNetSpec
+from pm4knime_utils.petri_net_type import convert_port_object_to_pm4py
 import pandas as pd
 import logging
 import os
