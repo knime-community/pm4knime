@@ -3,8 +3,8 @@ import pandas as pd
 import os
 import html
 import logging
-from utils import knime_util
-from utils.petri_net_type import convert_pm4py_to_port_object
+from pm4knime_utils import knime_util
+from pm4knime_utils.petri_net_type import convert_pm4py_to_port_object
 
 
 LOGGER = logging.getLogger(__name__)
